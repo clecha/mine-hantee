@@ -1,7 +1,7 @@
 import numpy as np
 import random as rd
 
-class plateau(object):
+class Plateau(object):
 	"""
     Plateau de jeu
     """
@@ -117,7 +117,7 @@ class plateau(object):
 	pass
 		
 
-class carte(object):
+class Carte(object):
 	"""Classe des cartes constituant le plateau"""
 	def __init__(self,position,type_carte,orientation = 0):
 		self.position = position #liste de la position sur la matrice du aplteau [x,y]
@@ -144,14 +144,14 @@ class carte(object):
 			else:
 				self.orientation -= 1
 	
-class fantome(object):
+class Fantome(object):
 	"""Fantomes"""
 	def __init__(self, numero,position):
 		self.numero = numero #numero du fantome
 		self.position = position #liste [x,y] de sa position sur la matrice du plateau
 		self.attrape = False #attrapé ou non
 
-class chasseur(object):
+class Chasseur(object):
 	"""Joueurs"""
 	def __init__(self, id,position):
 		self.id = id
