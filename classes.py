@@ -4,6 +4,10 @@ import random as rd
 class Plateau(object):
 	"""
     Plateau de jeu
+	----
+	dimension: entier impair >=7
+	matrice: array de taille dimension * dimension
+	carte_jouable: objet de type carte, correspond à la carte qui est hors plateau
     """
 	def __init__(self, dimension=7):
 		self.dimension = dimension #dimension du plateau
@@ -18,28 +22,28 @@ class Plateau(object):
 			orientation=0
 			for ligne in range(0,dimension, dimension-1):
 				for col in range(2, dimension, 2):
-					self.matrice[ligne][col] = carte([ligne,col], 3, orientation)
+					self.matrice[ligne][col] = Carte([ligne,col], 3, orientation, True)
 				orientation+=2
 				
 			#2. placement des bords - sur les colonnes
 			orientation=3
 			for col in range(0,dimension, dimension-1):
 				for ligne in range(2, dimension, 2):
-					self.matrice[ligne][col] = carte([ligne,col], 3, orientation)
+					self.matrice[ligne][col] = Carte([ligne,col], 3, orientation, True)
 				orientation-=2
 					
 			#3. placement des coins
 			orientation=0
 			for ligne in range(0,dimension, dimension-1):
 				for col in range(0,dimension, dimension-1):
-					self.matrice[ligne][col] = carte([ligne,col], 2, orientation)
+					self.matrice[ligne][col] = Carte([ligne,col], 2, orientation, True)
 					orientation+=1
 			
 			#4. placement du centre
 			for ligne in range(2, dimension-2, 2):
 				for col in range(2, dimension-2, 2):
 					orientation = rd.randint(0,3)
-					self.matrice[ligne][col] = carte([ligne,col], 3, orientation)
+					self.matrice[ligne][col] = Carte([ligne,col], 3, orientation, True)
 
 			#placement des cartes aléatoires
 			nb_cartes_fixes = ((dimension +  1)/2)**2
@@ -61,7 +65,7 @@ class Plateau(object):
 					alea = rd.randint(0,cpt_cartes_alea)
 					type_carte = liste_types.pop(alea)
 					orientation = rd.randint(0,3)
-					self.matrice[ligne][col] = carte([ligne,col], type_carte, orientation)
+					self.matrice[ligne][col] = Carte([ligne,col], type_carte, orientation, True)
 					cpt_cartes_alea-=1
 		
 			#2. parcours des lignes à rang impair (1,3,5 ..)
@@ -71,16 +75,16 @@ class Plateau(object):
 					alea = rd.randint(0,cpt_cartes_alea)
 					type_carte = liste_types.pop(alea)
 					orientation = rd.randint(0,3)
-					self.matrice[ligne][col] = carte([ligne,col], type_carte, orientation)
+					self.matrice[ligne][col] = Carte([ligne,col], type_carte, orientation, True)
 					cpt_cartes_alea-=1
 		
 		#carte restante
-				self.carte_jouable = carte(None, liste_types[0], 0)
+				self.carte_jouable = Carte(None, liste_types[0], 0, False)
 			
 		else:
 			print("Veuillez rentrer un nombre de cartes impair et supérieur à 7.")
 	
-	#affichage consol
+	#affichage console
 	def affichage_console(self):
 		"""Fonction qui créée un affichage console du plateau en cours
 		"""
@@ -95,9 +99,9 @@ class Plateau(object):
 					matrice_affichage_positions[ligne][col] = carte.position
 					matrice_affichage_type_carte[ligne][col] = carte.type_carte
 					matrice_affichage_orientation[ligne][col] = carte.orientation
-					print('matrice des positions:', matrice_affichage_positions)
-					print('matrice des types de carte:', matrice_affichage_type_carte)
-					print('matrice des orientations:', matrice_affichage_orientation)
+			print('matrice des positions:', matrice_affichage_positions)
+			print('matrice des types de carte:', matrice_affichage_type_carte)
+			print('matrice des orientations:', matrice_affichage_orientation)
 		except:
 			print('Il n y a aucun jeu en cours.')
 		pass
@@ -107,24 +111,58 @@ class Plateau(object):
 		Paramètres
 		-----------
 		carte : int"""
-
-	#Changement de carte jouable (celle en bout de la ligne/colonne qui bouge devient la nouvelle carte jouable)
-
-	#Déplacement de la ligne/colonne
-
-	#Insertion de la carte au la position en argument
-
-	pass
+		x_position = int(position[0])
+		y_position = int(position[1])
 		
+		#On initialise un booléen permettant de savoir si on insère sur une ligne ou sur une colonne
+		insertion_colonne = True
+		
+		#on insère sur une colonne en partant du haut du plateau (1ere ligne)
+		if x_position == 0:
+			liste_a_inserer, index_carte_a_pop = self.matrice[:,y_position], -1
+		#on insère sur une colonne en partant du bas du plateau (dernière ligne)
+		elif x_position == self.dimension - 1:
+			liste_a_inserer, index_carte_a_pop = self.matrice[:,y_position], 0
+		#on insère sur une ligne en partant de la gauche du plateau (1ere colonne)
+		elif y_position == 0:
+			liste_a_inserer, index_carte_a_pop = self.matrice[x_position,:], -1
+			insertion_colonne = False
+		#on insère sur une ligne en partant de la droite du plateau (derniere colonne)
+		elif y_position == self.dimension - 1:
+			liste_a_inserer, index_carte_a_pop = self.matrice[x_position,:], 0
+			insertion_colonne = False
+
+		#on retire l'élément qui a coulissé en dehors du plateau
+		nvelle_carte_jouable = liste_a_inserer[index_carte_a_pop]
+		liste_a_inserer = np.delete(liste_a_inserer, index_carte_a_pop)
+		
+		#On insère en début de ligne/colonne car on enlève le dernier élément
+		if index_carte_a_pop == -1:
+			liste_a_inserer = np.append([carte], liste_a_inserer)
+		else:
+			liste_a_inserer = np.append(liste_a_inserer, [carte])
+			
+		#Modification de la colonne/ligne où a été inséré la nouvelle liste
+		if insertion_colonne:
+			self.matrice[:,y_position] = liste_a_inserer
+		else:
+			self.matrice[x_position,:] = liste_a_inserer
+		
+		#on actualise la nouvelle carte jouable
+		self.carte_jouable = nvelle_carte_jouable
+		
+		#Actualisation des positions des cartes
+		carte.position = position
+		self.carte_jouable.position = None
 
 class Carte(object):
 	"""Classe des cartes constituant le plateau"""
-	def __init__(self,position,type_carte,orientation = 0):
-		self.position = position #liste de la position sur la matrice du aplteau [x,y]
+	def __init__(self,position,type_carte,orientation = 0, presence = True):
+		self.position = position #liste de la position sur la matrice du plateau [x,y],vaut None si n'est pas sur le plateau
 		self.type_carte = int(type_carte) #type de carte (1,2,3)
 		self.orientation = int(orientation) #entre 0,1,2,3
 		self.fantome = 0 #numero du fantome présent sur la carte, vaut 0 si pas de fantome
-		self.pepite = True #toutes les cartes possèdent une pépite en debut de jeu 
+		self.pepite = presence #toutes les cartes possèdent une pépite en debut de jeu, sauf la carte jouable
 		self.chasseur = 0 #id du chasseur présent sur la carte, 0 par défaut
 
 	def tourner(self,direction='droite'):
@@ -175,6 +213,7 @@ class Chasseur(object):
 			self.position[1] -= 1
 		if direction == 'bas':
 			self.position[1] += 1
+		pass
 		
 
 	def attraper_pepite(self,carte):
@@ -182,10 +221,12 @@ class Chasseur(object):
 		self.pepite += 1
 		self.score +=1
 		carte.pepite = False
+		pass
 
 	def utiliser_joker(self):
 		######instructions utilisation joker########
 		self.joker = False
+		pass
 
 	def attraper_fantome(self,numero_fantome,Plateau):
 		'''Ajoute le numero du fantome à a liste des fantomes attrapés, enlève le fantome de la carte concernée
@@ -198,12 +239,19 @@ class Chasseur(object):
 		'''
 		self.fantome += fantome.numero
 		Plateau.matrice[self.position] = 0
+		pass
 
 
 ##partie test
-test = plateau()
+test = Plateau()
 test.affichage_console()
-		
+carte = test.carte_jouable
+print(carte.position)
+test.inserer_carte(carte, [0,1])
+test.affichage_console()
+print(carte.position)
+carte = test.carte_jouable
+print(carte.position)
 
 
 		
