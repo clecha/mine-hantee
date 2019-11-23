@@ -99,9 +99,9 @@ class Plateau(object):
 					matrice_affichage_positions[ligne][col] = carte.position
 					matrice_affichage_type_carte[ligne][col] = carte.type_carte
 					matrice_affichage_orientation[ligne][col] = carte.orientation
-					print('matrice des positions:', matrice_affichage_positions)
-					print('matrice des types de carte:', matrice_affichage_type_carte)
-					print('matrice des orientations:', matrice_affichage_orientation)
+			print('matrice des positions:', matrice_affichage_positions)
+			print('matrice des types de carte:', matrice_affichage_type_carte)
+			print('matrice des orientations:', matrice_affichage_orientation)
 		except:
 			print('Il n y a aucun jeu en cours.')
 		pass
@@ -111,15 +111,49 @@ class Plateau(object):
 		Paramètres
 		-----------
 		carte : int"""
-
-	#Changement de carte jouable (celle en bout de la ligne/colonne qui bouge devient la nouvelle carte jouable)
-
-	#Déplacement de la ligne/colonne
-
-	#Insertion de la carte au la position en argument
-
-	pass
+		x_position = int(position[0])
+		y_position = int(position[1])
 		
+		#On initialise un booléen permettant de savoir si on insère sur une ligne ou sur une colonne
+		insertion_colonne = True
+		
+		#on insère sur une colonne en partant du haut du plateau (1ere ligne)
+		if x_position == 0:
+			liste_a_inserer, index_carte_a_pop = self.matrice[:,y_position], -1
+		#on insère sur une colonne en partant du bas du plateau (dernière ligne)
+		elif x_position == self.dimension - 1:
+			liste_a_inserer, index_carte_a_pop = self.matrice[:,y_position], 0
+		#on insère sur une ligne en partant de la gauche du plateau (1ere colonne)
+		elif y_position == 0:
+			liste_a_inserer, index_carte_a_pop = self.matrice[x_position,:], -1
+			insertion_colonne = False
+		#on insère sur une ligne en partant de la droite du plateau (derniere colonne)
+		elif y_position == self.dimension - 1:
+			liste_a_inserer, index_carte_a_pop = self.matrice[x_position,:], 0
+			insertion_colonne = False
+
+		#on retire l'élément qui a coulissé en dehors du plateau
+		nvelle_carte_jouable = liste_a_inserer[index_carte_a_pop]
+		liste_a_inserer = np.delete(liste_a_inserer, index_carte_a_pop)
+		
+		#On insère en début de ligne/colonne car on enlève le dernier élément
+		if index_carte_a_pop == -1:
+			liste_a_inserer = np.append([carte], liste_a_inserer)
+		else:
+			liste_a_inserer = np.append(liste_a_inserer, [carte])
+			
+		#Modification de la colonne/ligne où a été inséré la nouvelle liste
+		if insertion_colonne:
+			self.matrice[:,y_position] = liste_a_inserer
+		else:
+			self.matrice[x_position,:] = liste_a_inserer
+		
+		#on actualise la nouvelle carte jouable
+		self.carte_jouable = nvelle_carte_jouable
+		
+		#Actualisation des positions des cartes
+		carte.position = position
+		self.carte_jouable.position = None
 
 class Carte(object):
 	"""Classe des cartes constituant le plateau"""
@@ -209,9 +243,15 @@ class Chasseur(object):
 
 
 ##partie test
-#test = plateau()
-#test.affichage_console()
-		
+test = Plateau()
+test.affichage_console()
+carte = test.carte_jouable
+print(carte.position)
+test.inserer_carte(carte, [0,1])
+test.affichage_console()
+print(carte.position)
+carte = test.carte_jouable
+print(carte.position)
 
 
 		
