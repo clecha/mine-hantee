@@ -15,7 +15,7 @@ plateau = cl.Plateau(dimension)
 espace = 500
 pixel_case = 100
 
-print(plateau.carte_jouable.position)
+print(plateau.carte_jouable.jouable)
 
 # dictionnaire à fusionner avec le fichier main une fois les fichiers fusionnés
 
@@ -56,8 +56,9 @@ def actualisation_plateau():
 	#Parcours du plateau pour afficher toutes les cases
 	for ligne in range(dimension):
 		for col in range(dimension):
+			position = [ligne,col]
 			carte = matrice[ligne][col]
-			dessine_carte(carte)
+			dessine_carte(carte, position)
 			
 	#affichage de la carte jouable
 	carte_jouable = plateau.carte_jouable
@@ -97,13 +98,15 @@ def actualisation_plateau():
 	
 	
 	
-def dessine_carte(Carte):
+def dessine_carte(Carte, position = None):
 	global maSurface, BLACK, espace
 	
+	#position est definie comme None par defaut pour 
+	
 	# On vérifie que la carte est bien présente sur le plateau, i.e. que ce n'est pas la carte jouable
-	if Carte.position != None:
-		x_carte=Carte.position[0]
-		y_carte= Carte.position[1]
+	if Carte.jouable == False:
+		x_carte = position[0]
+		y_carte = position[1]
 		
 		#Conversion de la position matricielle en position en pixel
 		x_pixel = espace + x_carte * pixel_case
