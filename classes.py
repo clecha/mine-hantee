@@ -4,6 +4,10 @@ import random as rd
 class Plateau(object):
 	"""
     Plateau de jeu
+	----
+	dimension: entier impair >=7
+	matrice: array de taille dimension * dimension
+	carte_jouable: objet de type carte, correspond à la carte qui est hors plateau
     """
 	def __init__(self, dimension=7):
 		self.dimension = dimension #dimension du plateau
@@ -18,28 +22,28 @@ class Plateau(object):
 			orientation=0
 			for ligne in range(0,dimension, dimension-1):
 				for col in range(2, dimension, 2):
-					self.matrice[ligne][col] = carte([ligne,col], 3, orientation)
+					self.matrice[ligne][col] = Carte([ligne,col], 3, orientation, True)
 				orientation+=2
 				
 			#2. placement des bords - sur les colonnes
 			orientation=3
 			for col in range(0,dimension, dimension-1):
 				for ligne in range(2, dimension, 2):
-					self.matrice[ligne][col] = carte([ligne,col], 3, orientation)
+					self.matrice[ligne][col] = Carte([ligne,col], 3, orientation, True)
 				orientation-=2
 					
 			#3. placement des coins
 			orientation=0
 			for ligne in range(0,dimension, dimension-1):
 				for col in range(0,dimension, dimension-1):
-					self.matrice[ligne][col] = carte([ligne,col], 2, orientation)
+					self.matrice[ligne][col] = Carte([ligne,col], 2, orientation, True)
 					orientation+=1
 			
 			#4. placement du centre
 			for ligne in range(2, dimension-2, 2):
 				for col in range(2, dimension-2, 2):
 					orientation = rd.randint(0,3)
-					self.matrice[ligne][col] = carte([ligne,col], 3, orientation)
+					self.matrice[ligne][col] = Carte([ligne,col], 3, orientation, True)
 
 			#placement des cartes aléatoires
 			nb_cartes_fixes = ((dimension +  1)/2)**2
@@ -61,7 +65,7 @@ class Plateau(object):
 					alea = rd.randint(0,cpt_cartes_alea)
 					type_carte = liste_types.pop(alea)
 					orientation = rd.randint(0,3)
-					self.matrice[ligne][col] = carte([ligne,col], type_carte, orientation)
+					self.matrice[ligne][col] = Carte([ligne,col], type_carte, orientation, True)
 					cpt_cartes_alea-=1
 		
 			#2. parcours des lignes à rang impair (1,3,5 ..)
@@ -71,16 +75,16 @@ class Plateau(object):
 					alea = rd.randint(0,cpt_cartes_alea)
 					type_carte = liste_types.pop(alea)
 					orientation = rd.randint(0,3)
-					self.matrice[ligne][col] = carte([ligne,col], type_carte, orientation)
+					self.matrice[ligne][col] = Carte([ligne,col], type_carte, orientation, True)
 					cpt_cartes_alea-=1
 		
 		#carte restante
-				self.carte_jouable = carte(None, liste_types[0], 0)
+				self.carte_jouable = Carte(None, liste_types[0], 0, False)
 			
 		else:
 			print("Veuillez rentrer un nombre de cartes impair et supérieur à 7.")
 	
-	#affichage consol
+	#affichage console
 	def affichage_console(self):
 		"""Fonction qui créée un affichage console du plateau en cours
 		"""
@@ -119,12 +123,12 @@ class Plateau(object):
 
 class Carte(object):
 	"""Classe des cartes constituant le plateau"""
-	def __init__(self,position,type_carte,orientation = 0):
-		self.position = position #liste de la position sur la matrice du aplteau [x,y]
+	def __init__(self,position,type_carte,orientation = 0, presence = True):
+		self.position = position #liste de la position sur la matrice du plateau [x,y],vaut None si n'est pas sur le plateau
 		self.type_carte = int(type_carte) #type de carte (1,2,3)
 		self.orientation = int(orientation) #entre 0,1,2,3
 		self.fantome = 0 #numero du fantome présent sur la carte, vaut 0 si pas de fantome
-		self.pepite = True #toutes les cartes possèdent une pépite en debut de jeu 
+		self.pepite = presence #toutes les cartes possèdent une pépite en debut de jeu, sauf la carte jouable
 		self.chasseur = 0 #id du chasseur présent sur la carte, 0 par défaut
 
 	def tourner(self,direction='droite'):
@@ -175,6 +179,7 @@ class Chasseur(object):
 			self.position[1] -= 1
 		if direction == 'bas':
 			self.position[1] += 1
+		pass
 		
 
 	def attraper_pepite(self,carte):
@@ -182,10 +187,12 @@ class Chasseur(object):
 		self.pepite += 1
 		self.score +=1
 		carte.pepite = False
+		pass
 
 	def utiliser_joker(self):
 		######instructions utilisation joker########
 		self.joker = False
+		pass
 
 	def attraper_fantome(self,numero_fantome,Plateau):
 		'''Ajoute le numero du fantome à a liste des fantomes attrapés, enlève le fantome de la carte concernée
@@ -198,11 +205,12 @@ class Chasseur(object):
 		'''
 		self.fantome += fantome.numero
 		Plateau.matrice[self.position] = 0
+		pass
 
 
 ##partie test
-test = plateau()
-test.affichage_console()
+#test = plateau()
+#test.affichage_console()
 		
 
 
