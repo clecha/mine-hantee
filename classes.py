@@ -240,7 +240,7 @@ class Chasseur(object):
 		self.pepite += 1
 		self.score +=1
 		#Mise à jour de la valeur de la pepite sur la carte où est présent le chasseur
-		Plateau.matrice[x_position, y_position].carte.pepite = False
+		Plateau.matrice[x_position, y_position].pepite = False
 
 	def utiliser_joker(self):
 		######instructions utilisation joker########
