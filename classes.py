@@ -9,7 +9,8 @@ class Plateau(object):
 	dimension: entier impair >=7
 	matrice: array de taille dimension * dimension
 	carte_jouable: objet de type carte, correspond à la carte qui est hors plateau
-	joueur_actif: entier entre 1 et 4 -- indique le joueur à qui c'est le tour de jouer
+	joueur_actif: objet de type chasseur -- indique le joueur à qui c'est le tour de jouer
+	nb_joueurs: entier allant de 1 à 4 -- indique le nb de joueurs
     """
 	def __init__(self, dimension = 7, nb_joueurs = 4):
 		self.dimension = dimension #dimension du plateau
@@ -128,6 +129,7 @@ class Plateau(object):
 	#affichage console
 	def affichage_console(self):
 		"""Fonction qui créée un affichage console du plateau en cours
+		--> Utilisé pour faire des verifications lors du code surtout // pas utile à proprement parlé
 		"""
 		#try:
 		dimension = self.dimension
@@ -230,7 +232,7 @@ class Plateau(object):
 		#on actualise la nouvelle carte jouable
 		self.carte_jouable = nvelle_carte_jouable
 		
-		#Actualisation des positions des cartes
+		#Actualisation de la jouabilité des cartes
 		carte.jouable = False
 		self.carte_jouable.jouable = True
 		
@@ -356,8 +358,7 @@ class Chasseur(object):
 		'''Ajoute le numero du fantome à a liste des fantomes attrapés, enlève le fantome de la carte concernée
 		Paramètres
 		----------
-		numero_fantome : int -- Numéro du fantome attrapé
-		carte : Carte()  -- Carte sur laquelle le joueur est
+		Plateau: objet de type plateau
 		'''
 		x_position, y_position = self.position
 		#on recupere le fantome sur la case du plateau où est situé le chasseur
@@ -370,6 +371,9 @@ class Chasseur(object):
 		#si le fantome fait partie de la mission du chasseur, le score est actualise a +20, sinon à +5
 		if num_fantome in self.mission:
 			self.score+= 20
+			self.mission.remove(num_fantome)
+			if self.mission == []:
+				self.score+=40
 		else:
 			self.score+=5
 		
