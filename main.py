@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Nov 15 18:14:18 2019
-
-@author: SARREGUEMINES
+Fichier principal du jeu. Contenu :
+    
+main : fonction principale du jeu
+affiche_accueil : appelée au début de main, affiche l'écran d'accueil du jeu
+init_jeu : appelée dans main SI l'utilisateur clique sur nouveau jeu dans la fonction affiche_accueil. Affiche l'écran d'initilisation d'un nouveau jeu
+boucle_deplacement : appelée dans main pendant le jeu, pour gérer le déplacement du joueur_actif. 
+terminate : appelée lorque le joueur appuie sur échap. Ferme la fenetre de jeu.
 """
+
 
 import random, sys, copy, os, pygame
 from pygame.locals import *
@@ -18,8 +23,39 @@ BLUE = (0,80,255)
 WHITE = (255, 255, 255)
 BLACK = (0,0,0)
 
+#dictionnaire contenant l'ensemble des images du jeu
+IMAGES_DICT = {'titre': pygame.image.load('images/ecran_titre/titre.png'),
+               'bouton_nouv_jeu':pygame.image.load('images/ecran_titre/bouton_nouv_jeu.png'),
+               'bouton_nouv_jeu_hover':pygame.image.load('images/ecran_titre/bouton_nouv_jeu_bright.png'),
+               'bouton_reprendre':pygame.image.load('images/ecran_titre/bouton_reprendre.png'),
+               'bouton_reprendre_hover':pygame.image.load('images/ecran_titre/bouton_reprendre_bright.png'),
+               'bouton_quitter':pygame.image.load('images/ecran_titre/bouton_quitter.png'),
+               'bouton_quitter_hover':pygame.image.load('images/ecran_titre/bouton_quitter_bright.png'),
+               #########images de l'écran du choix des paramètres du nouveau jeu#############
+               'choix_nouv_jeu':pygame.image.load('images/init_jeu/Nouveau jeu.png'),
+               'choix_dimensions':pygame.image.load('images/init_jeu/Dimensions du plateau.png'),
+               'choix_dim7':pygame.image.load('images/init_jeu/bouton_7.png'),
+               'choix_dim7_grey':pygame.image.load('images/init_jeu/bouton_7_grey.png'),
+               'choix_dim9':pygame.image.load('images/init_jeu/bouton_9.png'),
+               'choix_dim9_grey':pygame.image.load('images/init_jeu/bouton_9_grey.png'),
+               'choix_j1':pygame.image.load('images/init_jeu/Joueur 1.png'),
+               'choix_j2':pygame.image.load('images/init_jeu/Joueur 2.png'),
+               'choix_j3':pygame.image.load('images/init_jeu/Joueur 3.png'),
+               'choix_j4':pygame.image.load('images/init_jeu/Joueur 4.png'),
+               'choix_hum':pygame.image.load('images/init_jeu/bouton_hum.png'),
+               'choix_hum_grey':pygame.image.load('images/init_jeu/bouton_hum_grey.png'),
+               'choix_ordi':pygame.image.load('images/init_jeu/bouton_ordi.png'),
+               'choix_ordi_grey':pygame.image.load('images/init_jeu/bouton_ordi_grey.png'),
+               'choix_ajouter_joueur':pygame.image.load('images/init_jeu/bouton_ajoute.png'),
+               'choix_ajouter_joueur_dis':pygame.image.load('images/init_jeu/bouton_ajoute_disabled.png'),
+               'choix_retirer_joueur':pygame.image.load('images/init_jeu/bouton_retire.png'),
+               'choix_retirer_joueur_dis':pygame.image.load('images/init_jeu/bouton_retire_disabled.png'),
+               'choix_valider':pygame.image.load('images/init_jeu/bouton_valider.png'),
+               }
 
 def main():
+    '''Fonction principale du jeu
+    '''
     global IMAGES_DICT, FPSCLOCK, gameDisplay
     
     # Pygame initialization and basic set up of the global variables.
@@ -27,48 +63,31 @@ def main():
     FPSCLOCK = pygame.time.Clock()
     
     #création de la fenêtre
-#    gameDisplay = pygame.display.set_mode((0, 0), pygame.FULLSCREEN, pygame.RESIZABLE)
-    gameDisplay = pygame.display.set_mode((WINWIDTH, WINHEIGHT),pygame.RESIZABLE)
-    
+#   gameDisplay = pygame.display.set_mode((0, 0), pygame.FULLSCREEN, pygame.RESIZABLE)
+    gameDisplay = pygame.display.set_mode((WINWIDTH, WINHEIGHT),pygame.RESIZABLE) 
     #titre de la fenetre
     pygame.display.set_caption('La Mine Hantée')
     
-    #dictionnaire contenant l'ensemble des images du jeu
-    IMAGES_DICT = {'titre': pygame.image.load('images/ecran_titre/titre.png'),
-                   'bouton_nouv_jeu':pygame.image.load('images/ecran_titre/bouton_nouv_jeu.png'),
-                   'bouton_nouv_jeu_hover':pygame.image.load('images/ecran_titre/bouton_nouv_jeu_bright.png'),
-                   'bouton_reprendre':pygame.image.load('images/ecran_titre/bouton_reprendre.png'),
-                   'bouton_reprendre_hover':pygame.image.load('images/ecran_titre/bouton_reprendre_bright.png'),
-                   'bouton_quitter':pygame.image.load('images/ecran_titre/bouton_quitter.png'),
-                   'bouton_quitter_hover':pygame.image.load('images/ecran_titre/bouton_quitter_bright.png'),
-                   #########images de l'écran du choix des paramètres du nouveau jeu#############
-                   'choix_nouv_jeu':pygame.image.load('images/init_jeu/Nouveau jeu.png'),
-                   'choix_dimensions':pygame.image.load('images/init_jeu/Dimensions du plateau.png'),
-                   'choix_dim7':pygame.image.load('images/init_jeu/bouton_7.png'),
-                   'choix_dim7_grey':pygame.image.load('images/init_jeu/bouton_7_grey.png'),
-                   'choix_dim9':pygame.image.load('images/init_jeu/bouton_9.png'),
-                   'choix_dim9_grey':pygame.image.load('images/init_jeu/bouton_9_grey.png'),
-                   'choix_j1':pygame.image.load('images/init_jeu/Joueur 1.png'),
-                   'choix_j2':pygame.image.load('images/init_jeu/Joueur 2.png'),
-                   'choix_j3':pygame.image.load('images/init_jeu/Joueur 3.png'),
-                   'choix_j4':pygame.image.load('images/init_jeu/Joueur 4.png'),
-                   'choix_hum':pygame.image.load('images/init_jeu/bouton_hum.png'),
-                   'choix_hum_grey':pygame.image.load('images/init_jeu/bouton_hum_grey.png'),
-                   'choix_ordi':pygame.image.load('images/init_jeu/bouton_ordi.png'),
-                   'choix_ordi_grey':pygame.image.load('images/init_jeu/bouton_ordi_grey.png'),
-                   'choix_ajouter_joueur':pygame.image.load('images/init_jeu/bouton_ajoute.png'),
-                   'choix_ajouter_joueur_dis':pygame.image.load('images/init_jeu/bouton_ajoute_disabled.png'),
-                   'choix_retirer_joueur':pygame.image.load('images/init_jeu/bouton_retire.png'),
-                   'choix_retirer_joueur_dis':pygame.image.load('images/init_jeu/bouton_retire_disabled.png'),
-                   'choix_valider':pygame.image.load('images/init_jeu/bouton_valider.png'),
-                   }
+
+    #appel de la fonction affichant l'écran d'accueil
+    choix_accueil = affiche_accueil() #choix_accueil prend la valeur retournée par affiche_accueil(), soit 'nouveau_jeu', soit 'reprendre_jeu'
     
-    a = affiche_accueil()
-    print(a)
+    #gestion du choix fait par l'utilisateur sur l'écran d'accueil ('nouveau_jeu','reprendre_jeu' ou 'quitter')
+    if choix_accueil == 'nouveau_jeu':
+        parametres_jeu = init_jeu() #parametres_jeu prend la valeur retournée par init_jeu, un tuple d'int contenant (dimension, joueur1,joueur2,joueur3,joueur4)
+        print(parametres_jeu)
+    elif choix_accueil == 'reprendre_jeu':
+        #/!\ à ajouter : doit mettre la fonction appelant l'écran du choix des parties sauvegardées
+        pass
+    elif choix_accueil == 'quitter':
+        terminate()       
+        
     return terminate()
     
 def affiche_accueil():
-    
+    '''Fonction permettant l'affichage de l'écran d'accueil du jeu, ou on peut faire les choix suivants : nouveau jeu, reprendre, quitter
+    -->: 'nouveau_jeu', 'reprendre_jeu' : c'est 2 valeurs sont utilisées dans main() pour appeler les fonctions adéquates
+    '''
     gameDisplay.fill(BLACK)
     
     #affichage du titre
@@ -82,13 +101,11 @@ def affiche_accueil():
     bouton_reprendre_hoverRect = IMAGES_DICT['bouton_reprendre_hover'].get_rect(center=(HALF_WINWIDTH, HALF_WINHEIGHT/4+250))
     bouton_quitterRect = IMAGES_DICT['bouton_quitter'].get_rect(center=(HALF_WINWIDTH, HALF_WINHEIGHT/4+350))
     bouton_quitter_hoverRect = IMAGES_DICT['bouton_quitter_hover'].get_rect(center=(HALF_WINWIDTH, HALF_WINHEIGHT/4+350))
-
-    mouse = pygame.mouse.get_pos()
     
     while True: # Main loop for the start screen.
         
-        mouse = pygame.mouse.get_pos()
-        clic = pygame.mouse.get_pressed()
+        mouse = pygame.mouse.get_pos() #recupere la position de la souris
+        clic = pygame.mouse.get_pressed() #recupere l'évenement clic de la souris (clic[0] = clic gauche, clic[1] = clic droit)
 
  #mise en place de l'affichage et de la surbrillance des boutons
         if bouton_nouveau_jeuRect.x+bouton_nouveau_jeuRect.width > mouse[0] > bouton_nouveau_jeuRect.x and bouton_nouveau_jeuRect.y+bouton_nouveau_jeuRect.height > mouse[1] > bouton_nouveau_jeuRect.y:
@@ -108,11 +125,11 @@ def affiche_accueil():
         
         for event in pygame.event.get():
             if clic[0] == 1 and bouton_nouveau_jeuRect.x+bouton_nouveau_jeuRect.width > mouse[0] > bouton_nouveau_jeuRect.x and bouton_nouveau_jeuRect.y+bouton_nouveau_jeuRect.height > mouse[1] > bouton_nouveau_jeuRect.y:
-                return init_jeu()
-            if event.type == QUIT:
-                terminate()
-            elif event.type == KEYDOWN:
-                if event.key == K_ESCAPE:
+                return 'nouveau_jeu'
+            if event.type == pygame.QUIT:
+                return 'quitter'
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
                     terminate()
             elif clic[0] == 1 and bouton_quitterRect.x+bouton_quitterRect.width > mouse[0] > bouton_quitterRect.x and bouton_quitterRect.y+bouton_quitterRect.height > mouse[1] > bouton_quitterRect.y:
                 terminate()
@@ -124,6 +141,11 @@ def affiche_accueil():
         FPSCLOCK.tick()
 
 def init_jeu():
+    '''Fonction gérant l'écran permettant d'initialiser les pramètres du nouveau jeu : dimension, nb de joueurs, humain ou ordi
+    -->: dimension(int), joueur 1(int), joueur 2(int), joueur 3(int), joueur4(int)
+    dimension : dimension du plateau
+    joueur x(int) : 0 si ce joueur n'existe pas (2 ou 3 joueurs), 1 si c'est un humain, 2 si c'est une IA
+    '''
     dimension = 7
     nb_joueurs = 2
     joueur1 = 1
@@ -231,24 +253,24 @@ def init_jeu():
         
         for event in pygame.event.get():
             #Events boutons du choix de dimensions
-            if dim9Rect.x+dim9Rect.width > mouse[0] > dim9Rect.x and dim9Rect.y+dim9Rect.height> mouse[1] >dim9Rect.y and event.type == MOUSEBUTTONUP:
+            if dim9Rect.x+dim9Rect.width > mouse[0] > dim9Rect.x and dim9Rect.y+dim9Rect.height> mouse[1] >dim9Rect.y and event.type == pygame.MOUSEBUTTONUP:
                 if bouton_dim9 ==  IMAGES_DICT['choix_dim9_grey']:
                     bouton_dim9 = IMAGES_DICT['choix_dim9']
                     bouton_dim7 = IMAGES_DICT['choix_dim7_grey']
                     dimension = 9
-            if dim7Rect.x+dim9Rect.width > mouse[0] > dim7Rect.x and dim9Rect.y+dim7Rect.height> mouse[1] >dim7Rect.y and event.type == MOUSEBUTTONUP:
+            if dim7Rect.x+dim9Rect.width > mouse[0] > dim7Rect.x and dim9Rect.y+dim7Rect.height> mouse[1] >dim7Rect.y and event.type == pygame.MOUSEBUTTONUP:
                 if bouton_dim7 ==  IMAGES_DICT['choix_dim7_grey']:
                     bouton_dim7 = IMAGES_DICT['choix_dim7']
                     bouton_dim9 = IMAGES_DICT['choix_dim9_grey']
                     dimension = 7
                     
             #Events choix humain/ordi joueur 1
-            if boutonj1humRect.width+boutonj1humRect.x > mouse[0] > boutonj1humRect.x and boutonj1humRect.y+ boutonj1humRect.height> mouse[1] > boutonj1humRect.y and event.type == MOUSEBUTTONUP:
+            if boutonj1humRect.width+boutonj1humRect.x > mouse[0] > boutonj1humRect.x and boutonj1humRect.y+ boutonj1humRect.height> mouse[1] > boutonj1humRect.y and event.type == pygame.MOUSEBUTTONUP:
                 if bouton_j1_hum ==  IMAGES_DICT['choix_hum_grey']:
                     bouton_j1_hum = IMAGES_DICT['choix_hum']
                     bouton_j1_ordi = IMAGES_DICT['choix_ordi_grey']
                     joueur1 = 1
-            if boutonj1ordiRect.width+boutonj1ordiRect.x > mouse[0] > boutonj1ordiRect.x and boutonj1ordiRect.y+ boutonj1ordiRect.height> mouse[1] > boutonj1ordiRect.y and event.type == MOUSEBUTTONUP:
+            if boutonj1ordiRect.width+boutonj1ordiRect.x > mouse[0] > boutonj1ordiRect.x and boutonj1ordiRect.y+ boutonj1ordiRect.height> mouse[1] > boutonj1ordiRect.y and event.type == pygame.MOUSEBUTTONUP:
                 if bouton_j1_ordi ==  IMAGES_DICT['choix_ordi_grey']:
                     bouton_j1_ordi = IMAGES_DICT['choix_ordi']
                     bouton_j1_hum =  IMAGES_DICT['choix_hum_grey']
@@ -267,58 +289,113 @@ def init_jeu():
                     joueur2 = 2
 
             #Event joueur 3
-            if boutonj3humRect.width+boutonj3humRect.x > mouse[0] > boutonj3humRect.x and boutonj3humRect.y+ boutonj3humRect.height> mouse[1] > boutonj3humRect.y and event.type == MOUSEBUTTONUP and nb_joueurs >= 3:
+            if boutonj3humRect.width+boutonj3humRect.x > mouse[0] > boutonj3humRect.x and boutonj3humRect.y+ boutonj3humRect.height> mouse[1] > boutonj3humRect.y and event.type == pygame.MOUSEBUTTONUP and nb_joueurs >= 3:
                 if bouton_j3_hum ==  IMAGES_DICT['choix_hum_grey']:
                     bouton_j3_hum = IMAGES_DICT['choix_hum']
                     bouton_j3_ordi = IMAGES_DICT['choix_ordi_grey']
                     joueur3 = 1
-            if boutonj3ordiRect.width+boutonj3ordiRect.x > mouse[0] > boutonj3ordiRect.x and boutonj3ordiRect.y+ boutonj3ordiRect.height> mouse[1] > boutonj3ordiRect.y and event.type == MOUSEBUTTONUP and nb_joueurs >= 3:
+            if boutonj3ordiRect.width+boutonj3ordiRect.x > mouse[0] > boutonj3ordiRect.x and boutonj3ordiRect.y+ boutonj3ordiRect.height> mouse[1] > boutonj3ordiRect.y and event.type == pygame.MOUSEBUTTONUP and nb_joueurs >= 3:
                 if bouton_j3_ordi ==  IMAGES_DICT['choix_ordi_grey']:
                     bouton_j3_ordi = IMAGES_DICT['choix_ordi']
                     bouton_j3_hum =  IMAGES_DICT['choix_hum_grey']
                     joueur2 = 2
             
             #Events joueur 4
-            if boutonj4humRect.width+boutonj4humRect.x > mouse[0] > boutonj4humRect.x and boutonj4humRect.y+ boutonj4humRect.height> mouse[1] > boutonj4humRect.y and event.type == MOUSEBUTTONUP and nb_joueurs == 4:
+            if boutonj4humRect.width+boutonj4humRect.x > mouse[0] > boutonj4humRect.x and boutonj4humRect.y+ boutonj4humRect.height> mouse[1] > boutonj4humRect.y and event.type == pygame.MOUSEBUTTONUP and nb_joueurs == 4:
                 if bouton_j4_hum ==  IMAGES_DICT['choix_hum_grey']:
                     bouton_j4_hum = IMAGES_DICT['choix_hum']
                     bouton_j4_ordi = IMAGES_DICT['choix_ordi_grey']
                     joueur4 = 'humain'
-            if boutonj4ordiRect.width+boutonj4ordiRect.x > mouse[0] > boutonj4ordiRect.x and boutonj4ordiRect.y+ boutonj4ordiRect.height> mouse[1] > boutonj4ordiRect.y and event.type == MOUSEBUTTONUP and nb_joueurs == 4:
+            if boutonj4ordiRect.width+boutonj4ordiRect.x > mouse[0] > boutonj4ordiRect.x and boutonj4ordiRect.y+ boutonj4ordiRect.height> mouse[1] > boutonj4ordiRect.y and event.type == pygame.MOUSEBUTTONUP and nb_joueurs == 4:
                 if bouton_j4_ordi ==  IMAGES_DICT['choix_ordi_grey']:
                     bouton_j4_ordi = IMAGES_DICT['choix_ordi']
                     bouton_j4_hum =  IMAGES_DICT['choix_hum_grey']
                     joueur4 = 'humain'
             
             #Gestion du nombre de joueurs
-            if ajoutJoueurRect.width + ajoutJoueurRect.x > mouse[0] > ajoutJoueurRect.x and ajoutJoueurRect.y+ ajoutJoueurRect.height> mouse[1] > ajoutJoueurRect.y and event.type == MOUSEBUTTONUP and nb_joueurs != 4:
+            if ajoutJoueurRect.width + ajoutJoueurRect.x > mouse[0] > ajoutJoueurRect.x and ajoutJoueurRect.y+ ajoutJoueurRect.height> mouse[1] > ajoutJoueurRect.y and event.type == pygame.MOUSEBUTTONUP and nb_joueurs != 4:
                 nb_joueurs += 1
                 print('nb',nb_joueurs)
-            if retireJoueurRect.width+retireJoueurRect.x > mouse[0] > retireJoueurRect.x and retireJoueurRect.y+ retireJoueurRect.height> mouse[1] > retireJoueurRect.y and event.type == MOUSEBUTTONUP and nb_joueurs != 2:
+            if retireJoueurRect.width+retireJoueurRect.x > mouse[0] > retireJoueurRect.x and retireJoueurRect.y+ retireJoueurRect.height> mouse[1] > retireJoueurRect.y and event.type == pygame.MOUSEBUTTONUP and nb_joueurs != 2:
                 nb_joueurs -= 1
                 print('nbm',nb_joueurs)
             
             #Gestion du bouton valider
-            if validerRect.width+validerRect.x > mouse[0] > validerRect.x and validerRect.y+ validerRect.height> mouse[1] > validerRect.y and event.type == MOUSEBUTTONUP:
-                print('cest ok')
+            if validerRect.width+validerRect.x > mouse[0] > validerRect.x and validerRect.y+ validerRect.height> mouse[1] > validerRect.y and event.type == pygame.MOUSEBUTTONUP:
+                print('dim,j1,j2,j3,j4:',dimension, joueur1, joueur2, joueur3, joueur4)
                 return dimension, joueur1, joueur2, joueur3, joueur4
                 
-                
-            if event.type == QUIT:
+            if event.type == pygame.QUIT:
                 terminate()
-            elif event.type == KEYDOWN:
-                if event.key == K_ESCAPE:
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
                     terminate()
                     return # user has pressed a key, so return.
     
         
         pygame.display.update()
         FPSCLOCK.tick()
-    
+ 
+def boucle_deplacement(joueur_actif, plateau):
+    '''
+    Fonction permettant le déplacement du joueur actif pendant son tour
+    Parametres : joueur_actif : Chasseur, plateau : Plateau
+    -->: None
+    '''
+    liste_deplacement = [] #futur liste des cartes par lesquelles passe ce déplacement
+    deplacement_valide = True #le deplacement est autorisée par les régles
+    x_init, y_init = joueur_actif.position #position initiale du joueur actif
+    x, y = x_init, y_init #position du joueur au fur et à mesure du déplacement
+    carte_depart = plateau.matrice[x_init, y_init] #carte de départ sur laquelle le joueur actif se situe
+    carte_actuelle = carte_depart #dernière carte choisie pendant le déplacement
+
+    while True:
+        #gestion des évenements joueurs lors du déplacement
+        for event in pygame.event.get():
+            #evenements de type touche pressée
+            if event.type == pygame.KEYDOWN:
+                #le joueur appuie sur la flèche haut
+                if event.key == pygame.K_UP:
+                    if plateau.deplacement_possible(joueur_actif,'haut'):
+                        #la carte en haut de la carte actuelle est ajoutée liste des cartes successives du déplacement
+                        liste_deplacement += [carte_a_cote[carte_actuelle]]
+                        print(liste_deplacement)
+                        print("Player pressed up!")
+                #le joueur appuie sur la flèche gauche                
+                elif event.key == pygame.K_LEFT:
+                    if plateau.deplacement_possible(joueur_actif,'gauche'):
+                        #la carte à gauche de la carte actuelle est ajoutée liste des cartes successives du déplacement
+                        liste_deplacement += [carte_a_cote[carte_actuelle]]
+                        print(liste_deplacement)
+                    print("Player pressed left!")
+                #le joueur appuie sur la flèche bas                    
+                elif event.key == pygame.K_DOWN:
+                    if plateau.deplacement_possible(joueur_actif,'bas'):
+                        #la carte en bas de la carte actuelle est ajoutée liste des cartes successives du déplacement
+                        liste_deplacement += [carte_a_cote[carte_actuelle]]
+                        print(liste_deplacement)
+                    print("Player pressed down!")
+                #le joueur appuie sur la flèche droite
+                elif event.key == pygame.K_RIGHT:
+                    if plateau.deplacement_possible(joueur_actif,'droite'):
+                        #la carte à droite de la carte actuelle est ajoutée liste des cartes successives du déplacement
+                        liste_deplacement += [carte_a_cote[carte_actuelle]]
+                        print(liste_deplacement)
+                    print("Player pressed right!")
+                #avorte la tentative de déplacement si on appuie sur échap
+                elif event.key == pygame.K_ESCAPE:
+                    return
+        #màj de l'écran
+        pygame.display.update()
+        FPSCLOCK.tick()
+
 
 def terminate():
+    '''
+    Fonction qui ferme la fenetre
+    '''
     pygame.quit()
-    sys.exit()
+#    sys.exit()
     
 if __name__ == '__main__':
     main()
