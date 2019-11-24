@@ -362,11 +362,13 @@ class Chasseur(object):
 		'''
 		x_position, y_position = self.position
 		#on recupere le fantome sur la case du plateau où est situé le chasseur
-		fantome = Plateau.matrice[x_position,y_position].fantome
+		carte = Plateau.matrice[x_position,y_position]
+		fantome = carte.fantome
 		#ajout du numero du fantome a la liste des fantomes collectés par le chasseur
 		num_fantome = fantome.numero
 		self.fantome += [num_fantome]
 		fantome.attrape = True
+		carte.fantome = 0
 		
 		#si le fantome fait partie de la mission du chasseur, le score est actualise a +20, sinon à +5
 		if num_fantome in self.mission:
