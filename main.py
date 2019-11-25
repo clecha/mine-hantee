@@ -336,15 +336,15 @@ def init_jeu():
         pygame.display.update()
         FPSCLOCK.tick()
  
-def boucle_deplacement(joueur_actif, plateau):
+def boucle_deplacement(plateau):
     '''
     Fonction permettant le déplacement du joueur actif pendant son tour
-    Parametres : joueur_actif : Chasseur, plateau : Plateau
+    Parametres : plateau : Plateau
     -->: None
     '''
     liste_deplacement = [] #futur liste des cartes par lesquelles passe ce déplacement
     deplacement_valide = True #le deplacement est autorisée par les régles
-    x_init, y_init = joueur_actif.position #position initiale du joueur actif
+    x_init, y_init = plateau.joueur_actif.position #position initiale du joueur actif
     x, y = x_init, y_init #position du joueur au fur et à mesure du déplacement
     carte_depart = plateau.matrice[x_init, y_init] #carte de départ sur laquelle le joueur actif se situe
     carte_actuelle = carte_depart #dernière carte choisie pendant le déplacement
@@ -356,28 +356,28 @@ def boucle_deplacement(joueur_actif, plateau):
             if event.type == pygame.KEYDOWN:
                 #le joueur appuie sur la flèche haut
                 if event.key == pygame.K_UP:
-                    if plateau.deplacement_possible(joueur_actif,'haut'):
+                    if plateau.deplacement_possible(plateau.joueur_actif,'haut'):
                         #la carte en haut de la carte actuelle est ajoutée liste des cartes successives du déplacement
                         liste_deplacement += [carte_a_cote[carte_actuelle]]
                         print(liste_deplacement)
                         print("Player pressed up!")
                 #le joueur appuie sur la flèche gauche                
                 elif event.key == pygame.K_LEFT:
-                    if plateau.deplacement_possible(joueur_actif,'gauche'):
+                    if plateau.deplacement_possible(plateau.joueur_actif,'gauche'):
                         #la carte à gauche de la carte actuelle est ajoutée liste des cartes successives du déplacement
                         liste_deplacement += [carte_a_cote[carte_actuelle]]
                         print(liste_deplacement)
                     print("Player pressed left!")
                 #le joueur appuie sur la flèche bas                    
                 elif event.key == pygame.K_DOWN:
-                    if plateau.deplacement_possible(joueur_actif,'bas'):
+                    if plateau.deplacement_possible(plateau.joueur_actif,'bas'):
                         #la carte en bas de la carte actuelle est ajoutée liste des cartes successives du déplacement
                         liste_deplacement += [carte_a_cote[carte_actuelle]]
                         print(liste_deplacement)
                     print("Player pressed down!")
                 #le joueur appuie sur la flèche droite
                 elif event.key == pygame.K_RIGHT:
-                    if plateau.deplacement_possible(joueur_actif,'droite'):
+                    if plateau.deplacement_possible(plateau.joueur_actif,'droite'):
                         #la carte à droite de la carte actuelle est ajoutée liste des cartes successives du déplacement
                         liste_deplacement += [carte_a_cote[carte_actuelle]]
                         print(liste_deplacement)
