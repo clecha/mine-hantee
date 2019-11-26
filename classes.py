@@ -17,9 +17,9 @@ class Plateau(object):
 	carte_jouable: objet de type carte, correspond à la carte qui est hors plateau
 	joueur_actif: entier entre 1 et 4 -- indique le joueur à qui c'est le tour de jouer
     """  
-    def __init__(self, dimension=7):
+	def __init__(self, dimension=7,nb_joueurs):
 		self.dimension = dimension #dimension du plateau
-		self.joueur = 1
+		self.joueur_actif = 1
 		if dimension % 2 == 1 and dimension >= 7:
         #création de la matrice contenant les objets cartes
 			self.matrice = np.zeros((dimension,dimension), dtype= object)
@@ -164,7 +164,7 @@ class Plateau(object):
 		carte.jouable = False
 		self.carte_jouable.jouable = True
     
-    def carte_a_cote(self, direction,x,y):
+	def carte_a_cote(self, direction,x,y):
         '''Fonction renvoyant la carte à côté de la carte présente
         x,y: position de la carte de départ
         direction : char
@@ -181,7 +181,7 @@ class Plateau(object):
             carte_a_cote = matrice[x-1,y+1]
         return carte_a_cote
     
-    def deplacement_possible(self, x_position,y_position, direction):
+	def deplacement_possible(self, x_position,y_position, direction):
         '''Fonction renvoyant en fonction de la position et de la direction du déplacement, si celui ci est possible ou non.'''
         direction_opposee = {'haut':'bas','bas':'haut','gauche':'droite','droite':'gauche'}
 #        x_position, y_position = chasseur.position
@@ -232,16 +232,16 @@ class Carte(object):
 				self.orientation -= 1
         update_murs()
                 
-    def update_murs(self):
+	def update_murs(self):
         '''Update les positions des murs en fonction du type de carte et de la position. Utilisé lors d'une rotation de carte.
         '''
         if self.type_carte == 1:
             if self.orientation in [0,2]:
                 self.murs ={'haut':True, 'droite':False,'bas':True, 'gauche':False}
             elif self.orientation in [1,3]:
-                self.murs = {'haut':False,'droite':True,'bas':False,'gauche':True]
+                self.murs = {'haut':False,'droite':True,'bas':False,'gauche':True}
 
-        elif self.type_carte == 2:
+		elif self.type_carte == 2:
             if self.orientation == 0:
                 self.murs = {'haut':True, 'droite':True, 'bas':False, 'gauche':False}
             if self.orientation == 1:
@@ -280,10 +280,10 @@ class Chasseur(object):
 	score: entier -- score amassé par le chasseur
 	joker : Booléen -- True si le chasseur dispose encore de son joker
 	fantome: liste d entiers -- correspond aux fantomes amasses par le chasseur"""
-	def __init__(self, id,position):
+	def __init__(self, id):
 		self.id = id
 
-		self.position = position
+		self.position = [None,None]
 		self.mission = []
 		self.pepite = 0
 		self.score = 0

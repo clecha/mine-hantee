@@ -5,13 +5,16 @@ Fichier principal du jeu. Contenu :
 main : fonction principale du jeu
 affiche_accueil : appelée au début de main, affiche l'écran d'accueil du jeu
 init_jeu : appelée dans main SI l'utilisateur clique sur nouveau jeu dans la fonction affiche_accueil. Affiche l'écran d'initilisation d'un nouveau jeu
+initialisation_partie: en fonction des paramètres choisie par les joueurs, crée le plateau, initialisa les joueurs et leur mission
 boucle_deplacement : appelée dans main pendant le jeu, pour gérer le déplacement du joueur_actif. 
 terminate : appelée lorque le joueur appuie sur échap. Ferme la fenetre de jeu.
 """
 
 
 import random, sys, copy, os, pygame
+from random import shuffle
 from pygame.locals import *
+import classes as cl
 
 FPS = 30 # frames per second to update the screen
 WINWIDTH = 1100 # width of the program's window, in pixels
@@ -76,12 +79,18 @@ def main():
     if choix_accueil == 'nouveau_jeu':
         parametres_jeu = init_jeu() #parametres_jeu prend la valeur retournée par init_jeu, un tuple d'int contenant (dimension, joueur1,joueur2,joueur3,joueur4)
         print(parametres_jeu)
+        #Création du plateau sur lequel on va jouer
+        plateau, dico_joueurs = initialisation_partie(parametres_jeu)
     elif choix_accueil == 'reprendre_jeu':
         #/!\ à ajouter : doit mettre la fonction appelant l'écran du choix des parties sauvegardées
         pass
     elif choix_accueil == 'quitter':
         terminate()       
-        
+     
+    #a ce stade on a créé le plateau et les joueurs
+
+    while True:
+
     return terminate()
     
 def affiche_accueil():
@@ -142,7 +151,7 @@ def affiche_accueil():
 
 def init_jeu():
     '''Fonction gérant l'écran permettant d'initialiser les pramètres du nouveau jeu : dimension, nb de joueurs, humain ou ordi
-    -->: dimension(int), joueur 1(int), joueur 2(int), joueur 3(int), joueur4(int)
+    -->: dictionnaire contenant : dimension(int), nb_joueurs (in), joueur 1(int), joueur 2(int), joueur 3(int), joueur4(int)
     dimension : dimension du plateau
     joueur x(int) : 0 si ce joueur n'existe pas (2 ou 3 joueurs), 1 si c'est un humain, 2 si c'est une IA
     '''
@@ -323,7 +332,7 @@ def init_jeu():
             #Gestion du bouton valider
             if validerRect.width+validerRect.x > mouse[0] > validerRect.x and validerRect.y+ validerRect.height> mouse[1] > validerRect.y and event.type == pygame.MOUSEBUTTONUP:
                 print('dim,j1,j2,j3,j4:',dimension, joueur1, joueur2, joueur3, joueur4)
-                return dimension, joueur1, joueur2, joueur3, joueur4
+                return {'dimension':dimension, 'nb_joueurs':nb_joueurs,'joueur1': joueur1, 'joueur2':joueur2, 'joueur3':joueur3, 'joueur4':joueur4}
                 
             if event.type == pygame.QUIT:
                 terminate()
@@ -389,6 +398,43 @@ def boucle_deplacement(plateau):
         pygame.display.update()
         FPSCLOCK.tick()
 
+def initialisation_partie(parametres_jeu):
+    """Fonction initialisant les objets d'un jeu.
+    Arguments:
+        dico_parametres {dict} -- Contient les valeurs de dimension, nb_joueur, et type de joueur
+    
+    Returns:
+        Plateau, dict -- plateau de jeu, dictionnaire contenant les objets type Chasseur
+    """
+
+    ###Initialisation du plateau
+    plateau = cl.Plateau(parametres_jeu['dimension'],parametres_jeu['nb_joueurs'])
+    dico_joueurs = {}
+
+    ###Initialisation des chasseurs et de leurs missions
+    for i in parametres_jeu['nb_joueurs']:
+        if parametres_jeu['joueur'+str(i)] == 1: #le ieme joueurs est humain
+            dico_joueurs[i] = cl.Chasseur(i) #on crée un objet Chasseur ajouté au dictionnaire des joueurs
+        elif parametres_jeu['joueur'+str(i)] == 2: #le ieme joueurs est une IA
+            pass
+    
+    ###Initialisation des missions des joueurs
+    fantomes = [x for x in range(1,22)] #cette liste contient les fantomes disponibles
+    shuffle(fantomes) #on la mélange
+    for j in dico_joueurs.values(): #parcourt les objets Chasseur contenus dans le dictionnaire
+        for x in range(3):
+            j.mission.append(fantomes[0]) #on ajoute à la liste mission du joueur le premier objet de la liste mélangée
+            fantomes.remove(fantomes[0]) #on retire ensuite le premier objet de la liste
+
+    ###Placement des joueurs sur le plateau si dim = 7
+    if parametres_jeu['dimension'] == 7:
+        dico_joueurs[1].position, dico_joueurs[2].position = [2,2], [4,4]
+        if  parametres_jeu['nb_joueurs'] == 3:
+            dico_joueurs[3].position = [2,4]
+        if  parametres_jeu['nb_joueurs'] == 4:
+            dico_joueurs[4].position = [4,2]
+
+    return plateau, dico_joueurs
 
 def terminate():
     '''
