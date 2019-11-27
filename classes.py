@@ -10,18 +10,18 @@ import random as rd
 
 class Plateau(object):
 	"""
-    Plateau de jeu
+	Plateau de jeu
 	----
 	dimension: entier impair >=7
 	matrice: array de taille dimension * dimension
 	carte_jouable: objet de type carte, correspond à la carte qui est hors plateau
 	joueur_actif: entier entre 1 et 4 -- indique le joueur à qui c'est le tour de jouer
-    """  
-	def __init__(self, dimension=7,nb_joueurs):
+	"""  
+	def __init__(self, dimension=7,nb_joueurs=4):
 		self.dimension = dimension #dimension du plateau
 		self.joueur_actif = 1
 		if dimension % 2 == 1 and dimension >= 7:
-        #création de la matrice contenant les objets cartes
+		#création de la matrice contenant les objets cartes
 			self.matrice = np.zeros((dimension,dimension), dtype= object)
 
 			#placement des cartes fixes
@@ -163,36 +163,37 @@ class Plateau(object):
 		#Actualisation des positions des cartes
 		carte.jouable = False
 		self.carte_jouable.jouable = True
-    
+		
 	def carte_a_cote(self, direction,x,y):
-        '''Fonction renvoyant la carte à côté de la carte présente
-        x,y: position de la carte de départ
-        direction : char
-        Direction dans laquelle on regarde, valeurs possibles : gauche, droite, haut, bas
-        -->: la carte à cote de la carte(x,y) pour la direction donnée
-        '''
-        if direction == 'gauche':
-            carte_a_cote = matrice[x-1,y]
-        elif direction == 'droite':
-            carte_a_cote = matrice[x+1,y]
-        elif direction == 'haut':
-            carte_a_cote = matrice[x,y-1]
-        else:
-            carte_a_cote = matrice[x-1,y+1]
-        return carte_a_cote
-    
+		'''Fonction renvoyant la carte à côté de la carte présente
+		x,y: position de la carte de départ
+		direction : char
+		Direction dans laquelle on regarde, valeurs possibles : gauche, droite, haut, bas
+		-->: la carte à cote de la carte(x,y) pour la direction donnée
+		'''
+		if direction == 'gauche':
+			carte_a_cote = matrice[x-1,y]
+		elif direction == 'droite':
+			carte_a_cote = matrice[x+1,y]
+		elif direction == 'haut':
+			carte_a_cote = matrice[x,y-1]
+		else:
+			carte_a_cote = matrice[x-1,y+1]
+		return carte_a_cote
+	
 	def deplacement_possible(self, x_position,y_position, direction):
-        '''Fonction renvoyant en fonction de la position et de la direction du déplacement, si celui ci est possible ou non.'''
-        direction_opposee = {'haut':'bas','bas':'haut','gauche':'droite','droite':'gauche'}
+		'''Fonction renvoyant en fonction de la position et de la direction du déplacement, si celui ci est possible ou non.
+		'''
+		direction_opposee = {'haut':'bas','bas':'haut','gauche':'droite','droite':'gauche'}
 #        x_position, y_position = chasseur.position
-        carte_actuelle = self.matrice[x_position, y_position]
-        carte_visee = self.carte_a_cote(x_position, y_position,direction)
-        if carte_actuelle.murs[direction] == False and carte_visee.murs[direction_opposee[direction]] ==False: #s'il n(y a pas de murs sur les deux cartes)
-            return True
-        else: #s'il y a un mur sur l'une des deux cartes
-            return False
-        
-             
+		carte_actuelle = self.matrice[x_position, y_position]
+		carte_visee = self.carte_a_cote(x_position, y_position,direction)
+		if carte_actuelle.murs[direction] == False and carte_visee.murs[direction_opposee[direction]] ==False: #s'il n(y a pas de murs sur les deux cartes)
+			return True
+		else: #s'il y a un mur sur l'une des deux cartes
+			return False
+		
+			 
 
 
 class Carte(object):
@@ -206,13 +207,13 @@ class Carte(object):
 	chasseur = entier entre 0 et 4 -- la valeur 0 indique l'absence de chasseur"""
 	def __init__(self,type_carte,jouable = False, orientation = 0, presence = True):
 		self.position = [0,0]
-        self.jouable = jouable #Booléen indiquant si la carte est jouable ou non (i.e. si elle est hors plateau ou pas)
+		self.jouable = jouable #Booléen indiquant si la carte est jouable ou non (i.e. si elle est hors plateau ou pas)
 		self.type_carte = int(type_carte) #type de carte (1,2,3)
 		self.orientation = int(orientation) #entre 0,1,2,3
 		self.fantome = 0 #numero du fantome présent sur la carte, vaut 0 si pas de fantome
 		self.pepite = presence #toutes les cartes possèdent une pépite en debut de jeu, sauf la carte jouable
 		self.chasseur = 0 #id du chasseur présent sur la carte, 0 par défaut
-        update_murs() #présence de mur a gauche, droite, en haut et bas de la carte
+		self.update_murs() #présence de mur a gauche, droite, en haut et bas de la carte
 
 	def tourner(self,direction='droite'):
 		"""Permet de tourner la carte d'un sens ou de l'autre en changeant la valeur de l'attribut orientation,
@@ -230,36 +231,36 @@ class Carte(object):
 				self.orientation += 1
 			else:
 				self.orientation -= 1
-        update_murs()
-                
+		update_murs()
+				
 	def update_murs(self):
-        '''Update les positions des murs en fonction du type de carte et de la position. Utilisé lors d'une rotation de carte.
-        '''
-        if self.type_carte == 1:
-            if self.orientation in [0,2]:
-                self.murs ={'haut':True, 'droite':False,'bas':True, 'gauche':False}
-            elif self.orientation in [1,3]:
-                self.murs = {'haut':False,'droite':True,'bas':False,'gauche':True}
+		'''Update les positions des murs en fonction du type de carte et de la position. Utilisé lors d'une rotation de carte.
+		'''
+		if self.type_carte == 1:
+			if self.orientation in [0,2]:
+				self.murs ={'haut':True, 'droite':False,'bas':True, 'gauche':False}
+			elif self.orientation in [1,3]:
+				self.murs = {'haut':False,'droite':True,'bas':False,'gauche':True}
 
 		elif self.type_carte == 2:
-            if self.orientation == 0:
-                self.murs = {'haut':True, 'droite':True, 'bas':False, 'gauche':False}
-            if self.orientation == 1:
-                self.murs = {'haut':False, 'droite':True, 'bas':True, 'gauche':False}
-            if self.orientation == 2:
-                self.murs = {'haut':False, 'droite':False, 'bas':True, 'gauche':True}               
-            if self.orientation == 3:
-                self.murs = {'haut':True, 'droite':False, 'bas':False, 'gauche':True}
-                
-        elif self.type_carte == 3:
-            if self.orientation == 0:
-                self.murs = {'haut':True, 'droite':False, 'bas':False, 'gauche':False}
-            if self.orientation == 1:
-                self.murs = {'haut':False, 'droite':True, 'bas':False, 'gauche':False}
-            if self.orientation == 2:
-                self.murs = {'haut':False, 'droite':False, 'bas':True, 'gauche':False}                
-            if self.orientation == 3:
-                self.murs = {'haut':False, 'droite':False, 'bas':False, 'gauche':True}
+			if self.orientation == 0:
+				self.murs = {'haut':True, 'droite':True, 'bas':False, 'gauche':False}
+			if self.orientation == 1:
+				self.murs = {'haut':False, 'droite':True, 'bas':True, 'gauche':False}
+			if self.orientation == 2:
+				self.murs = {'haut':False, 'droite':False, 'bas':True, 'gauche':True}               
+			if self.orientation == 3:
+				self.murs = {'haut':True, 'droite':False, 'bas':False, 'gauche':True}
+				
+		elif self.type_carte == 3:
+			if self.orientation == 0:
+				self.murs = {'haut':True, 'droite':False, 'bas':False, 'gauche':False}
+			if self.orientation == 1:
+				self.murs = {'haut':False, 'droite':True, 'bas':False, 'gauche':False}
+			if self.orientation == 2:
+				self.murs = {'haut':False, 'droite':False, 'bas':True, 'gauche':False}                
+			if self.orientation == 3:
+				self.murs = {'haut':False, 'droite':False, 'bas':False, 'gauche':True}
 	
 class Fantome(object):
 	"""Fantomes
@@ -330,15 +331,15 @@ class Chasseur(object):
 		self.fantome += [fantome.numero]
 		fantome.attrape = True
 
-                    
-                    
-        
-                
-        
-        
-           
-        
-        
+					
+					
+		
+				
+		
+		
+		   
+		
+		
 
 ##partie test
 		
