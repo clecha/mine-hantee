@@ -24,9 +24,11 @@ IMAGES_dict={'pepite': pygame.image.load('images/persos/pepite.png'),
 			 'chasseur2': pygame.image.load('images/persos/chasseur2.png'),
 			 'chasseur3': pygame.image.load('images/persos/chasseur3.png'),
 			 'chasseur4': pygame.image.load('images/persos/chasseur4.png'),
-			 'fantome': pygame.image.load('images/persos/fantome.png'),	 
-		}
-
+			 'fantome': pygame.image.load('images/persos/fantome.png'),	
+             'carte1' : pygame.image.load('images/cartes/Type 1.png'),
+             'carte2' : pygame.image.load('images/cartes/Type 2.png'),
+             'carte3' : pygame.image.load('images/cartes/Type 3.png'),	
+             }
 
 def init_plateau():
 	global espace, pixel_case, maSurface, largeur, hauteur

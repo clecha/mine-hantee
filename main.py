@@ -86,10 +86,17 @@ def main():
         pass
     elif choix_accueil == 'quitter':
         terminate()       
-     
-    #a ce stade on a créé le plateau et les joueurs
+    
+    print(plateau, dico_joueurs)
+    """
+    À ce stade on a créé le plateau et les joueurs, contenus dans la variable plateau et dico_joueur
+    plateau : contient les cartes
+    dico_joueurs : contient les objets Chasseurs
+    """
 
     while True:
+        print("joueur{} est le joueur actif".format())
+        print("J{} est le joueur actif")
 
     return terminate()
     
