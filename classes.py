@@ -171,14 +171,26 @@ class Plateau(object):
 		Direction dans laquelle on regarde, valeurs possibles : gauche, droite, haut, bas
 		-->: la carte à cote de la carte(x,y) pour la direction donnée
 		'''
-		if direction == 'gauche':
-			carte_a_cote = matrice[x-1,y]
-		elif direction == 'droite':
-			carte_a_cote = matrice[x+1,y]
+        if direction == 'gauche':
+            if x == 0:
+                carte_a_cote = self.matrice[self.dimension-1,y]
+            else:
+                carte_a_cote = self.matrice[x-1,y]
+        elif direction == 'droite':
+            if x == self.dimension-1:
+                carte_a_cote = self.matrice[0,y]
+            else:
+    			carte_a_cote = self.matrice[x+1,y]
 		elif direction == 'haut':
-			carte_a_cote = matrice[x,y-1]
-		else:
-			carte_a_cote = matrice[x-1,y+1]
+            if y == 0:
+                carte_a_cote = self.matrice[x,self.dimension-1]
+            else:
+    			carte_a_cote = self.matrice[x,y-1]
+		else: #bas
+            if y == self.dimension-1:
+                carte_a_cote = self.matrice[x,0]
+            else:
+    			carte_a_cote = self.matrice[x-1,y+1]
 		return carte_a_cote
 	
 	def deplacement_possible(self, x_position,y_position, direction):
@@ -188,7 +200,7 @@ class Plateau(object):
 #        x_position, y_position = chasseur.position
 		carte_actuelle = self.matrice[x_position, y_position]
 		carte_visee = self.carte_a_cote(x_position, y_position,direction)
-		if carte_actuelle.murs[direction] == False and carte_visee.murs[direction_opposee[direction]] ==False: #s'il n(y a pas de murs sur les deux cartes)
+		if carte_actuelle.murs[direction] == False and carte_visee.murs[direction_opposee[direction]] == False: #s'il n(y a pas de murs sur les deux cartes)
 			return True
 		else: #s'il y a un mur sur l'une des deux cartes
 			return False
@@ -231,7 +243,7 @@ class Carte(object):
 				self.orientation += 1
 			else:
 				self.orientation -= 1
-		update_murs()
+		self.update_murs()
 				
 	def update_murs(self):
 		'''Update les positions des murs en fonction du type de carte et de la position. Utilisé lors d'une rotation de carte.

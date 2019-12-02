@@ -322,12 +322,12 @@ def init_jeu():
                 if bouton_j4_hum ==  IMAGES_DICT['choix_hum_grey']:
                     bouton_j4_hum = IMAGES_DICT['choix_hum']
                     bouton_j4_ordi = IMAGES_DICT['choix_ordi_grey']
-                    joueur4 = 'humain'
+                    joueur4 = 1
             if boutonj4ordiRect.width+boutonj4ordiRect.x > mouse[0] > boutonj4ordiRect.x and boutonj4ordiRect.y+ boutonj4ordiRect.height> mouse[1] > boutonj4ordiRect.y and event.type == pygame.MOUSEBUTTONUP and nb_joueurs == 4:
                 if bouton_j4_ordi ==  IMAGES_DICT['choix_ordi_grey']:
                     bouton_j4_ordi = IMAGES_DICT['choix_ordi']
                     bouton_j4_hum =  IMAGES_DICT['choix_hum_grey']
-                    joueur4 = 'humain'
+                    joueur4 = 2
             
             #Gestion du nombre de joueurs
             if ajoutJoueurRect.width + ajoutJoueurRect.x > mouse[0] > ajoutJoueurRect.x and ajoutJoueurRect.y+ ajoutJoueurRect.height> mouse[1] > ajoutJoueurRect.y and event.type == pygame.MOUSEBUTTONUP and nb_joueurs != 4:
@@ -367,9 +367,10 @@ def boucle_deplacement(plateau):
     liste_mouvements = [] #listes des directions du déplacements
     deplacement_valide = True #le deplacement est autorisée par les régles
     x_init, y_init = plateau.joueur_actif.position #position initiale du joueur actif
-#    x, y = x_init, y_init #position du joueur au fur et à mesure du déplacement
+    x, y = x_init, y_init #position du joueur au fur et à mesure du déplacement
     carte_depart = plateau.matrice[x_init, y_init] #carte de départ sur laquelle le joueur actif se situe
     carte_actuelle = carte_depart #dernière carte choisie pendant le déplacement
+	direction_opposee = {'haut':'bas','bas':'haut','gauche':'droite','droite':'gauche'}
 
     while True:
         #gestion des évenements joueurs lors du déplacement
@@ -380,7 +381,7 @@ def boucle_deplacement(plateau):
                 #le joueur appuie sur la flèche haut
                 if event.key == pygame.K_UP:
                     #vérification que le déplacement est possible (absence de mur sur les deux cartes concernéees)
-                    if plateau.deplacement_possible(plateau.joueur_actif,'haut'):
+                    if plateau.deplacement_possible(x, y,'haut'):
                         if liste_mouvements[-1]!='bas':
                             #la carte en haut de la carte actuelle est ajoutée liste des cartes successives du déplacement
                             liste_mouvements += ['haut']
@@ -397,7 +398,7 @@ def boucle_deplacement(plateau):
                     
                 #le joueur appuie sur la flèche gauche                
                 elif event.key == pygame.K_LEFT:
-                    if plateau.deplacement_possible(plateau.joueur_actif,'gauche'):
+                    if plateau.deplacement_possible(x, y,'gauche'):
                         if liste_mouvements[-1]!='droite':
                             liste_mouvements += ['gauche']
                             #la carte à gauche de la carte actuelle est ajoutée liste des cartes successives du déplacement
@@ -414,7 +415,7 @@ def boucle_deplacement(plateau):
                     
                 #le joueur appuie sur la flèche bas                    
                 elif event.key == pygame.K_DOWN:
-                    if plateau.deplacement_possible(plateau.joueur_actif,'bas'):
+                    if plateau.deplacement_possible(x, y,'bas'):
                         if liste_mouvements[-1] != 'haut':
                             liste_mouvements += ['bas']
                             #la carte en bas de la carte actuelle est ajoutée liste des cartes successives du déplacement
@@ -431,7 +432,7 @@ def boucle_deplacement(plateau):
                     
                 #le joueur appuie sur la flèche droite
                 elif event.key == pygame.K_RIGHT:
-                    if plateau.deplacement_possible(plateau.joueur_actif,'droite'):
+                    if plateau.deplacement_possible(x, y,'droite'):
                         if liste_mouvements[-1] != 'gauche':
                             #la carte à droite de la carte actuelle est ajoutée liste des cartes successives du déplacement
                             liste_cartes += [plateau.carte_a_cote[carte_actuelle]]
