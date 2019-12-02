@@ -314,7 +314,7 @@ def init_jeu():
                 if bouton_j3_ordi ==  IMAGES_DICT['choix_ordi_grey']:
                     bouton_j3_ordi = IMAGES_DICT['choix_ordi']
                     bouton_j3_hum =  IMAGES_DICT['choix_hum_grey']
-                    joueur2 = 2
+                    joueur3 = 2
             
             #Events joueur 4
             if boutonj4humRect.width+boutonj4humRect.x > mouse[0] > boutonj4humRect.x and boutonj4humRect.y+ boutonj4humRect.height> mouse[1] > boutonj4humRect.y and event.type == pygame.MOUSEBUTTONUP and nb_joueurs == 4:
