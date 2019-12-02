@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Nov 23 13:52:59 2019
-
-@author: SARREGUEMINES
-"""
-
 import numpy as np
 import random as rd
 
