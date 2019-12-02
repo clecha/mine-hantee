@@ -93,10 +93,10 @@ def main():
     plateau : contient les cartes
     dico_joueurs : contient les objets Chasseurs
     """
-
-    while True:
-        print("joueur{} est le joueur actif".format())
-        print("J{} est le joueur actif")
+#
+#    while True:
+#        print("joueur{} est le joueur actif".format())
+#        print("J{} est le joueur actif")
 
     return terminate()
     
@@ -419,7 +419,7 @@ def initialisation_partie(parametres_jeu):
     dico_joueurs = {}
 
     ###Initialisation des chasseurs et de leurs missions
-    for i in parametres_jeu['nb_joueurs']:
+    for i in range(1,parametres_jeu['nb_joueurs']+1):
         if parametres_jeu['joueur'+str(i)] == 1: #le ieme joueurs est humain
             dico_joueurs[i] = cl.Chasseur(i) #on crée un objet Chasseur ajouté au dictionnaire des joueurs
         elif parametres_jeu['joueur'+str(i)] == 2: #le ieme joueurs est une IA
