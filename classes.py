@@ -10,7 +10,7 @@ class Plateau(object):
 	matrice: array de taille dimension * dimension
 	carte_jouable: objet de type carte, correspond à la carte qui est hors plateau
 	joueur_actif: objet de type chasseur -- indique le joueur à qui c'est le tour de jouer
-	nb_joueurs: entier allant de 1 à 4 -- indique le nb de joueurs                                                                
+	nb_joueurs: entier allant de 1 à 4 -- indique le nb de joueurs																  
 	"""
 	def __init__(self, dimension = 7, nb_joueurs = 4):
 		self.dimension = dimension #dimension du plateau
@@ -50,7 +50,7 @@ class Plateau(object):
 					self.matrice[ligne][col] = Carte(3, False, orientation, True)
 
 			#placement des cartes aléatoires
-			nb_cartes_fixes = ((dimension +  1)/2)**2
+			nb_cartes_fixes = ((dimension +	 1)/2)**2
 			nb_cartes_alea = dimension**2 - nb_cartes_fixes + 1
 		
 			nb_type_1= round(nb_cartes_alea*0.38)
@@ -132,27 +132,27 @@ class Plateau(object):
 		--> Utilisé pour faire des verifications lors du code surtout // pas utile à proprement parlé
 		"""
 		try:
-            dimension = self.dimension
-            matrice_affichage_jouabilite = np.zeros((dimension,dimension), dtype=object)
-            matrice_affichage_type_carte = np.zeros((dimension,dimension))
-            matrice_affichage_orientation = np.zeros((dimension,dimension))
-            matrice_affichage_chasseurs = np.zeros((dimension,dimension))
-            matrice_affichage_fantomes = np.zeros((dimension,dimension))
-            for ligne in range(dimension):
-                for col in range(dimension):
-                    carte = self.matrice[ligne][col]
-                    matrice_affichage_jouabilite[ligne][col] = carte.jouable
-                    matrice_affichage_type_carte[ligne][col] = carte.type_carte
-                    matrice_affichage_orientation[ligne][col] = carte.orientation
-				chasseur, fantome = carte.chasseur, carte.fantome
-				if type(chasseur) != int:
-					matrice_affichage_chasseurs[ligne][col] = carte.chasseur.id
-				else:
-					matrice_affichage_chasseurs[ligne][col] = carte.chasseur
-				if type(fantome) != int:
-					matrice_affichage_fantomes[ligne][col] = carte.fantome.numero
-				else:
-					matrice_affichage_fantomes[ligne][col] = carte.fantome
+			dimension = self.dimension
+			matrice_affichage_jouabilite = np.zeros((dimension,dimension), dtype=object)
+			matrice_affichage_type_carte = np.zeros((dimension,dimension))
+			matrice_affichage_orientation = np.zeros((dimension,dimension))
+			matrice_affichage_chasseurs = np.zeros((dimension,dimension))
+			matrice_affichage_fantomes = np.zeros((dimension,dimension))
+			for ligne in range(dimension):
+				for col in range(dimension):
+					carte = self.matrice[ligne][col]
+					matrice_affichage_jouabilite[ligne][col] = carte.jouable
+					matrice_affichage_type_carte[ligne][col] = carte.type_carte
+					matrice_affichage_orientation[ligne][col] = carte.orientation
+					chasseur, fantome = carte.chasseur, carte.fantome
+					if type(chasseur) != int:
+						matrice_affichage_chasseurs[ligne][col] = carte.chasseur.id
+					else:
+						matrice_affichage_chasseurs[ligne][col] = carte.chasseur
+					if type(fantome) != int:
+						matrice_affichage_fantomes[ligne][col] = carte.fantome.numero
+					else:
+						matrice_affichage_fantomes[ligne][col] = carte.fantome
 
 			print('matrice des jouabilites:', matrice_affichage_jouabilite)
 			print('matrice des types de carte:', matrice_affichage_type_carte)
@@ -291,17 +291,14 @@ class Plateau(object):
 			if y == self.dimension-1:
 				carte_a_cote = self.matrice[x,0]
 			else:
-				carte_a_cote = self.matrice[x-1,y+1]
-			carte_a_cote = matrice[x,y-1]
-		else:
-			carte_a_cote = matrice[x,y+1]
+				carte_a_cote = self.matrice[x,y+1]
 		return carte_a_cote
 	
 	def deplacement_possible(self, x_position,y_position, direction):
 		'''Fonction renvoyant en fonction de la position et de la direction du déplacement, si celui ci est possible ou non.
 		'''
 		direction_opposee = {'haut':'bas','bas':'haut','gauche':'droite','droite':'gauche'}
-#        x_position, y_position = chasseur.position
+#		 x_position, y_position = chasseur.position
 		carte_actuelle = self.matrice[x_position, y_position]
 		carte_visee = self.carte_a_cote(x_position, y_position,direction)
 		if carte_actuelle.murs[direction] == False and carte_visee.murs[direction_opposee[direction]] == False: #s'il n(y a pas de murs sur les deux cartes)
@@ -364,7 +361,7 @@ class Carte(object):
 			if self.orientation == 1:
 				self.murs = {'haut':False, 'droite':True, 'bas':True, 'gauche':False}
 			if self.orientation == 2:
-				self.murs = {'haut':False, 'droite':False, 'bas':True, 'gauche':True}               
+				self.murs = {'haut':False, 'droite':False, 'bas':True, 'gauche':True}				
 			if self.orientation == 3:
 				self.murs = {'haut':True, 'droite':False, 'bas':False, 'gauche':True}
 				
@@ -374,7 +371,7 @@ class Carte(object):
 			if self.orientation == 1:
 				self.murs = {'haut':False, 'droite':True, 'bas':False, 'gauche':False}
 			if self.orientation == 2:
-				self.murs = {'haut':False, 'droite':False, 'bas':True, 'gauche':False}                
+				self.murs = {'haut':False, 'droite':False, 'bas':True, 'gauche':False}				  
 			if self.orientation == 3:
 				self.murs = {'haut':False, 'droite':False, 'bas':False, 'gauche':True}
 	
@@ -462,17 +459,17 @@ class Chasseur(object):
 ##partie test
 		
 #1. test de la mise en place des cartes
-test = Plateau(nb_joueurs = 2)
+test = Plateau(nb_joueurs = 4)
 test.affichage_console()
 carte = test.carte_jouable
 print(carte.jouable)
-test.inserer_carte(carte, [0,2])
+#test.inserer_carte(carte, [0,2])
 test.affichage_console()
 print(carte.jouable)
 carte = test.carte_jouable
 print(carte.jouable)
 
-carte = test.carte_jouable
-test.inserer_carte(carte, [0,2])
-test.affichage_console()
+#carte = test.carte_jouable
+#test.inserer_carte(carte, [0,2])
+#test.affichage_console()
 		

@@ -157,13 +157,16 @@ def dessine_carte(Carte, position = None):
 		maSurface.blit(IMAGES_dict['pepite'],(x_pixel+40,y_pixel+40))
 	
 	#Affichage du chasseur
-	id_chasseur = Carte.chasseur
-	if id_chasseur != 0:
-		maSurface.blit(IMAGES_dict['chasseur'+str(id_chasseur)+'.png'],(x_pixel,y_pixel))
+	chasseur = Carte.chasseur
+	if chasseur != 0:
+		id_chasseur = chasseur.id
+		print(id_chasseur)
+		maSurface.blit(IMAGES_dict['chasseur'+str(id_chasseur)],(x_pixel,y_pixel))
 		
 	#Affichage du fantôme
-	id_fantome = Carte.fantome
-	if id_fantome != 0 :
+	fantome = Carte.fantome
+	if fantome != 0 :
+		id_fantome = fantome.numero
 		maSurface.blit(IMAGES_dict['fantome'],(x_pixel+70,y_pixel+10))
 
 		
