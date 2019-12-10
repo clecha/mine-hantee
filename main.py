@@ -15,6 +15,7 @@ import random, sys, copy, os, pygame
 from random import shuffle
 from pygame.locals import *
 import classes as cl
+from math import *
 
 FPS = 30 # frames per second to update the screen
 WINWIDTH = 1100 # width of the program's window, in pixels
@@ -398,11 +399,11 @@ def boucle_deplacement(plateau):
 				#le joueur appuie sur la flèche haut
 				if event.key == pygame.K_UP:
 					#vérification que le déplacement est possible (absence de mur sur les deux cartes concernéees)
-					if plateau.deplacement_possible(x, y,'haut'):
-						if liste_mouvements[-1]!='bas':
+					if plateau.deplacement_possible(x, y,'haut')==True:
+						if liste_mouvements[-1]!='bas': 
 							#la carte en haut de la carte actuelle est ajoutée liste des cartes successives du déplacement
 							liste_mouvements += ['haut']
-							liste_cartes += [plateau.carte_a_cote[carte_actuelle]]
+							liste_cartes += [plateau.carte_a_cote('haut',x,y)]
 							carte_actuelle = liste_cartes[-1]
 						else: #si le mouvement consiste à revenir en arrière
 							#on enlève le dernier mouvement de la liste des mouvements
@@ -665,6 +666,33 @@ def dessine_carte(Carte, position = None):
 	if Carte.pepite == True:
 		maSurface.blit(IMAGES_dict['pepite'],(x_pixel+40,y_pixel+40))	
 		
+def rotation_carte_jouable(Plateau,Carte):
+	mouse = pygame.mouse.get_pos()
+	clic = pygame.mouse.get_pressed()
+	fleche1dim= IMAGES_DICT['fleche1'].get_rect(center=(HALF_WINWIDTH, HALF_WINHEIGHT/4))
+	fleche2dim= IMAGES_DICT['fleche1'].get_rect(center=(HALF_WINWIDTH, HALF_WINHEIGHT/4))
+	while True:
+		for event in pygame.event.get():			:
+			if clic[0] == 1 and fleche1dim.x+fleche1dim.width > mouse[0] > fleche1dim.x and fleche1dim.y+fleche1dim.height> mouse[1] >fleche1dim.y and event.type == pygame.MOUSEBUTTONUP:
+				plateau.carte_jouable.tourner('gauche')
+				plateau.carte_jouable.update_murs()
+			elif clic[0] == 1 andfleche2dim.x+fleche2dim.width > mouse[0] > fleche2dim.x and fleche2dim.y+fleche2dim.height> mouse[1] >fleche2dim.y and event.type == pygame.MOUSEBUTTONUP:
+				plateau.carte_jouable.tourner('droite')
+				plateau.carte_jouable.update_murs()
+				
+def insertion_carte_jouable(Plateau, Carte):
+	global espace, pixel_case, maSurface, largeur, hauteur, dimension
+	mouse = pygame.mouse.get_pos()
+	clic = pygame.mouse.get_pressed()
+	while True:
+		for event in pygame.event.get():	
+			if clic[0] == 1 and espace > mouse[1] > espace+(dimension*pixel_case) and 0> mouse[0] >dimension*pixel_case and event.type == pygame.MOUSEBUTTONUP:
+				arrondiInf_x = floor(mouse[0]/100)*100
+				x_carte=int(arrondiInf_x-espace)/pixel_case)
+				arrondiInf_y = floor(mouse[1]/100)*100
+				y_carte=int(arrondiInf_y/pixel_case)
+				plateau.inserer_carte(plateau.carte_jouable,[x_carte,y_carte])
+			
 
 def terminate():
 	'''
