@@ -91,26 +91,26 @@ class Plateau(object):
 				self.carte_jouable = Carte(liste_types[0], True, 0, False)
 				
 				
-			# placement des joueurs
-			# cree la liste des joueurs
-			liste_joueurs = [k for k in range(1,self.nb_joueurs + 1)]
-			
-			# on crée une liste des fantomes qui servira pour l'attribut des missions
-			liste_fantomes = [k for k in range(0,21)]
-			rd.shuffle(liste_fantomes)
-			
-			#liste des positions possibles, que l'on va randomiser pour attribuer aléatoirement aux joueurs
-			init = dimension // 2 - 1
-			liste_pos_joueurs = [[init,init],[init,init+2],[init+2,init],[init+2,init+2]]
-			rd.shuffle(liste_pos_joueurs)
-			
-			#on parcourt la liste des joueurs pour leur attribuer une position et une mission
-			for joueur in liste_joueurs:
-				ligne, col = liste_pos_joueurs[joueur-1]
-				self.matrice[ligne][col].chasseur = Chasseur(joueur,[ligne,col], liste_fantomes[0:3])
-				
-				#On retire les fantomes déjà attribués
-				liste_fantomes.pop(0),liste_fantomes.pop(1),liste_fantomes.pop(2)
+#			# placement des joueurs
+#			# cree la liste des joueurs
+#			liste_joueurs = [k for k in range(1,self.nb_joueurs + 1)]
+#			
+#			# on crée une liste des fantomes qui servira pour l'attribut des missions
+#			liste_fantomes = [k for k in range(0,21)]
+#			rd.shuffle(liste_fantomes)
+#			
+#			#liste des positions possibles, que l'on va randomiser pour attribuer aléatoirement aux joueurs
+#			init = dimension // 2 - 1
+#			liste_pos_joueurs = [[init,init],[init,init+2],[init+2,init],[init+2,init+2]]
+#			rd.shuffle(liste_pos_joueurs)
+#			
+#			#on parcourt la liste des joueurs pour leur attribuer une position et une mission
+#			for joueur in liste_joueurs:
+#				ligne, col = liste_pos_joueurs[joueur-1]
+#				self.matrice[ligne][col].chasseur = Chasseur(joueur,[ligne,col], liste_fantomes[0:3])
+#				
+#				#On retire les fantomes déjà attribués
+#				liste_fantomes.pop(0),liste_fantomes.pop(1),liste_fantomes.pop(2)
 				
 			
 			#On place les fantomes aléatoirement avec la liste des positions liste_pos_carte_alea construite précédemment
@@ -394,11 +394,11 @@ class Chasseur(object):
 	score: entier -- score amassé par le chasseur
 	joker : Booléen -- True si le chasseur dispose encore de son joker
 	fantome: liste d entiers -- correspond aux fantomes amasses par le chasseur"""
-	def __init__(self, id,position, mission):
+	def __init__(self, id):
 		self.id = id
 
-		self.position = position
-		self.mission = mission
+		self.position = [0,0]
+		self.mission = []
 		self.pepite = 0
 		self.score = 0
 		self.joker = True

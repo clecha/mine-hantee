@@ -21,6 +21,13 @@ WINWIDTH = 1100 # width of the program's window, in pixels
 WINHEIGHT = 800 # height in pixels
 HALF_WINWIDTH = int(WINWIDTH / 2)
 HALF_WINHEIGHT = int(WINHEIGHT / 2)
+##########################################
+espace 
+pixel_case 
+maSurface
+largeur 
+hauteur 
+dimension
 
 BLUE = (0,80,255)
 WHITE = (255, 255, 255)
