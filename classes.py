@@ -171,70 +171,78 @@ class Plateau(object):
 		position: liste de coordonnées [x,y]"""
 		x_position = int(position[0])
 		y_position = int(position[1])
+		dimension = self.dimension
 		
 		#On initialise un booléen permettant de savoir si on insère sur une ligne ou sur une colonne
 		insertion_colonne = True
 		
-		#on insère sur une colonne en partant du haut du plateau (1ere ligne)
-		if x_position == 0:
-			liste_a_inserer, index_carte_a_pop = self.matrice[:,y_position], -1
-		#on insère sur une colonne en partant du bas du plateau (dernière ligne)
-		elif x_position == self.dimension - 1:
-			liste_a_inserer, index_carte_a_pop = self.matrice[:,y_position], 0
-		#on insère sur une ligne en partant de la gauche du plateau (1ere colonne)
-		elif y_position == 0:
-			liste_a_inserer, index_carte_a_pop = self.matrice[x_position,:], -1
-			insertion_colonne = False
-		#on insère sur une ligne en partant de la droite du plateau (derniere colonne)
-		elif y_position == self.dimension - 1:
-			liste_a_inserer, index_carte_a_pop = self.matrice[x_position,:], 0
-			insertion_colonne = False
-
-		#on retire l'élément qui a coulissé en dehors du plateau
-		nvelle_carte_jouable = liste_a_inserer[index_carte_a_pop]
-		liste_a_inserer = np.delete(liste_a_inserer, index_carte_a_pop)
+		#1er test: on vérifie que la position d'insertion est valide, çad que l'on veut insérer la carte 
+		#sur une bordure du plateau aux endroits spécifiques d'insertions
+		positions_valides= [[x_pos,y_pos] for x_pos in range(1,dimension-1,2) for y_pos in [0,dimension-1]]+[[x_pos,y_pos] for y_pos in range(1,dimension-1,2) for x_pos in [0,dimension-1]]
 		
+		#l'insertion est effectuée uniquement si la case est présente dans positions_valides
+		if position in positions_valides:
 		
-		
-		#On vérifie la présence d'un fantome ou d'un joueur sur la carte qui a été sortie du tableau
-		#on initialise un booleen qui permettra d'actualiser ou non la position du chasseur
-		presence_chasseur = False
-		#si la carte qui est sortie du plateau avait un fantome, on le déplace sur la carte qu'on insère
-		if nvelle_carte_jouable.fantome !=0:
-			carte.fantome = nvelle_carte_jouable.fantome
-			nvelle_carte_jouable.fantome = 0
-		#puis on fait de même pour les chasseurs
-		if nvelle_carte_jouable.chasseur != 0:
-			carte.chasseur = nvelle_carte_jouable.chasseur
-			nvelle_carte_jouable.chasseur = 0
-			presence_chasseur = True
-			#il faudra quand même actualiser la position du chasseur
-
-		#On insère en début de ligne/colonne car on enlève le dernier élément
-		if index_carte_a_pop == -1:
-			liste_a_inserer = np.append([carte], liste_a_inserer)
-			index_chasseur = 0
-		else:
-			liste_a_inserer = np.append(liste_a_inserer, [carte])
-			index_chasseur = -1
+			#on insère sur une colonne en partant du haut du plateau (1ere ligne)
+			if x_position == 0:
+				liste_a_inserer, index_carte_a_pop = self.matrice[:,y_position], -1
+			#on insère sur une colonne en partant du bas du plateau (dernière ligne)
+			elif x_position == dimension - 1:
+				liste_a_inserer, index_carte_a_pop = self.matrice[:,y_position], 0
+			#on insère sur une ligne en partant de la gauche du plateau (1ere colonne)
+			elif y_position == 0:
+				liste_a_inserer, index_carte_a_pop = self.matrice[x_position,:], -1
+				insertion_colonne = False
+			#on insère sur une ligne en partant de la droite du plateau (derniere colonne)
+			elif y_position == dimension - 1:
+				liste_a_inserer, index_carte_a_pop = self.matrice[x_position,:], 0
+				insertion_colonne = False
+	
+			#on retire l'élément qui a coulissé en dehors du plateau
+			nvelle_carte_jouable = liste_a_inserer[index_carte_a_pop]
+			liste_a_inserer = np.delete(liste_a_inserer, index_carte_a_pop)
 			
-		#Modification de la colonne/ligne où a été inséré la nouvelle liste
-		if insertion_colonne:
-			self.matrice[:,y_position] = liste_a_inserer
-			if presence_chasseur:
-				#Actualisation de la position du chasseur dans l'objet chasseur
-				self.matrice[index_chasseur, y_position].chasseur.position = [index_chasseur, y_position]
-		else:
-			self.matrice[x_position,:] = liste_a_inserer
-			if presence_chasseur:
-				self.matrice[x_position, index_chasseur].chasseur.position = [x_position, index_chasseur]
-		
-		#on actualise la nouvelle carte jouable
-		self.carte_jouable = nvelle_carte_jouable
-		
-		#Actualisation de la jouabilité des cartes
-		carte.jouable = False
-		self.carte_jouable.jouable = True
+			
+			
+			#On vérifie la présence d'un fantome ou d'un joueur sur la carte qui a été sortie du tableau
+			#on initialise un booleen qui permettra d'actualiser ou non la position du chasseur
+			presence_chasseur = False
+			#si la carte qui est sortie du plateau avait un fantome, on le déplace sur la carte qu'on insère
+			if nvelle_carte_jouable.fantome !=0:
+				carte.fantome = nvelle_carte_jouable.fantome
+				nvelle_carte_jouable.fantome = 0
+			#puis on fait de même pour les chasseurs
+			if nvelle_carte_jouable.chasseur != 0:
+				carte.chasseur = nvelle_carte_jouable.chasseur
+				nvelle_carte_jouable.chasseur = 0
+				presence_chasseur = True
+				#il faudra quand même actualiser la position du chasseur
+	
+			#On insère en début de ligne/colonne car on enlève le dernier élément
+			if index_carte_a_pop == -1:
+				liste_a_inserer = np.append([carte], liste_a_inserer)
+				index_chasseur = 0
+			else:
+				liste_a_inserer = np.append(liste_a_inserer, [carte])
+				index_chasseur = -1
+				
+			#Modification de la colonne/ligne où a été inséré la nouvelle liste
+			if insertion_colonne:
+				self.matrice[:,y_position] = liste_a_inserer
+				if presence_chasseur:
+					#Actualisation de la position du chasseur dans l'objet chasseur
+					self.matrice[index_chasseur, y_position].chasseur.position = [index_chasseur, y_position]
+			else:
+				self.matrice[x_position,:] = liste_a_inserer
+				if presence_chasseur:
+					self.matrice[x_position, index_chasseur].chasseur.position = [x_position, index_chasseur]
+			
+			#on actualise la nouvelle carte jouable
+			self.carte_jouable = nvelle_carte_jouable
+			
+			#Actualisation de la jouabilité des cartes
+			carte.jouable = False
+			self.carte_jouable.jouable = True
 		
 	def sauvegarde(self, num_sauvegarde = 1):
 		""" Methode qui permet de sauvegarder un plateau dans un fichier à un instant t
