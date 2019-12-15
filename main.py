@@ -22,12 +22,12 @@ WINHEIGHT = 800 # height in pixels
 HALF_WINWIDTH = int(WINWIDTH / 2)
 HALF_WINHEIGHT = int(WINHEIGHT / 2)
 ##########################################
-espace 
-pixel_case 
-maSurface
-largeur 
-hauteur 
-dimension
+#espace 
+#pixel_case 
+#maSurface
+#largeur 
+#hauteur 
+#dimension
 
 BLUE = (0,80,255)
 WHITE = (255, 255, 255)
@@ -74,8 +74,8 @@ IMAGES_DICT = {'titre': pygame.image.load('images/ecran_titre/titre.png'),
              'carte1' : pygame.image.load('images/cartes/type1.png'),
              'carte2' : pygame.image.load('images/cartes/type2.png'),
              'carte3' : pygame.image.load('images/cartes/type3.png'),	
-             'fleche1': pygame.image.load('images/fleche1.png'),
-             'fleche2': pygame.image.load('images/fleche2.png')
+             'fleche1': pygame.image.load('images/fleches/fleche1.png'),
+             'fleche2': pygame.image.load('images/fleches/fleche2.png')
 			   }
 
 def main():
