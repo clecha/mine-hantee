@@ -108,7 +108,8 @@ def main():
 def affiche_accueil():
 	'''Fonction permettant l'affichage de l'écran d'accueil du jeu, ou on peut faire les choix suivants : nouveau jeu, reprendre, quitter
 	-->: 'nouveau_jeu', 'reprendre_jeu' : c'est 2 valeurs sont utilisées dans main() pour appeler les fonctions adéquates
-	'''
+	/!\ il faut encore écrire l'éveneement cliquer sur reprendre le jeu 
+    '''
 	gameDisplay.fill(BLACK)
 	
 	#affichage du titre
@@ -163,11 +164,13 @@ def affiche_accueil():
 
 def init_jeu():
 	global plateau
+    
 	'''Fonction gérant l'écran permettant d'initialiser les pramètres du nouveau jeu : dimension, nb de joueurs, humain ou ordi
 	-->: dictionnaire contenant : dimension(int), nb_joueurs (in), joueur 1(int), joueur 2(int), joueur 3(int), joueur4(int)
 	dimension : dimension du plateau
 	joueur x(int) : 0 si ce joueur n'existe pas (2 ou 3 joueurs), 1 si c'est un humain, 2 si c'est une IA
 	'''
+    
 	dimension = 7
 	nb_joueurs = 2
 	joueur1 = 1
