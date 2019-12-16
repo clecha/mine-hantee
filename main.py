@@ -18,17 +18,20 @@ import classes as cl
 from math import *
 
 FPS = 30 # frames per second to update the screen
-WINWIDTH = 1100 # width of the program's window, in pixels
-WINHEIGHT = 800 # height in pixels
+WINWIDTH = 1200 # width of the program's window, in pixels
+WINHEIGHT = 700 # height in pixels
 HALF_WINWIDTH = int(WINWIDTH / 2)
 HALF_WINHEIGHT = int(WINHEIGHT / 2)
 
+dimension=7
 BLUE = (0,80,255)
 WHITE = (255, 255, 255)
 BLACK = (0,0,0)
+GREY=(50,50,50)
 
 espace = 500
-pixel_case = 100
+
+
 
 #dictionnaire contenant l'ensemble des images du jeu
 IMAGES_DICT = {'titre': pygame.image.load('images/ecran_titre/titre.png'),
@@ -57,26 +60,13 @@ IMAGES_DICT = {'titre': pygame.image.load('images/ecran_titre/titre.png'),
 			   'choix_ajouter_joueur_dis':pygame.image.load('images/init_jeu/bouton_ajoute_disabled.png'),
 			   'choix_retirer_joueur':pygame.image.load('images/init_jeu/bouton_retire.png'),
 			   'choix_retirer_joueur_dis':pygame.image.load('images/init_jeu/bouton_retire_disabled.png'),
-			   'choix_valider':pygame.image.load('images/init_jeu/bouton_valider.png'),
-			   #########images plateau de jeu##########
-			 'pepite': pygame.image.load('images/persos/pepite.png'),
-			 'chasseur1': pygame.image.load('images/persos/chasseur1.png'),
-			 'chasseur2': pygame.image.load('images/persos/chasseur2.png'),
-			 'chasseur3': pygame.image.load('images/persos/chasseur3.png'),
-			 'chasseur4': pygame.image.load('images/persos/chasseur4.png'),
-			 'fantome': pygame.image.load('images/persos/fantome.png'),	
-             'carte1' : pygame.image.load('images/cartes/type1.png'),
-             'carte2' : pygame.image.load('images/cartes/type2.png'),
-             'carte3' : pygame.image.load('images/cartes/type3.png'),	
-             'fleche1': pygame.image.load('images/fleche1.png'),
-             'fleche2': pygame.image.load('images/fleche2.png')
-			   }
+			   'choix_valider':pygame.image.load('images/init_jeu/bouton_valider.png')}
+
 
 def main():
 	'''Fonction principale du jeu
 	'''
-	global IMAGES_DICT, FPSCLOCK, gameDisplay
-	
+	global IMAGES_DICT, FPSCLOCK, gameDisplay, plateau
 	# Pygame initialization and basic set up of the global variables.
 	pygame.init()
 	FPSCLOCK = pygame.time.Clock()
@@ -87,35 +77,27 @@ def main():
 	#titre de la fenetre
 	pygame.display.set_caption('La Mine Hantée')
 	
-
 	#appel de la fonction affichant l'écran d'accueil
 	choix_accueil = affiche_accueil() #choix_accueil prend la valeur retournée par affiche_accueil(), soit 'nouveau_jeu', soit 'reprendre_jeu'
 	
 	#gestion du choix fait par l'utilisateur sur l'écran d'accueil ('nouveau_jeu','reprendre_jeu' ou 'quitter')
 	if choix_accueil == 'nouveau_jeu':
-		parametres_jeu = init_jeu() #parametres_jeu prend la valeur retournée par init_jeu, un tuple d'int contenant (dimension, joueur1,joueur2,joueur3,joueur4)
-		print(parametres_jeu)
-		#Création du plateau sur lequel on va jouer
-		plateau, dico_joueurs = initialisation_partie(parametres_jeu)
-		print(init_plateau())
-		print(actualisation_plateau())
+		parametres_jeu = init_jeu() #parametres_jeu prend la valeur retournée par init_jeu, un dictionnaire contenant (dimension, joueur1,joueur2,joueur3,joueur4,go)
+		plateau = cl.Plateau(parametres_jeu['dimension'],parametres_jeu['nb_joueurs'])
+		init_plateau()
+		actualisation_plateau()
 	elif choix_accueil == 'reprendre_jeu':
 		#/!\ à ajouter : doit mettre la fonction appelant l'écran du choix des parties sauvegardées
 		pass
 	elif choix_accueil == 'quitter':
 		terminate()		  
 	
-	print(plateau, dico_joueurs)
-	"""
-	À ce stade on a créé le plateau et les joueurs, contenus dans la variable plateau et dico_joueur
-	plateau : contient les cartes
-	dico_joueurs : contient les objets Chasseurs
-	"""
-#
-	while True:
-		print("joueur{} est le joueur actif".format())
-		print("J{} est le joueur actif")
-		plateau.joueur_actif = 1
+	"""À ce stade on a créé le plateau et les joueurs, contenus dans la variable plateau et dico_joueur
+	plateau : contient les cartes"""
+	# while True:
+	# 	print("joueur{} est le joueur actif".format())
+	# 	print("J{} est le joueur actif")
+	# 	plateau.joueur_actif = 1
 
 	return terminate()
 	
@@ -176,6 +158,7 @@ def affiche_accueil():
 		FPSCLOCK.tick()
 
 def init_jeu():
+	global plateau
 	'''Fonction gérant l'écran permettant d'initialiser les pramètres du nouveau jeu : dimension, nb de joueurs, humain ou ordi
 	-->: dictionnaire contenant : dimension(int), nb_joueurs (in), joueur 1(int), joueur 2(int), joueur 3(int), joueur4(int)
 	dimension : dimension du plateau
@@ -356,10 +339,9 @@ def init_jeu():
 				print('nbm',nb_joueurs)
 			
 			#Gestion du bouton valider
-			if validerRect.width+validerRect.x > mouse[0] > validerRect.x and validerRect.y+ validerRect.height> mouse[1] > validerRect.y and event.type == pygame.MOUSEBUTTONUP:
+			if validerRect.width+validerRect.x > mouse[0] > validerRect.x and validerRect.y+ validerRect.height> mouse[1] > validerRect.y and event.type == pygame.MOUSEBUTTONUP and clic[0] == 1:
 				print('dim,j1,j2,j3,j4:',dimension, joueur1, joueur2, joueur3, joueur4)
 				return {'dimension':dimension, 'nb_joueurs':nb_joueurs,'joueur1': joueur1, 'joueur2':joueur2, 'joueur3':joueur3, 'joueur4':joueur4}
-				
 			if event.type == pygame.QUIT:
 				terminate()
 			elif event.type == pygame.KEYDOWN:
@@ -478,54 +460,30 @@ def boucle_deplacement(plateau):
 		pygame.display.update()
 		FPSCLOCK.tick()
 
-def initialisation_partie(parametres_jeu):
-	"""Fonction initialisant les objets d'un jeu.
-	Arguments:
-		dico_parametres {dict} -- Contient les valeurs de dimension, nb_joueur, et type de joueur
-	
-	Returns:
-		Plateau, dict -- plateau de jeu, dictionnaire contenant les objets type Chasseur
-	"""
-
-	###Initialisation du plateau
-	plateau = cl.Plateau(parametres_jeu['dimension'],parametres_jeu['nb_joueurs'])
-	dico_joueurs = {}
-	
-	###Initialisation des chasseurs et de leurs missions
-	for i in range(1,parametres_jeu['nb_joueurs']+1):
-		if parametres_jeu['joueur'+str(i)] == 1: #le ieme joueurs est humain
-			dico_joueurs[i] = cl.Chasseur(i) #on crée un objet Chasseur ajouté au dictionnaire des joueurs
-		elif parametres_jeu['joueur'+str(i)] == 2: #le ieme joueurs est une IA
-			pass
-	
-	###Initialisation des missions des joueurs
-	fantomes = [x for x in range(1,22)] #cette liste contient les fantomes disponibles
-	shuffle(fantomes) #on la mélange
-	for j in dico_joueurs.values(): #parcourt les objets Chasseur contenus dans le dictionnaire
-		for x in range(3):
-			j.mission.append(fantomes[0]) #on ajoute à la liste mission du joueur le premier objet de la liste mélangée
-			fantomes.remove(fantomes[0]) #on retire ensuite le premier objet de la liste
-
-	###Placement des joueurs sur le plateau si dim = 7
-	if parametres_jeu['dimension'] == 7:
-		dico_joueurs[1].position, dico_joueurs[2].position = [2,2], [4,4]
-		if	parametres_jeu['nb_joueurs'] == 3:
-			dico_joueurs[3].position = [2,4]
-		if	parametres_jeu['nb_joueurs'] == 4:
-			dico_joueurs[4].position = [4,2]
-
-	return plateau, dico_joueurs
 
 def init_plateau():
-	global espace, pixel_case, maSurface, largeur, hauteur, dimension
+	global plateau, espace, pixel_case, maSurface, WINWIDTH, WINHEIGHT, IMAGES_DICT
+	dimension = plateau.dimension
+	pixel_case=int(WINHEIGHT/dimension)
 	
+	IMAGES_DICT={'pepite': pygame.transform.scale(pygame.image.load('images/persos/pepite.png'),(int(pixel_case/6),int(pixel_case/6))),
+		'chasseur1': pygame.transform.scale(pygame.image.load('images/persos/chasseur1.png'),(int(pixel_case*2/3),int(pixel_case*2/3))),
+		'chasseur2': pygame.transform.scale(pygame.image.load('images/persos/chasseur2.png'),(int(pixel_case*2/3),int(pixel_case*2/3))),
+		'chasseur3': pygame.transform.scale(pygame.image.load('images/persos/chasseur3.png'),(int(pixel_case*2/3),int(pixel_case*2/3))),
+		'chasseur4': pygame.transform.scale(pygame.image.load('images/persos/chasseur4.png'),(int(pixel_case*2/3),int(pixel_case*2/3))),
+		'fantome': pygame.transform.scale(pygame.image.load('images/persos/fantome.png'),(int(pixel_case*3/5),int(pixel_case*3/5))),	
+		'carte1' : pygame.transform.scale(pygame.image.load('images/cartes/type1.png'),(pixel_case,pixel_case)),
+		'carte2' : pygame.transform.scale(pygame.image.load('images/cartes/type2.png'),(pixel_case,pixel_case)),
+		'carte3' : pygame.transform.scale(pygame.image.load('images/cartes/type3.png'),(pixel_case,pixel_case)),
+		'fleche1': pygame.image.load('images/fleche1.png'),
+		'fleche2': pygame.image.load('images/fleche2.png')
+             }
 	#Initialisation de la fenetre du plateau
 	pygame.init()
-	largeur=int(dimension*pixel_case+espace)
-	hauteur=int(dimension*pixel_case)
-	
+
 	#Affichage du plateau et de tous les éléments qui ne changent pas au cours de la partie
-	maSurface = pygame.display.set_mode((largeur,hauteur))
+
+	maSurface = pygame.display.set_mode((WINWIDTH,WINHEIGHT))
 	pygame.display.set_caption('La mine hantée')
 	maSurface.fill(GREY)
 	
@@ -537,12 +495,12 @@ def init_plateau():
 	monRectangleDeTexte	 = maSurfaceDeTexte.get_rect()
 	monRectangleDeTexte .topleft = (10,550)
 	maSurface.blit(maSurfaceDeTexte,monRectangleDeTexte)
-	maSurface.blit(IMAGES_dict['fleche1'],(150,530))
-	maSurface.blit(IMAGES_dict['fleche2'],(275,530))
+	maSurface.blit(IMAGES_DICT['fleche1'],(150,530))
+	maSurface.blit(IMAGES_DICT['fleche2'],(275,530))
 	
 	
 def actualisation_plateau():
-	global plateau, espace, pixel_case, maSurface, largeur, hauteur, dico_joueurs
+	global plateau, espace, pixel_case, maSurface, WINWIDTH, WINHEIGHT, dico_joueurs
 	dimension = plateau.dimension
 	matrice = plateau.matrice
 	
@@ -558,7 +516,7 @@ def actualisation_plateau():
 	dessine_carte(carte_jouable)
 
 	#affichage des données spécifiques à chaque joueur
-	l=[(10,20),(255,20),(10,265),(255,265)] #liste des positions du texte
+	'''l=[(10,20),(255,20),(10,265),(255,265)] #liste des positions du texte
 	m=[(170,0),(425,0),(170,245),(425,245)]	
 	i=0
 	for j in dico_joueurs.values():
@@ -567,31 +525,31 @@ def actualisation_plateau():
 		
 		fontObj = pygame.font.SysFont('arial',25)
 		
-		maSurfaceDeTexte = fontObj.render('Mission: ',True,WHITE)
-		monRectangleDeTexte= maSurfaceDeTexte.get_rect()
-		monRectangleDeTexte.topleft = (l[i][0],l[i][1])
+		maSurfaceDeTexte = fontObj.render('Mission: '+(', '.join(str(elem) for elem in j.mission),True,WHITE)
+		monRectangleDeTexte	 = maSurfaceDeTexte.get_rect()
+		monRectangleDeTexte .topleft = (l[i][0],l[i][1])
 		maSurface.blit(maSurfaceDeTexte,monRectangleDeTexte)
 		
 	
-		maSurfaceDeTexte = fontObj.render('Nombre de pépites:',True,WHITE)
+		maSurfaceDeTexte = fontObj.render('Nombre de pépites: '+str(j.pepite),True,WHITE)
 		monRectangleDeTexte	 = maSurfaceDeTexte.get_rect()
 		monRectangleDeTexte .topleft = (l[i][0],l[i][1]+55)
 		maSurface.blit(maSurfaceDeTexte,monRectangleDeTexte)
 	
-		maSurfaceDeTexte = fontObj.render('Fantômes attrapés: ',True,WHITE)
+		maSurfaceDeTexte = fontObj.render('Fantômes attrapés: '+(', '.join(str(elem) for elem in j.fantome),True,WHITE)
 		monRectangleDeTexte	 = maSurfaceDeTexte.get_rect()
 		monRectangleDeTexte .topleft = (l[i][0],l[i][1]+110)
 		maSurface.blit(maSurfaceDeTexte,monRectangleDeTexte)
 	
-		maSurfaceDeTexte = fontObj.render('Joker: ',True,WHITE)
+		maSurfaceDeTexte = fontObj.render('Joker: ' + j.joker,True,WHITE)
 		monRectangleDeTexte	 = maSurfaceDeTexte.get_rect()
 		monRectangleDeTexte .topleft = (l[i][0],l[i][1]+185)
 		maSurface.blit(maSurfaceDeTexte,monRectangleDeTexte)
 		
-		i+=1
-
+		i+=1'''
+		
 def dessine_carte(Carte, position = None):
-	global maSurface, BLACK, espace
+	global maSurface, BLACK, espace, WINWIDTH, WINHEIGHT
 	
 	#position est definie comme None par defaut pour 
 	
@@ -613,35 +571,35 @@ def dessine_carte(Carte, position = None):
 	#Carte type 1
 	if Carte.type_carte==1:
 		if Carte.orientation==0 or Carte.orientation==2:
-			carte_rotate=pygame.transform.rotate(IMAGES_dict['carte'+str(Carte.type_carte)],90)
+			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)],90)
 			maSurface.blit(carte_rotate,(x_pixel,y_pixel))
 		else:
-			maSurface.blit(IMAGES_dict['carte'+str(Carte.type_carte)],(x_pixel,y_pixel))
+			maSurface.blit(IMAGES_DICT['carte'+str(Carte.type_carte)],(x_pixel,y_pixel))
 	#Carte type 2
 	if Carte.type_carte==2:
 		if Carte.orientation==0:
-			maSurface.blit(IMAGES_dict['carte'+str(Carte.type_carte)],(x_pixel,y_pixel))
+			maSurface.blit(IMAGES_DICT['carte'+str(Carte.type_carte)],(x_pixel,y_pixel))
 		elif Carte.orientation==1:
-			carte_rotate=pygame.transform.rotate(IMAGES_dict['carte'+str(Carte.type_carte)],90)
+			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)],90)
 			maSurface.blit(carte_rotate,(x_pixel,y_pixel))
 		elif Carte.orientation==2:
-			carte_rotate=pygame.transform.rotate(IMAGES_dict['carte'+str(Carte.type_carte)],180)
+			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)],180)
 			maSurface.blit(carte_rotate,(x_pixel,y_pixel))
 		else:
-			carte_rotate=pygame.transform.rotate(IMAGES_dict['carte'+str(Carte.type_carte)],270)
+			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)],270)
 			maSurface.blit(carte_rotate,(x_pixel,y_pixel))
 	#Carte type 3
 	if Carte.type_carte==3:
 		if Carte.orientation==0:
-			maSurface.blit(IMAGES_dict['carte'+str(Carte.type_carte)],(x_pixel,y_pixel))
+			maSurface.blit(IMAGES_DICT['carte'+str(Carte.type_carte)],(x_pixel,y_pixel))
 		elif Carte.orientation==1:
-			carte_rotate=pygame.transform.rotate(IMAGES_dict['carte'+str(Carte.type_carte)],90)
+			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)],90)
 			maSurface.blit(carte_rotate,(x_pixel,y_pixel))
 		elif Carte.orientation==2:
-			carte_rotate=pygame.transform.rotate(IMAGES_dict['carte'+str(Carte.type_carte)],180)
+			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)],180)
 			maSurface.blit(carte_rotate,(x_pixel,y_pixel))
 		else:
-			carte_rotate=pygame.transform.rotate(IMAGES_dict['carte'+str(Carte.type_carte)],270)
+			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)],270)
 			maSurface.blit(carte_rotate,(x_pixel,y_pixel))
 	
 	#Affichage du chasseur
@@ -649,49 +607,57 @@ def dessine_carte(Carte, position = None):
 	if chasseur != 0:
 		id_chasseur = chasseur.id
 		#print(id_chasseur)
-		maSurface.blit(IMAGES_dict['chasseur'+str(id_chasseur)],(x_pixel+20,y_pixel+10))
+		maSurface.blit(IMAGES_DICT['chasseur'+str(id_chasseur)],(x_pixel+2*pixel_case/10,y_pixel+pixel_case/10))
 		
 	#Affichage du fantôme
 	fantome = Carte.fantome
 	if fantome != 0 :
 		id_fantome = fantome.numero
-		maSurface.blit(IMAGES_dict['fantome'],(x_pixel+2,y_pixel+2))
+		maSurface.blit(IMAGES_DICT['fantome'],(x_pixel+2,y_pixel+2))
 		fontObj = pygame.font.SysFont('arial',20,bold=True)
 		maSurfaceDeTexte=fontObj.render(str(id_fantome),True,BLACK)
 		monRectangleDeTexte=maSurfaceDeTexte.get_rect()
-		monRectangleDeTexte.topleft = (x_pixel+30,y_pixel+5)
+		monRectangleDeTexte.topleft = (x_pixel+3*pixel_case/10,y_pixel+5)
 		maSurface.blit(maSurfaceDeTexte,monRectangleDeTexte)
 		
 	#Affichage de la pépite
 	if Carte.pepite == True:
-		maSurface.blit(IMAGES_dict['pepite'],(x_pixel+40,y_pixel+40))	
+		maSurface.blit(IMAGES_DICT['pepite'],(x_pixel+40,y_pixel+40))	
 		
+
 def rotation_carte_jouable(Plateau,Carte):
 	mouse = pygame.mouse.get_pos()
 	clic = pygame.mouse.get_pressed()
-	fleche1dim= IMAGES_DICT['fleche1'].get_rect(center=(HALF_WINWIDTH, HALF_WINHEIGHT/4))
-	fleche2dim= IMAGES_DICT['fleche1'].get_rect(center=(HALF_WINWIDTH, HALF_WINHEIGHT/4))
+	fleche1= IMAGES_DICT['fleche1'].get_rect()
+	fleche2= IMAGES_DICT['fleche1'].get_rect()
 	while True:
-		for event in pygame.event.get():			:
-			if clic[0] == 1 and fleche1dim.x+fleche1dim.width > mouse[0] > fleche1dim.x and fleche1dim.y+fleche1dim.height> mouse[1] >fleche1dim.y and event.type == pygame.MOUSEBUTTONUP:
-				plateau.carte_jouable.tourner('gauche')
-				plateau.carte_jouable.update_murs()
-			elif clic[0] == 1 andfleche2dim.x+fleche2dim.width > mouse[0] > fleche2dim.x and fleche2dim.y+fleche2dim.height> mouse[1] >fleche2dim.y and event.type == pygame.MOUSEBUTTONUP:
-				plateau.carte_jouable.tourner('droite')
-				plateau.carte_jouable.update_murs()
+		for event in pygame.event.get():	
+			if event.type == QUIT:
+				terminate()		
+			elif event.type == pygame.MOUSEMOTION:
+				if clic[0] == 1 and fleche1[0]+fleche1[2] > mouse[0] > fleche1[0] and fleche1[1]+fleche1[3]> mouse[1] >fleche1[1]:
+					plateau.carte_jouable.tourner('gauche')
+					plateau.carte_jouable.update_murs()
+				elif clic[0] == 1 and fleche2[0]+fleche2[2] > mouse[0] > fleche2[0] and fleche2[1]+fleche2[3]> mouse[1] >fleche2[1]:
+					plateau.carte_jouable.tourner('droite')
+					plateau.carte_jouable.update_murs()
+
 				
 def insertion_carte_jouable(Plateau, Carte):
-	global espace, pixel_case, maSurface, largeur, hauteur, dimension
+	global espace, pixel_case, gameDisplay, WINWIDTH, WINHEIGHT, dimension
 	mouse = pygame.mouse.get_pos()
 	clic = pygame.mouse.get_pressed()
 	while True:
 		for event in pygame.event.get():	
-			if clic[0] == 1 and espace > mouse[1] > espace+(dimension*pixel_case) and 0> mouse[0] >dimension*pixel_case and event.type == pygame.MOUSEBUTTONUP:
-				arrondiInf_x = floor(mouse[0]/100)*100
-				x_carte=int(arrondiInf_x-espace)/pixel_case)
-				arrondiInf_y = floor(mouse[1]/100)*100
-				y_carte=int(arrondiInf_y/pixel_case)
-				plateau.inserer_carte(plateau.carte_jouable,[x_carte,y_carte])
+			if event.type == QUIT:
+				terminate()
+			elif event.type == pygame.MOUSEBUTTONUP:
+				if clic[0] == 1 and espace > mouse[1] > espace+(dimension*pixel_case) and 0> mouse[0] >dimension*pixel_case:
+					arrondiInf_x = floor(mouse[0]/100)*100
+					x_carte=int(arrondiInf_x-espace)/pixel_case
+					arrondiInf_y = floor(mouse[1]/100)*100
+					y_carte=int(arrondiInf_y/pixel_case)
+					plateau.inserer_carte(plateau.carte_jouable,[x_carte,y_carte])
 			
 
 def terminate():
@@ -703,3 +669,9 @@ def terminate():
 	
 if __name__ == '__main__':
 	main()
+	
+
+#test
+# plateau = cl.Plateau(11,3)
+# init_plateau()
+# actualisation_plateau()
