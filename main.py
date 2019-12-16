@@ -66,7 +66,7 @@ IMAGES_DICT = {'titre': pygame.image.load('images/ecran_titre/titre.png'),
 def main():
 	'''Fonction principale du jeu
 	'''
-	global IMAGES_DICT, FPSCLOCK, gameDisplay, plateau
+	global IMAGES_DICT, FPSCLOCK, gameDisplay
 	# Pygame initialization and basic set up of the global variables.
 	pygame.init()
 	FPSCLOCK = pygame.time.Clock()
@@ -84,7 +84,7 @@ def main():
 	if choix_accueil == 'nouveau_jeu':
 		parametres_jeu = init_jeu() #parametres_jeu prend la valeur retournée par init_jeu, un dictionnaire contenant (dimension, joueur1,joueur2,joueur3,joueur4,go)
 		plateau = cl.Plateau(parametres_jeu['dimension'],parametres_jeu['nb_joueurs'])
-		init_plateau()
+		init_plateau(plateau)
 	elif choix_accueil == 'reprendre_jeu':
 		#/!\ à ajouter : doit mettre la fonction appelant l'écran du choix des parties sauvegardées
 		terminate()
@@ -93,7 +93,7 @@ def main():
 	
 	while True:
 		
-		actualisation_plateau()
+		actualisation_plateau(plateau)
 	
 	
 	"""À ce stade on a créé le plateau et les joueurs, contenus dans la variable plateau et dico_joueur
@@ -163,7 +163,6 @@ def affiche_accueil():
 		FPSCLOCK.tick()
 
 def init_jeu():
-	global plateau
     
 	'''Fonction gérant l'écran permettant d'initialiser les pramètres du nouveau jeu : dimension, nb de joueurs, humain ou ordi
 	-->: dictionnaire contenant : dimension(int), nb_joueurs (in), joueur 1(int), joueur 2(int), joueur 3(int), joueur4(int)
@@ -468,8 +467,8 @@ def boucle_deplacement(plateau):
 		FPSCLOCK.tick()
 
 
-def init_plateau():
-	global plateau, espace, pixel_case, gameDisplay, WINWIDTH, WINHEIGHT, IMAGES_DICT
+def init_plateau(plateau):
+	global espace, pixel_case, gameDisplay, WINWIDTH, WINHEIGHT, IMAGES_DICT
 	print("init plateau")
 	dimension = plateau.dimension
 	pixel_case=int(WINHEIGHT/dimension)
@@ -504,15 +503,13 @@ def init_plateau():
 	monRectangleDeTexte .topleft = (10,550)
 	gameDisplay.blit(gameDisplayDeTexte,monRectangleDeTexte)
 	gameDisplay.blit(IMAGES_DICT['fleche1'],(150,530))
-	gameDisplay.blit(IMAGES_DICT['fleche2'],(275,530))
+	gameDisplay.blit(IMAGES_DICT['fleche2'],(275,530))	
 	
-	
-	actualisation_plateau()
+	actualisation_plateau(plateau)
 
 	
-	
-def actualisation_plateau():
-	global plateau, espace, pixel_case, gameDisplay, WINWIDTH, WINHEIGHT, dico_joueurs
+def actualisation_plateau(plateau):
+	global espace, pixel_case, gameDisplay, WINWIDTH, WINHEIGHT, dico_joueurs
 	dimension = plateau.dimension
 	matrice = plateau.matrice
 	
