@@ -85,12 +85,16 @@ def main():
 		parametres_jeu = init_jeu() #parametres_jeu prend la valeur retournée par init_jeu, un dictionnaire contenant (dimension, joueur1,joueur2,joueur3,joueur4,go)
 		plateau = cl.Plateau(parametres_jeu['dimension'],parametres_jeu['nb_joueurs'])
 		init_plateau()
-		actualisation_plateau()
 	elif choix_accueil == 'reprendre_jeu':
 		#/!\ à ajouter : doit mettre la fonction appelant l'écran du choix des parties sauvegardées
-		pass
+		terminate()
 	elif choix_accueil == 'quitter':
 		terminate()		  
+	
+	while True:
+		
+		actualisation_plateau()
+	
 	
 	"""À ce stade on a créé le plateau et les joueurs, contenus dans la variable plateau et dico_joueur
 	plateau : contient les cartes"""
@@ -462,7 +466,8 @@ def boucle_deplacement(plateau):
 
 
 def init_plateau():
-	global plateau, espace, pixel_case, maSurface, WINWIDTH, WINHEIGHT, IMAGES_DICT
+	global plateau, espace, pixel_case, gameDisplay, WINWIDTH, WINHEIGHT, IMAGES_DICT
+	print("init plateau")
 	dimension = plateau.dimension
 	pixel_case=int(WINHEIGHT/dimension)
 	
@@ -478,42 +483,58 @@ def init_plateau():
 		'fleche1': pygame.image.load('images/fleche1.png'),
 		'fleche2': pygame.image.load('images/fleche2.png')
              }
-	#Initialisation de la fenetre du plateau
-	pygame.init()
+
 
 	#Affichage du plateau et de tous les éléments qui ne changent pas au cours de la partie
+	# 
+	# gameDisplay = pygame.display.set_mode((WINWIDTH,WINHEIGHT))
+	# pygame.display.set_caption('La mine hantée')
 
-	maSurface = pygame.display.set_mode((WINWIDTH,WINHEIGHT))
-	pygame.display.set_caption('La mine hantée')
-	maSurface.fill(GREY)
+	gameDisplay.fill(GREY)
 	
-	pygame.draw.line(maSurface,WHITE,(10,240),(490,240),5)
-	pygame.draw.line(maSurface,WHITE,(240,10),(240,485),5)
+	pygame.draw.line(gameDisplay,WHITE,(10,240),(490,240),5)
+	pygame.draw.line(gameDisplay,WHITE,(240,10),(240,485),5)
 	
 	fontObj = pygame.font.SysFont('arial',40)
-	maSurfaceDeTexte = fontObj.render('Carte: ',True,WHITE)
-	monRectangleDeTexte	 = maSurfaceDeTexte.get_rect()
+	gameDisplayDeTexte = fontObj.render('Carte: ',True,WHITE)
+	monRectangleDeTexte	 = gameDisplayDeTexte.get_rect()
 	monRectangleDeTexte .topleft = (10,550)
-	maSurface.blit(maSurfaceDeTexte,monRectangleDeTexte)
-	maSurface.blit(IMAGES_DICT['fleche1'],(150,530))
-	maSurface.blit(IMAGES_DICT['fleche2'],(275,530))
+	gameDisplay.blit(gameDisplayDeTexte,monRectangleDeTexte)
+	gameDisplay.blit(IMAGES_DICT['fleche1'],(150,530))
+	gameDisplay.blit(IMAGES_DICT['fleche2'],(275,530))
+	
+	
+	actualisation_plateau()
+
 	
 	
 def actualisation_plateau():
-	global plateau, espace, pixel_case, maSurface, WINWIDTH, WINHEIGHT, dico_joueurs
+	global plateau, espace, pixel_case, gameDisplay, WINWIDTH, WINHEIGHT, dico_joueurs
 	dimension = plateau.dimension
 	matrice = plateau.matrice
 	
-	#Parcours du plateau pour afficher toutes les cases
-	for ligne in range(dimension):
-		for col in range(dimension):
-			position = [ligne,col]
-			carte = matrice[ligne][col]
-			dessine_carte(carte, position)
+	while True:
+		#Parcours du plateau pour afficher toutes les cases
+		for ligne in range(dimension):
+			for col in range(dimension):
+				position = [ligne,col]
+				carte = matrice[ligne][col]
+				dessine_carte(carte, position)
+				
+		#affichage de la carte jouable
+		carte_jouable = plateau.carte_jouable
+		dessine_carte(carte_jouable)
 			
-	#affichage de la carte jouable
-	carte_jouable = plateau.carte_jouable
-	dessine_carte(carte_jouable)
+		for event in pygame.event.get():
+			if event.type == pygame.KEYDOWN:
+				if event.key == pygame.K_ESCAPE:
+					terminate()
+				return # user has pressed a key, so return.
+		
+		pygame.display.update()
+		FPSCLOCK.tick()
+		
+		
 
 	#affichage des données spécifiques à chaque joueur
 	'''l=[(10,20),(255,20),(10,265),(255,265)] #liste des positions du texte
@@ -521,35 +542,35 @@ def actualisation_plateau():
 	i=0
 	for j in dico_joueurs.values():
 		
-		maSurface.blit(IMAGES_dict['chasseur'+str(j.id)],(m[i][0],m[i][1]))
+		gameDisplay.blit(IMAGES_dict['chasseur'+str(j.id)],(m[i][0],m[i][1]))
 		
 		fontObj = pygame.font.SysFont('arial',25)
 		
-		maSurfaceDeTexte = fontObj.render('Mission: '+(', '.join(str(elem) for elem in j.mission),True,WHITE)
-		monRectangleDeTexte	 = maSurfaceDeTexte.get_rect()
+		gameDisplayDeTexte = fontObj.render('Mission: '+(', '.join(str(elem) for elem in j.mission),True,WHITE)
+		monRectangleDeTexte	 = gameDisplayDeTexte.get_rect()
 		monRectangleDeTexte .topleft = (l[i][0],l[i][1])
-		maSurface.blit(maSurfaceDeTexte,monRectangleDeTexte)
+		gameDisplay.blit(gameDisplayDeTexte,monRectangleDeTexte)
 		
 	
-		maSurfaceDeTexte = fontObj.render('Nombre de pépites: '+str(j.pepite),True,WHITE)
-		monRectangleDeTexte	 = maSurfaceDeTexte.get_rect()
+		gameDisplayDeTexte = fontObj.render('Nombre de pépites: '+str(j.pepite),True,WHITE)
+		monRectangleDeTexte	 = gameDisplayDeTexte.get_rect()
 		monRectangleDeTexte .topleft = (l[i][0],l[i][1]+55)
-		maSurface.blit(maSurfaceDeTexte,monRectangleDeTexte)
+		gameDisplay.blit(gameDisplayDeTexte,monRectangleDeTexte)
 	
-		maSurfaceDeTexte = fontObj.render('Fantômes attrapés: '+(', '.join(str(elem) for elem in j.fantome),True,WHITE)
-		monRectangleDeTexte	 = maSurfaceDeTexte.get_rect()
+		gameDisplayDeTexte = fontObj.render('Fantômes attrapés: '+(', '.join(str(elem) for elem in j.fantome),True,WHITE)
+		monRectangleDeTexte	 = gameDisplayDeTexte.get_rect()
 		monRectangleDeTexte .topleft = (l[i][0],l[i][1]+110)
-		maSurface.blit(maSurfaceDeTexte,monRectangleDeTexte)
+		gameDisplay.blit(gameDisplayDeTexte,monRectangleDeTexte)
 	
-		maSurfaceDeTexte = fontObj.render('Joker: ' + j.joker,True,WHITE)
-		monRectangleDeTexte	 = maSurfaceDeTexte.get_rect()
+		gameDisplayDeTexte = fontObj.render('Joker: ' + j.joker,True,WHITE)
+		monRectangleDeTexte	 = gameDisplayDeTexte.get_rect()
 		monRectangleDeTexte .topleft = (l[i][0],l[i][1]+185)
-		maSurface.blit(maSurfaceDeTexte,monRectangleDeTexte)
+		gameDisplay.blit(gameDisplayDeTexte,monRectangleDeTexte)
 		
 		i+=1'''
 		
 def dessine_carte(Carte, position = None):
-	global maSurface, BLACK, espace, WINWIDTH, WINHEIGHT
+	global gameDisplay, BLACK, espace, WINWIDTH, WINHEIGHT
 	
 	#position est definie comme None par defaut pour 
 	
@@ -572,57 +593,57 @@ def dessine_carte(Carte, position = None):
 	if Carte.type_carte==1:
 		if Carte.orientation==0 or Carte.orientation==2:
 			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)],90)
-			maSurface.blit(carte_rotate,(x_pixel,y_pixel))
+			gameDisplay.blit(carte_rotate,(x_pixel,y_pixel))
 		else:
-			maSurface.blit(IMAGES_DICT['carte'+str(Carte.type_carte)],(x_pixel,y_pixel))
+			gameDisplay.blit(IMAGES_DICT['carte'+str(Carte.type_carte)],(x_pixel,y_pixel))
 	#Carte type 2
 	if Carte.type_carte==2:
 		if Carte.orientation==0:
-			maSurface.blit(IMAGES_DICT['carte'+str(Carte.type_carte)],(x_pixel,y_pixel))
+			gameDisplay.blit(IMAGES_DICT['carte'+str(Carte.type_carte)],(x_pixel,y_pixel))
 		elif Carte.orientation==1:
 			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)],90)
-			maSurface.blit(carte_rotate,(x_pixel,y_pixel))
+			gameDisplay.blit(carte_rotate,(x_pixel,y_pixel))
 		elif Carte.orientation==2:
 			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)],180)
-			maSurface.blit(carte_rotate,(x_pixel,y_pixel))
+			gameDisplay.blit(carte_rotate,(x_pixel,y_pixel))
 		else:
 			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)],270)
-			maSurface.blit(carte_rotate,(x_pixel,y_pixel))
+			gameDisplay.blit(carte_rotate,(x_pixel,y_pixel))
 	#Carte type 3
 	if Carte.type_carte==3:
 		if Carte.orientation==0:
-			maSurface.blit(IMAGES_DICT['carte'+str(Carte.type_carte)],(x_pixel,y_pixel))
+			gameDisplay.blit(IMAGES_DICT['carte'+str(Carte.type_carte)],(x_pixel,y_pixel))
 		elif Carte.orientation==1:
 			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)],90)
-			maSurface.blit(carte_rotate,(x_pixel,y_pixel))
+			gameDisplay.blit(carte_rotate,(x_pixel,y_pixel))
 		elif Carte.orientation==2:
 			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)],180)
-			maSurface.blit(carte_rotate,(x_pixel,y_pixel))
+			gameDisplay.blit(carte_rotate,(x_pixel,y_pixel))
 		else:
 			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)],270)
-			maSurface.blit(carte_rotate,(x_pixel,y_pixel))
+			gameDisplay.blit(carte_rotate,(x_pixel,y_pixel))
 	
 	#Affichage du chasseur
 	chasseur = Carte.chasseur
 	if chasseur != 0:
 		id_chasseur = chasseur.id
 		#print(id_chasseur)
-		maSurface.blit(IMAGES_DICT['chasseur'+str(id_chasseur)],(x_pixel+2*pixel_case/10,y_pixel+pixel_case/10))
+		gameDisplay.blit(IMAGES_DICT['chasseur'+str(id_chasseur)],(x_pixel+2*pixel_case/10,y_pixel+pixel_case/10))
 		
 	#Affichage du fantôme
 	fantome = Carte.fantome
 	if fantome != 0 :
 		id_fantome = fantome.numero
-		maSurface.blit(IMAGES_DICT['fantome'],(x_pixel+2,y_pixel+2))
+		gameDisplay.blit(IMAGES_DICT['fantome'],(x_pixel+2,y_pixel+2))
 		fontObj = pygame.font.SysFont('arial',20,bold=True)
-		maSurfaceDeTexte=fontObj.render(str(id_fantome),True,BLACK)
-		monRectangleDeTexte=maSurfaceDeTexte.get_rect()
+		gameDisplayDeTexte=fontObj.render(str(id_fantome),True,BLACK)
+		monRectangleDeTexte=gameDisplayDeTexte.get_rect()
 		monRectangleDeTexte.topleft = (x_pixel+3*pixel_case/10,y_pixel+5)
-		maSurface.blit(maSurfaceDeTexte,monRectangleDeTexte)
+		gameDisplay.blit(gameDisplayDeTexte,monRectangleDeTexte)
 		
 	#Affichage de la pépite
 	if Carte.pepite == True:
-		maSurface.blit(IMAGES_DICT['pepite'],(x_pixel+40,y_pixel+40))	
+		gameDisplay.blit(IMAGES_DICT['pepite'],(x_pixel+40,y_pixel+40))	
 		
 
 def rotation_carte_jouable(Plateau,Carte):
@@ -638,9 +659,14 @@ def rotation_carte_jouable(Plateau,Carte):
 				if clic[0] == 1 and fleche1[0]+fleche1[2] > mouse[0] > fleche1[0] and fleche1[1]+fleche1[3]> mouse[1] >fleche1[1]:
 					plateau.carte_jouable.tourner('gauche')
 					plateau.carte_jouable.update_murs()
+					print('tourner gauche')
 				elif clic[0] == 1 and fleche2[0]+fleche2[2] > mouse[0] > fleche2[0] and fleche2[1]+fleche2[3]> mouse[1] >fleche2[1]:
 					plateau.carte_jouable.tourner('droite')
 					plateau.carte_jouable.update_murs()
+					print('droite')
+		actualisation_plateau()
+		pygame.display.update()
+		FPSCLOCK.tick()
 
 				
 def insertion_carte_jouable(Plateau, Carte):
