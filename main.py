@@ -22,6 +22,13 @@ WINWIDTH = 1200 # width of the program's window, in pixels
 WINHEIGHT = 700 # height in pixels
 HALF_WINWIDTH = int(WINWIDTH / 2)
 HALF_WINHEIGHT = int(WINHEIGHT / 2)
+##########################################
+#espace 
+#pixel_case 
+#maSurface
+#largeur 
+#hauteur 
+#dimension
 
 
 dimension=7
@@ -61,9 +68,20 @@ IMAGES_DICT = {'titre': pygame.image.load('images/ecran_titre/titre.png'),
 			   'choix_ajouter_joueur_dis':pygame.image.load('images/init_jeu/bouton_ajoute_disabled.png'),
 			   'choix_retirer_joueur':pygame.image.load('images/init_jeu/bouton_retire.png'),
 			   'choix_retirer_joueur_dis':pygame.image.load('images/init_jeu/bouton_retire_disabled.png'),
-			   'choix_valider':pygame.image.load('images/init_jeu/bouton_valider.png')}
-
-
+			   'choix_valider':pygame.image.load('images/init_jeu/bouton_valider.png'),
+			   #########images plateau de jeu##########
+			 'pepite': pygame.image.load('images/persos/pepite.png'),
+			 'chasseur1': pygame.image.load('images/persos/chasseur1.png'),
+			 'chasseur2': pygame.image.load('images/persos/chasseur2.png'),
+			 'chasseur3': pygame.image.load('images/persos/chasseur3.png'),
+			 'chasseur4': pygame.image.load('images/persos/chasseur4.png'),
+			 'fantome': pygame.image.load('images/persos/fantome.png'),	
+             'carte1' : pygame.image.load('images/cartes/type1.png'),
+             'carte2' : pygame.image.load('images/cartes/type2.png'),
+             'carte3' : pygame.image.load('images/cartes/type3.png'),	
+             'fleche1': pygame.image.load('images/fleches/fleche1.png'),
+             'fleche2': pygame.image.load('images/fleches/fleche2.png')
+			   }
 
 def main():
 	'''Fonction principale du jeu
