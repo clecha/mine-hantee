@@ -521,11 +521,11 @@ def actualisation_plateau(plateau):
 			for col in range(dimension):
 				position = [ligne,col]
 				carte = matrice[ligne][col]
-				dessine_carte(carte, position)
+				dessine_carte(plateau,carte, position)
 				
 		#affichage de la carte jouable
 		carte_jouable = plateau.carte_jouable
-		dessine_carte(carte_jouable)
+		dessine_carte(plateau,carte_jouable)
 			
 		for event in pygame.event.get():
 			if event.type == pygame.KEYDOWN:
@@ -571,11 +571,9 @@ def actualisation_plateau(plateau):
 		
 		i+=1'''
 		
-def dessine_carte(Carte, position = None):
+def dessine_carte(Plateau, Carte, position = None):
 	global gameDisplay, BLACK, espace, WINWIDTH, WINHEIGHT
-	
-	#position est definie comme None par defaut pour 
-	
+
 	# On vérifie que la carte est bien présente sur le plateau, i.e. que ce n'est pas la carte jouable
 	if Carte.jouable == False:
 		x_carte = position[0]
@@ -670,7 +668,6 @@ def rotation_carte_jouable(Plateau,Carte):
 		pygame.display.update()
 		FPSCLOCK.tick()
 
-				
 def insertion_carte_jouable(Plateau, Carte):
 	global espace, pixel_case, gameDisplay, WINWIDTH, WINHEIGHT, dimension
 	mouse = pygame.mouse.get_pos()
@@ -686,8 +683,6 @@ def insertion_carte_jouable(Plateau, Carte):
 					arrondiInf_y = floor(mouse[1]/100)*100
 					y_carte=int(arrondiInf_y/pixel_case)
 					plateau.inserer_carte(plateau.carte_jouable,[x_carte,y_carte])
-			
-
 def terminate():
 	'''
 	Fonction qui ferme la fenetre
