@@ -23,6 +23,7 @@ WINHEIGHT = 700 # height in pixels
 HALF_WINWIDTH = int(WINWIDTH / 2)
 HALF_WINHEIGHT = int(WINHEIGHT / 2)
 
+
 dimension=7
 BLUE = (0,80,255)
 WHITE = (255, 255, 255)
@@ -61,6 +62,7 @@ IMAGES_DICT = {'titre': pygame.image.load('images/ecran_titre/titre.png'),
 			   'choix_retirer_joueur':pygame.image.load('images/init_jeu/bouton_retire.png'),
 			   'choix_retirer_joueur_dis':pygame.image.load('images/init_jeu/bouton_retire_disabled.png'),
 			   'choix_valider':pygame.image.load('images/init_jeu/bouton_valider.png')}
+
 
 
 def main():
@@ -473,6 +475,7 @@ def init_plateau(plateau):
 	dimension = plateau.dimension
 	pixel_case=int(WINHEIGHT/dimension)
 	
+    #change l'échelle des images
 	IMAGES_DICT={'pepite': pygame.transform.scale(pygame.image.load('images/persos/pepite.png'),(int(pixel_case/6),int(pixel_case/6))),
 		'chasseur1': pygame.transform.scale(pygame.image.load('images/persos/chasseur1.png'),(int(pixel_case*2/3),int(pixel_case*2/3))),
 		'chasseur2': pygame.transform.scale(pygame.image.load('images/persos/chasseur2.png'),(int(pixel_case*2/3),int(pixel_case*2/3))),
@@ -485,7 +488,6 @@ def init_plateau(plateau):
 		'fleche1': pygame.image.load('images/fleche1.png'),
 		'fleche2': pygame.image.load('images/fleche2.png')
              }
-
 
 	#Affichage du plateau et de tous les éléments qui ne changent pas au cours de la partie
 	# 
