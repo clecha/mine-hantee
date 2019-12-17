@@ -675,12 +675,12 @@ def rotation_carte_jouable(Plateau,Carte):
 				terminate()		
 			elif event.type == pygame.MOUSEMOTION:
 				if clic[0] == 1 and fleche1[0]+fleche1[2] > mouse[0] > fleche1[0] and fleche1[1]+fleche1[3]> mouse[1] >fleche1[1]:
-					plateau.carte_jouable.tourner('gauche')
-					plateau.carte_jouable.update_murs()
+					Plateau.carte_jouable.tourner('gauche')
+					Plateau.carte_jouable.update_murs()
 					print('tourner gauche')
 				elif clic[0] == 1 and fleche2[0]+fleche2[2] > mouse[0] > fleche2[0] and fleche2[1]+fleche2[3]> mouse[1] >fleche2[1]:
-					plateau.carte_jouable.tourner('droite')
-					plateau.carte_jouable.update_murs()
+					Plateau.carte_jouable.tourner('droite')
+					Plateau.carte_jouable.update_murs()
 					print('droite')
 		actualisation_plateau()
 		pygame.display.update()
@@ -700,7 +700,8 @@ def insertion_carte_jouable(Plateau, Carte):
 					x_carte=int(arrondiInf_x-espace)/pixel_case
 					arrondiInf_y = floor(mouse[1]/100)*100
 					y_carte=int(arrondiInf_y/pixel_case)
-					plateau.inserer_carte(plateau.carte_jouable,[x_carte,y_carte])
+					Plateau.inserer_carte(Plateau.carte_jouable,[x_carte,y_carte])
+
 def terminate():
 	'''
 	Fonction qui ferme la fenetre
