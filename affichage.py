@@ -15,7 +15,7 @@ def affiche_accueil():
 	'''Fonction permettant l'affichage de l'écran d'accueil du jeu, ou on peut faire les choix suivants : nouveau jeu, reprendre, quitter
 	-->: 'nouveau_jeu', 'reprendre_jeu' : c'est 2 valeurs sont utilisées dans main() pour appeler les fonctions adéquates
 	/!\ il faut encore écrire l'éveneement cliquer sur reprendre le jeu 
-    '''
+	'''
 #	gameDisplay = pygame.display.set_mode((WINWIDTH, WINHEIGHT),pygame.RESIZABLE)
 	gameDisplay.fill(BLACK)
 	
@@ -70,13 +70,13 @@ def affiche_accueil():
 		FPSCLOCK.tick()
 
 def init_jeu():
-    
+	
 	'''Fonction gérant l'écran permettant d'initialiser les pramètres du nouveau jeu : dimension, nb de joueurs, humain ou ordi
 	-->: dictionnaire contenant : dimension(int), nb_joueurs (in), joueur 1(int), joueur 2(int), joueur 3(int), joueur4(int)
 	dimension : dimension du plateau
 	joueur x(int) : 0 si ce joueur n'existe pas (2 ou 3 joueurs), 1 si c'est un humain, 2 si c'est une IA
 	'''
-    
+	
 	dimension = 7
 	nb_joueurs = 2
 	joueur1 = 1
@@ -265,23 +265,32 @@ def init_jeu():
 		
 		pygame.display.update()
 		FPSCLOCK.tick()
- 
-def dessine_carte(Plateau, Carte, position = None):
-	global gameDisplay, BLACK, espace, WINWIDTH, WINHEIGHT
-
+		
+def position_pixel(Carte, position=None):
+	global espace
+	marge = 5
 	# On vérifie que la carte est bien présente sur le plateau, i.e. que ce n'est pas la carte jouable
-	if Carte.jouable == False:
+	if Carte.jouable == False and position != None:
 		x_carte = position[0]
 		y_carte = position[1]
 		
 		#Conversion de la position matricielle en position en pixel
-		x_pixel = espace + x_carte * pixel_case
-		y_pixel = y_carte * pixel_case
+		x_pixel = espace + x_carte * pixel_case + x_carte*marge/2
+		y_pixel = y_carte * pixel_case + y_carte*marge/2
 	
 	# Carte hors plateau 
 	else:
 		x_pixel = 190
 		y_pixel = 560
+		
+	return x_pixel, y_pixel
+	
+def dessine_carte(Plateau, Carte, position = None):
+	global gameDisplay, BLACK, espace, WINWIDTH, WINHEIGHT
+
+	#obtention des coordonnées en pixels de la carte
+	x_pixel, y_pixel = position_pixel(Carte, position)
+#	print(x_pixel, y_pixel)
 	
 	# Affichage de la carte de type labyrinthe
 	#Carte type 1
@@ -347,27 +356,26 @@ def init_affichage_plateau(plateau):
 	dimension = plateau.dimension
 	pixel_case=int(WINHEIGHT/dimension)
 	
-    #change l'échelle des images
+	#change l'échelle des images
 	IMAGES_DICT={'pepite': pygame.transform.scale(pygame.image.load('images/persos/pepite.png'),(int(pixel_case/6),int(pixel_case/6))),
-		'chasseur1': pygame.transform.scale(pygame.image.load('images/persos/chasseur1.png'),(int(pixel_case*2/3),int(pixel_case*2/3))),
+		'chasseur1': pygame.transform.scale(pygame.image.load('images/persos/chasseur1.png').convert_alpha(),(int(pixel_case*2/3),int(pixel_case*2/3))),
 		'chasseur2': pygame.transform.scale(pygame.image.load('images/persos/chasseur2.png'),(int(pixel_case*2/3),int(pixel_case*2/3))),
 		'chasseur3': pygame.transform.scale(pygame.image.load('images/persos/chasseur3.png'),(int(pixel_case*2/3),int(pixel_case*2/3))),
 		'chasseur4': pygame.transform.scale(pygame.image.load('images/persos/chasseur4.png'),(int(pixel_case*2/3),int(pixel_case*2/3))),
 		'fantome': pygame.transform.scale(pygame.image.load('images/persos/fantome.png'),(int(pixel_case*3/5),int(pixel_case*3/5))),	
-		'carte1' : pygame.transform.scale(pygame.image.load('images/cartes/type1.png'),(pixel_case,pixel_case)),
-		'carte2' : pygame.transform.scale(pygame.image.load('images/cartes/type2.png'),(pixel_case,pixel_case)),
-		'carte3' : pygame.transform.scale(pygame.image.load('images/cartes/type3.png'),(pixel_case,pixel_case)),
+		'carte1' : pygame.transform.scale(pygame.image.load('images/cartes/type1.png').convert_alpha(),(pixel_case,pixel_case)),
+		'carte2' : pygame.transform.scale(pygame.image.load('images/cartes/type2.png').convert_alpha(),(pixel_case,pixel_case)),
+		'carte3' : pygame.transform.scale(pygame.image.load('images/cartes/type3.png').convert_alpha(),(pixel_case,pixel_case)),
 		'fleche1': pygame.image.load('images/fleche1.png'),
 		'fleche2': pygame.image.load('images/fleche2.png')
-             }
-
+			 }
 	#Affichage du plateau et de tous les éléments qui ne changent pas au cours de la partie
 	# 
 	# gameDisplay = pygame.display.set_mode((WINWIDTH,WINHEIGHT))
 	# pygame.display.set_caption('La mine hantée')
-
+	#remplissage du fond en gris
 	gameDisplay.fill(GREY)
-	
+	#dessin du quadrillage en haut à gauche
 	pygame.draw.line(gameDisplay,WHITE,(10,240),(490,240),5)
 	pygame.draw.line(gameDisplay,WHITE,(240,10),(240,485),5)
 	
@@ -378,35 +386,26 @@ def init_affichage_plateau(plateau):
 	gameDisplay.blit(gameDisplayDeTexte,monRectangleDeTexte)
 	gameDisplay.blit(IMAGES_DICT['fleche1'],(150,530))
 	gameDisplay.blit(IMAGES_DICT['fleche2'],(275,530))	
-	
-	actualisation_affichage_plateau(plateau)
+
 
 	
 def actualisation_affichage_plateau(plateau):
 	global espace, pixel_case, gameDisplay, WINWIDTH, WINHEIGHT, dico_joueurs
 	dimension = plateau.dimension
 	matrice = plateau.matrice
-	
-	while True:
-		#Parcours du plateau pour afficher toutes les cases
-		for ligne in range(dimension):
-			for col in range(dimension):
-				position = [ligne,col]
-				carte = matrice[ligne][col]
-				dessine_carte(plateau,carte, position)
+
+	#Parcours du plateau pour afficher toutes les cases
+	for ligne in range(dimension):
+		for col in range(dimension):
+			position = [ligne,col]
+			carte = matrice[ligne][col]
+			dessine_carte(plateau,carte, position)
 				
-		#affichage de la carte jouable
-		carte_jouable = plateau.carte_jouable
-		dessine_carte(plateau,carte_jouable)
+	#affichage de la carte jouable
+	carte_jouable = plateau.carte_jouable
+	dessine_carte(plateau,carte_jouable)
 			
-		for event in pygame.event.get():
-			if event.type == pygame.KEYDOWN:
-				if event.key == pygame.K_ESCAPE:
-					terminate()
-				return # user has pressed a key, so return.
-		
-		pygame.display.update()
-		FPSCLOCK.tick()
+
 		
 		
 

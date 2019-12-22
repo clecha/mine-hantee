@@ -1,13 +1,16 @@
 import numpy as np
 import random as rd
 import shelve as sh
+import affichage as af
+from variables import IMAGES_DICT
 
 class Plateau(object):
 	"""
 	Plateau de jeu
 	----
 	dimension: entier impair >=7
-	matrice: array de taille dimension * dimension
+	matrice: array de taille dimension * dimension, contenant les objets Cartes
+    matrice_surfaces :  array de taille dimension * dimension, contenant les surfaces des Cartes
 	carte_jouable: objet de type carte, correspond à la carte qui est hors plateau
 	joueur_actif: objet de type chasseur -- indique le joueur à qui c'est le tour de jouer
 	nb_joueurs: entier allant de 1 à 4 -- indique le nb de joueurs																  
@@ -125,11 +128,25 @@ class Plateau(object):
 			
 		else:
 			print("Veuillez rentrer un nombre de cartes impair et supérieur à 7.")
-	
+
+		#initialisation de la matrice des surfaces
+		self.matrice_surfaces = np.zeros((dimension,dimension), dtype= object)
+		self.actualisation_matrice_surfaces()
+
+	def actualisation_matrice_surfaces(self):
+		"""Actualisation de la matrice des surfaces get_rect associées aux cartes
+		"""
+		#parcourt de la matrice
+		for i in range(self.dimension):
+			for j in range(self.dimension):
+				carte = self.matrice[i,j] #on recupere l'objet carte
+				x,y = af.position_pixel(carte, (i,j)) #et ses coordonnées
+				self.matrice_surfaces[i,j] = IMAGES_DICT['carte'+str(carte.type_carte)].get_rect().move((x,y)) #création de l'objet Surface, placement dans la matrice 
+
 	#affichage console
 	def affichage_console(self):
 		"""Fonction qui créée un affichage console du plateau en cours
-		--> Utilisé pour faire des verifications lors du code surtout // pas utile à proprement parlé
+		--> Utilisée pour faire des verifications lors du code surtout // pas utile à proprement parlé
 		"""
 		try:
 			dimension = self.dimension
@@ -159,6 +176,8 @@ class Plateau(object):
 			print('matrice des orientations:', matrice_affichage_orientation)
 			print('matrice des chasseurs:', matrice_affichage_chasseurs)
 			print('matrice des fantomes:', matrice_affichage_fantomes)
+			print('matrice des surfaces', self.matrice_surfaces)
+
 		except:
 			print('Il n y a aucun jeu en cours.')
 		pass
@@ -467,15 +486,15 @@ class Chasseur(object):
 ##partie test
 		
 #1. test de la mise en place des cartes
-test = Plateau(nb_joueurs = 4)
-test.affichage_console()
-carte = test.carte_jouable
-print(carte.jouable)
-#test.inserer_carte(carte, [0,2])
-test.affichage_console()
-print(carte.jouable)
-carte = test.carte_jouable
-print(carte.jouable)
+#test = Plateau(nb_joueurs = 4)
+#test.affichage_console()
+#carte = test.carte_jouable
+#print(carte.jouable)
+##test.inserer_carte(carte, [0,2])
+#test.affichage_console()
+#print(carte.jouable)
+#carte = test.carte_jouable
+#print(carte.jouable)
 
 #carte = test.carte_jouable
 #test.inserer_carte(carte, [0,2])

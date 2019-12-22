@@ -12,6 +12,7 @@ terminate : appelée lorque le joueur appuie sur échap. Ferme la fenetre de jeu
 
 import random, sys, copy, os, pygame
 from random import shuffle
+import numpy as np
 from pygame.locals import *
 import classes as cl
 from math import *
@@ -39,7 +40,9 @@ def main():
 	if choix_accueil == 'nouveau_jeu':
 		parametres_jeu = init_jeu() #parametres_jeu prend la valeur retournée par init_jeu, un dictionnaire contenant (dimension, joueur1,joueur2,joueur3,joueur4,go)
 		plateau = cl.Plateau(parametres_jeu['dimension'],parametres_jeu['nb_joueurs'])
+		redimension_images(parametres_jeu['dimension'])
 		init_affichage_plateau(plateau)
+		plateau.actualisation_matrice_surfaces()
 	elif choix_accueil == 'reprendre_jeu':
 		#/!\ à ajouter : doit mettre la fonction appelant l'écran du choix des parties sauvegardées
 		terminate()
@@ -47,8 +50,37 @@ def main():
 		terminate()		  
 	
 	while True:
-		
+		mouse = pygame.mouse.get_pos()
+		clic = pygame.mouse.get_pressed()
 		actualisation_affichage_plateau(plateau)
+		
+		
+		for event in pygame.event.get():
+			if event.type == pygame.KEYDOWN:
+				if event.key == pygame.K_ESCAPE:
+					terminate()
+			
+			elif clic[0]:
+				#gestion du clic sur les places d'insertion
+				x_souris,y_souris = event.pos #recupération des coordonnées de la souris
+				#itération sur la matrice des surfaces ou index = (ligne,colonne), surface_carte = objet Surface
+				for index, surface_carte in np.ndenumerate(plateau.matrice_surfaces):
+					if surface_carte.collidepoint(x_souris, y_souris):
+						print(x_souris,y_souris)
+						print(index, surface_carte)
+						print('clicked on carte['+str(index[0])+str(index[1])+']') 
+
+#						position_image = image.get_rect().move(position_pixel(carte))
+				#gestion du clique sur les flèches pour tourner la carte jouable
+				position_fleche1, position_fleche2 = IMAGES_DICT['fleche1'].get_rect().move((150,530)),IMAGES_DICT['fleche2'].get_rect().move((275,530))
+				if position_fleche1.collidepoint(x_souris, y_souris):
+					print('clicked on fleche 1')
+				elif position_fleche2.collidepoint(x_souris, y_souris):
+					print('clicked on fleche 2')
+
+		
+		pygame.display.update()
+		FPSCLOCK.tick()
 	
 	
 	"""À ce stade on a créé le plateau et les joueurs, contenus dans la variable plateau et dico_joueur
@@ -192,21 +224,49 @@ def rotation_carte_jouable(Plateau,Carte):
 		pygame.display.update()
 		FPSCLOCK.tick()
 
+#def insertion_carte_jouable(Plateau, Carte):
+#	global espace, pixel_case, gameDisplay, WINWIDTH, WINHEIGHT, dimension
+#	mouse = pygame.mouse.get_pos()
+#	clic = pygame.mouse.get_pressed()
+#
+#	for event in pygame.event.get():	
+#		if event.type == QUIT:
+#			terminate()
+#		elif event.type == pygame.MOUSEBUTTONUP:
+#			if clic[0] == 1 and espace > mouse[1] > espace+(dimension*pixel_case) and 0> mouse[0] >dimension*pixel_case:
+#				arrondiInf_x = floor(mouse[0]/100)*100
+#				x_carte=int(arrondiInf_x-espace)/pixel_case
+#				arrondiInf_y = floor(mouse[1]/100)*100
+#				y_carte=int(arrondiInf_y/pixel_case)
+#				Plateau.inserer_carte(Plateau.carte_jouable,[x_carte,y_carte])
+
 def insertion_carte_jouable(Plateau, Carte):
 	global espace, pixel_case, gameDisplay, WINWIDTH, WINHEIGHT, dimension
-	mouse = pygame.mouse.get_pos()
-	clic = pygame.mouse.get_pressed()
-	while True:
-		for event in pygame.event.get():	
-			if event.type == QUIT:
-				terminate()
-			elif event.type == pygame.MOUSEBUTTONUP:
-				if clic[0] == 1 and espace > mouse[1] > espace+(dimension*pixel_case) and 0> mouse[0] >dimension*pixel_case:
-					arrondiInf_x = floor(mouse[0]/100)*100
-					x_carte=int(arrondiInf_x-espace)/pixel_case
-					arrondiInf_y = floor(mouse[1]/100)*100
-					y_carte=int(arrondiInf_y/pixel_case)
-					Plateau.inserer_carte(Plateau.carte_jouable,[x_carte,y_carte])
+
+	for event in pygame.event.get():	
+		if event.type == QUIT:
+			terminate()
+		elif event.type == pygame.MOUSEBUTTONUP:
+			if clic[0] == 1 and espace > mouse[1] > espace+(dimension*pixel_case) and 0> mouse[0] >dimension*pixel_case:
+				arrondiInf_x = floor(mouse[0]/100)*100
+				x_carte=int(arrondiInf_x-espace)/pixel_case
+				arrondiInf_y = floor(mouse[1]/100)*100
+				y_carte=int(arrondiInf_y/pixel_case)
+				Plateau.inserer_carte(Plateau.carte_jouable,[x_carte,y_carte])
+
+def redimension_images(dimension):
+	global IMAGES_DICT, pixel_case
+	IMAGES_DICT['pepite']= pygame.transform.scale(IMAGES_DICT['pepite'],(int(pixel_case/6),int(pixel_case/6)))
+	IMAGES_DICT['chasseur1']= pygame.transform.scale(IMAGES_DICT['chasseur1'],(pixel_case,pixel_case))
+	IMAGES_DICT['chasseur2']= pygame.transform.scale(IMAGES_DICT['chasseur2'],(pixel_case,pixel_case))
+	IMAGES_DICT['chasseur3']= pygame.transform.scale(IMAGES_DICT['chasseur3'],(pixel_case,pixel_case))
+	IMAGES_DICT['chasseur4']= pygame.transform.scale(IMAGES_DICT['chasseur4'],(pixel_case,pixel_case))
+	IMAGES_DICT['fantome']= pygame.transform.scale(IMAGES_DICT['fantome'],(pixel_case,pixel_case))
+	IMAGES_DICT['carte1' ]= pygame.transform.scale(IMAGES_DICT['carte1'],(pixel_case,pixel_case))
+	IMAGES_DICT['carte2' ]= pygame.transform.scale(IMAGES_DICT['carte2'],(pixel_case,pixel_case))
+	IMAGES_DICT['carte3' ]= pygame.transform.scale(IMAGES_DICT['carte3'],(pixel_case,pixel_case))
+	IMAGES_DICT['fleche1']= pygame.transform.scale(IMAGES_DICT['fleche1'],(pixel_case,pixel_case))
+	IMAGES_DICT['fleche2']= pygame.transform.scale(IMAGES_DICT['fleche2'],(pixel_case,pixel_case))
 
 def terminate():
 	'''

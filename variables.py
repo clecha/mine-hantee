@@ -7,7 +7,6 @@ Created on Tue Dec 17 18:43:53 2019
 from pygame.locals import *
 import pygame
 
-
 FPS = 30 # frames per second to update the screen
 WINWIDTH = 1200 # width of the program's window, in pixels
 WINHEIGHT = 700 # height in pixels
@@ -21,6 +20,7 @@ BLACK = (0,0,0)
 GREY=(50,50,50)
 
 espace = 500
+pixel_case=int(WINHEIGHT/7)
 
 FPSCLOCK = pygame.time.Clock()
 gameDisplay = pygame.display.set_mode((WINWIDTH, WINHEIGHT),pygame.RESIZABLE)
@@ -60,9 +60,9 @@ IMAGES_DICT = {'titre': pygame.image.load('images/ecran_titre/titre.png'),
 			 'chasseur3': pygame.image.load('images/persos/chasseur3.png'),
 			 'chasseur4': pygame.image.load('images/persos/chasseur4.png'),
 			 'fantome': pygame.image.load('images/persos/fantome.png'),	
-             'carte1' : pygame.image.load('images/cartes/type1.png'),
-             'carte2' : pygame.image.load('images/cartes/type2.png'),
-             'carte3' : pygame.image.load('images/cartes/type3.png'),	
+             'carte1' : pygame.image.load('images/cartes/type1.png').convert_alpha(),
+             'carte2' : pygame.image.load('images/cartes/type2.png').convert(),
+             'carte3' : pygame.image.load('images/cartes/type3.png').convert(),	
              'fleche1': pygame.image.load('images/fleches/fleche1.png'),
              'fleche2': pygame.image.load('images/fleches/fleche2.png')
 			   }
