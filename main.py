@@ -255,6 +255,13 @@ def insertion_carte_jouable(Plateau, Carte):
 				Plateau.inserer_carte(Plateau.carte_jouable,[x_carte,y_carte])
 
 def redimension_images(dimension):
+	'''Redimension des images selon la dimension du plateau
+	
+	Transforme certaines images de IMAGES_DICT
+	
+	Arguments:
+		dimension {int} -- dimension du plateau de jeu
+	'''
 	global IMAGES_DICT, pixel_case
 	IMAGES_DICT['pepite']= pygame.transform.scale(IMAGES_DICT['pepite'],(int(pixel_case/6),int(pixel_case/6)))
 	IMAGES_DICT['chasseur1']= pygame.transform.scale(IMAGES_DICT['chasseur1'],(pixel_case,pixel_case))
