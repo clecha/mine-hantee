@@ -51,7 +51,7 @@ def main():
 	
 	while True:
 		actualisation_affichage_plateau(plateau)		
-		
+		#gestion des évenements
 		for event in pygame.event.get():
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_ESCAPE:

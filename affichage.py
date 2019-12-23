@@ -332,15 +332,10 @@ def dessine_carte(Plateau, Carte, position = None):
 			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)+bouge],270)
 			gameDisplay.blit(carte_rotate,(x_pixel,y_pixel))
 		
-	#initialisation du foncement des cartes
-	# if Carte.bougeable == False:
-	# 	print('position:', Carte.position, 'bougeable:', Carte.bougeable)
-	# 	image = IMAGES_DICT['carte'+str(Carte.type_carte)+bouge]
-	# 	print('i',image)
-	# 	darken_percent = 0.5
-	# 	dark = pygame.Surface(image.get_size()).convert_alpha()
-	# 	dark.fill((0, 0, 0, darken_percent*255))
-	# 	image.blit(dark, (0, 0), special_flags=pygame.BLEND_RGBA_SUB)
+
+	#Affichage de la pépite
+	if Carte.pepite == True:
+		gameDisplay.blit(IMAGES_DICT['pepite'],(x_pixel+40,y_pixel+40))	
 
 	#Affichage du chasseur
 	chasseur = Carte.chasseur
@@ -360,10 +355,6 @@ def dessine_carte(Plateau, Carte, position = None):
 		monRectangleDeTexte.topleft = (x_pixel+3*pixel_case/10,y_pixel+5)
 		gameDisplay.blit(gameDisplayDeTexte,monRectangleDeTexte)
 		
-	#Affichage de la pépite
-	if Carte.pepite == True:
-		gameDisplay.blit(IMAGES_DICT['pepite'],(x_pixel+40,y_pixel+40))	
-
 		
 
 def init_affichage_plateau(plateau):
