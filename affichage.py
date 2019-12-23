@@ -37,30 +37,28 @@ def affiche_accueil():
 		clic = pygame.mouse.get_pressed() #recupere l'évenement clic de la souris (clic[0] = clic gauche, clic[1] = clic droit)
 
  #mise en place de l'affichage et de la surbrillance des boutons
-		if bouton_nouveau_jeuRect.x+bouton_nouveau_jeuRect.width > mouse[0] > bouton_nouveau_jeuRect.x and bouton_nouveau_jeuRect.y+bouton_nouveau_jeuRect.height > mouse[1] > bouton_nouveau_jeuRect.y:
+		if bouton_nouveau_jeuRect.collidepoint(mouse):
 			gameDisplay.blit(IMAGES_DICT['bouton_nouv_jeu_hover'],bouton_nouveau_jeu_hoverRect)
 		else:
-			gameDisplay.blit(IMAGES_DICT['bouton_nouv_jeu'],bouton_nouveau_jeuRect)
-		
-		if bouton_reprendreRect.x+bouton_reprendreRect.width > mouse[0] > bouton_reprendreRect.x and bouton_reprendreRect.y+bouton_reprendreRect.height > mouse[1] > bouton_reprendreRect.y:
+			gameDisplay.blit(IMAGES_DICT['bouton_nouv_jeu'],bouton_nouveau_jeuRect)		
+		if bouton_reprendreRect.collidepoint(mouse):
 			gameDisplay.blit(IMAGES_DICT['bouton_reprendre_hover'],bouton_reprendre_hoverRect)
 		else:
-			gameDisplay.blit(IMAGES_DICT['bouton_reprendre'],bouton_reprendreRect)
-			
-		if bouton_quitterRect.x+bouton_quitterRect.width > mouse[0] > bouton_quitterRect.x and bouton_quitterRect.y+bouton_quitterRect.height > mouse[1] > bouton_quitterRect.y:
+			gameDisplay.blit(IMAGES_DICT['bouton_reprendre'],bouton_reprendreRect)			
+		if bouton_quitterRect.collidepoint(mouse):
 			gameDisplay.blit(IMAGES_DICT['bouton_quitter_hover'],bouton_quitter_hoverRect)
 		else:
 			gameDisplay.blit(IMAGES_DICT['bouton_quitter'],bouton_quitterRect)
 		
 		for event in pygame.event.get():
-			if clic[0] == 1 and bouton_nouveau_jeuRect.x+bouton_nouveau_jeuRect.width > mouse[0] > bouton_nouveau_jeuRect.x and bouton_nouveau_jeuRect.y+bouton_nouveau_jeuRect.height > mouse[1] > bouton_nouveau_jeuRect.y:
+			if clic[0] and bouton_nouveau_jeuRect.collidepoint(mouse):
 				return 'nouveau_jeu'
 			if event.type == pygame.QUIT:
 				return 'quitter'
 			elif event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_ESCAPE:
 					terminate()
-			elif clic[0] == 1 and bouton_quitterRect.x+bouton_quitterRect.width > mouse[0] > bouton_quitterRect.x and bouton_quitterRect.y+bouton_quitterRect.height > mouse[1] > bouton_quitterRect.y:
+			elif clic[0] and bouton_quitterRect.collidepoint(mouse):
 				terminate()
 				return # user has pressed a key, so return.
 		
@@ -184,84 +182,82 @@ def init_jeu():
 		
 		for event in pygame.event.get():
 			#Events boutons du choix de dimensions
-			if dim9Rect.x+dim9Rect.width > mouse[0] > dim9Rect.x and dim9Rect.y+dim9Rect.height> mouse[1] >dim9Rect.y and event.type == pygame.MOUSEBUTTONUP:
-				if bouton_dim9 ==  IMAGES_DICT['choix_dim9_grey']:
-					bouton_dim9 = IMAGES_DICT['choix_dim9']
-					bouton_dim7 = IMAGES_DICT['choix_dim7_grey']
-					dimension = 9
-			if dim7Rect.x+dim9Rect.width > mouse[0] > dim7Rect.x and dim9Rect.y+dim7Rect.height> mouse[1] >dim7Rect.y and event.type == pygame.MOUSEBUTTONUP:
-				if bouton_dim7 ==  IMAGES_DICT['choix_dim7_grey']:
-					bouton_dim7 = IMAGES_DICT['choix_dim7']
-					bouton_dim9 = IMAGES_DICT['choix_dim9_grey']
-					dimension = 7
-					
-			#Events choix humain/ordi joueur 1
-			if boutonj1humRect.width+boutonj1humRect.x > mouse[0] > boutonj1humRect.x and boutonj1humRect.y+ boutonj1humRect.height> mouse[1] > boutonj1humRect.y and event.type == pygame.MOUSEBUTTONUP:
-				if bouton_j1_hum ==	 IMAGES_DICT['choix_hum_grey']:
-					bouton_j1_hum = IMAGES_DICT['choix_hum']
-					bouton_j1_ordi = IMAGES_DICT['choix_ordi_grey']
-					joueur1 = 1
-			if boutonj1ordiRect.width+boutonj1ordiRect.x > mouse[0] > boutonj1ordiRect.x and boutonj1ordiRect.y+ boutonj1ordiRect.height> mouse[1] > boutonj1ordiRect.y and event.type == pygame.MOUSEBUTTONUP:
-				if bouton_j1_ordi ==  IMAGES_DICT['choix_ordi_grey']:
-					bouton_j1_ordi = IMAGES_DICT['choix_ordi']
-					bouton_j1_hum =	 IMAGES_DICT['choix_hum_grey']
-					joueur1 = 2
-		   
-			#clicabilité joueur 2
-			if boutonj2humRect.width+boutonj2humRect.x > mouse[0] > boutonj2humRect.x and boutonj2humRect.y+ boutonj2humRect.height> mouse[1] > boutonj2humRect.y and clic[0] == 1:
-				if bouton_j2_hum ==	 IMAGES_DICT['choix_hum_grey']:
-					bouton_j2_hum = IMAGES_DICT['choix_hum']
-					bouton_j2_ordi = IMAGES_DICT['choix_ordi_grey']
-					joueur2 = 1
-			if boutonj2ordiRect.width+boutonj2ordiRect.x > mouse[0] > boutonj2ordiRect.x and boutonj2ordiRect.y+ boutonj2ordiRect.height> mouse[1] > boutonj2ordiRect.y and clic[0] == 1:
-				if bouton_j2_ordi ==  IMAGES_DICT['choix_ordi_grey']:
-					bouton_j2_ordi = IMAGES_DICT['choix_ordi']
-					bouton_j2_hum =	 IMAGES_DICT['choix_hum_grey']
-					joueur2 = 2
+			if event.type == MOUSEBUTTONUP:
+				if dim9Rect.collidepoint(mouse):
+					if bouton_dim9 ==  IMAGES_DICT['choix_dim9_grey']:
+						bouton_dim9 = IMAGES_DICT['choix_dim9']
+						bouton_dim7 = IMAGES_DICT['choix_dim7_grey']
+						dimension = 9
+				if dim7Rect.collidepoint(mouse):
+					if bouton_dim7 ==  IMAGES_DICT['choix_dim7_grey']:
+						bouton_dim7 = IMAGES_DICT['choix_dim7']
+						bouton_dim9 = IMAGES_DICT['choix_dim9_grey']
+						dimension = 7					
+				#Events choix humain/ordi joueur 1
+				if boutonj1humRect.collidepoint(mouse):
+					if bouton_j1_hum ==	 IMAGES_DICT['choix_hum_grey']:
+						bouton_j1_hum = IMAGES_DICT['choix_hum']
+						bouton_j1_ordi = IMAGES_DICT['choix_ordi_grey']
+						joueur1 = 1
+				if boutonj1ordiRect.collidepoint(mouse):
+					if bouton_j1_ordi ==  IMAGES_DICT['choix_ordi_grey']:
+						bouton_j1_ordi = IMAGES_DICT['choix_ordi']
+						bouton_j1_hum =	 IMAGES_DICT['choix_hum_grey']
+						joueur1 = 2
+			   
+				#clicabilité joueur 2
+				if boutonj2humRect.collidepoint(mouse):
+					if bouton_j2_hum ==	 IMAGES_DICT['choix_hum_grey']:
+						bouton_j2_hum = IMAGES_DICT['choix_hum']
+						bouton_j2_ordi = IMAGES_DICT['choix_ordi_grey']
+						joueur2 = 1
+				if boutonj2ordiRect.collidepoint(mouse):
+					if bouton_j2_ordi ==  IMAGES_DICT['choix_ordi_grey']:
+						bouton_j2_ordi = IMAGES_DICT['choix_ordi']
+						bouton_j2_hum =	 IMAGES_DICT['choix_hum_grey']
+						joueur2 = 2
 
-			#Event joueur 3
-			if boutonj3humRect.width+boutonj3humRect.x > mouse[0] > boutonj3humRect.x and boutonj3humRect.y+ boutonj3humRect.height> mouse[1] > boutonj3humRect.y and event.type == pygame.MOUSEBUTTONUP and nb_joueurs >= 3:
-				if bouton_j3_hum ==	 IMAGES_DICT['choix_hum_grey']:
-					bouton_j3_hum = IMAGES_DICT['choix_hum']
-					bouton_j3_ordi = IMAGES_DICT['choix_ordi_grey']
-					joueur3 = 1
-			if boutonj3ordiRect.width+boutonj3ordiRect.x > mouse[0] > boutonj3ordiRect.x and boutonj3ordiRect.y+ boutonj3ordiRect.height> mouse[1] > boutonj3ordiRect.y and event.type == pygame.MOUSEBUTTONUP and nb_joueurs >= 3:
-				if bouton_j3_ordi ==  IMAGES_DICT['choix_ordi_grey']:
-					bouton_j3_ordi = IMAGES_DICT['choix_ordi']
-					bouton_j3_hum =	 IMAGES_DICT['choix_hum_grey']
-					joueur3 = 2
-			
-			#Events joueur 4
-			if boutonj4humRect.width+boutonj4humRect.x > mouse[0] > boutonj4humRect.x and boutonj4humRect.y+ boutonj4humRect.height> mouse[1] > boutonj4humRect.y and event.type == pygame.MOUSEBUTTONUP and nb_joueurs == 4:
-				if bouton_j4_hum ==	 IMAGES_DICT['choix_hum_grey']:
-					bouton_j4_hum = IMAGES_DICT['choix_hum']
-					bouton_j4_ordi = IMAGES_DICT['choix_ordi_grey']
-					joueur4 = 1
-			if boutonj4ordiRect.width+boutonj4ordiRect.x > mouse[0] > boutonj4ordiRect.x and boutonj4ordiRect.y+ boutonj4ordiRect.height> mouse[1] > boutonj4ordiRect.y and event.type == pygame.MOUSEBUTTONUP and nb_joueurs == 4:
-				if bouton_j4_ordi ==  IMAGES_DICT['choix_ordi_grey']:
-					bouton_j4_ordi = IMAGES_DICT['choix_ordi']
-					bouton_j4_hum =	 IMAGES_DICT['choix_hum_grey']
-					joueur4 = 2
-			
-			#Gestion du nombre de joueurs
-			if ajoutJoueurRect.width + ajoutJoueurRect.x > mouse[0] > ajoutJoueurRect.x and ajoutJoueurRect.y+ ajoutJoueurRect.height> mouse[1] > ajoutJoueurRect.y and event.type == pygame.MOUSEBUTTONUP and nb_joueurs != 4:
-				nb_joueurs += 1
-				print('nb',nb_joueurs)
-			if retireJoueurRect.width+retireJoueurRect.x > mouse[0] > retireJoueurRect.x and retireJoueurRect.y+ retireJoueurRect.height> mouse[1] > retireJoueurRect.y and event.type == pygame.MOUSEBUTTONUP and nb_joueurs != 2:
-				nb_joueurs -= 1
-				print('nbm',nb_joueurs)
-			
-			#Gestion du bouton valider
-			if validerRect.width+validerRect.x > mouse[0] > validerRect.x and validerRect.y+ validerRect.height> mouse[1] > validerRect.y and event.type == pygame.MOUSEBUTTONUP and clic[0] == 1:
-				print('dim,j1,j2,j3,j4:',dimension, joueur1, joueur2, joueur3, joueur4)
-				return {'dimension':dimension, 'nb_joueurs':nb_joueurs,'joueur1': joueur1, 'joueur2':joueur2, 'joueur3':joueur3, 'joueur4':joueur4}
+				#Event joueur 3
+				if boutonj3humRect.collidepoint(mouse):
+					if bouton_j3_hum ==	 IMAGES_DICT['choix_hum_grey']:
+						bouton_j3_hum = IMAGES_DICT['choix_hum']
+						bouton_j3_ordi = IMAGES_DICT['choix_ordi_grey']
+						joueur3 = 1
+				if boutonj3ordiRect.collidepoint(mouse):
+					if bouton_j3_ordi ==  IMAGES_DICT['choix_ordi_grey']:
+						bouton_j3_ordi = IMAGES_DICT['choix_ordi']
+						bouton_j3_hum =	 IMAGES_DICT['choix_hum_grey']
+						joueur3 = 2
+				
+				#Events joueur 4
+				if boutonj4humRect.collidepoint(mouse):
+					if bouton_j4_hum ==	 IMAGES_DICT['choix_hum_grey']:
+						bouton_j4_hum = IMAGES_DICT['choix_hum']
+						bouton_j4_ordi = IMAGES_DICT['choix_ordi_grey']
+						joueur4 = 1
+				if boutonj4ordiRect.collidepoint(mouse):
+					if bouton_j4_ordi ==  IMAGES_DICT['choix_ordi_grey']:
+						bouton_j4_ordi = IMAGES_DICT['choix_ordi']
+						bouton_j4_hum =	 IMAGES_DICT['choix_hum_grey']
+						joueur4 = 2
+				
+				#Gestion du nombre de joueurs
+				if ajoutJoueurRect.collidepoint(mouse) and nb_joueurs != 4:
+					nb_joueurs += 1
+					print('nb',nb_joueurs)
+				if retireJoueurRect.collidepoint(mouse) and nb_joueurs != 2:
+					nb_joueurs -= 1
+					print('nbm',nb_joueurs)
+				
+				#Gestion du bouton valider
+				if validerRect.collidepoint(mouse):
+					print('dim,j1,j2,j3,j4:',dimension, joueur1, joueur2, joueur3, joueur4)
+					return {'dimension':dimension, 'nb_joueurs':nb_joueurs,'joueur1': joueur1, 'joueur2':joueur2, 'joueur3':joueur3, 'joueur4':joueur4}
 			if event.type == pygame.QUIT:
 				terminate()
 			elif event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_ESCAPE:
 					terminate()
-					return # user has pressed a key, so return.
-	
 		
 		pygame.display.update()
 		FPSCLOCK.tick()
