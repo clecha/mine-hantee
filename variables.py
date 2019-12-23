@@ -63,6 +63,9 @@ IMAGES_DICT = {'titre': pygame.image.load('images/ecran_titre/titre.png'),
              'carte1' : pygame.image.load('images/cartes/type1.png').convert_alpha(),
              'carte2' : pygame.image.load('images/cartes/type2.png').convert(),
              'carte3' : pygame.image.load('images/cartes/type3.png').convert(),	
+             'carte1_dark' : pygame.image.load('images/cartes/type1_dark.png').convert_alpha(),
+             'carte2_dark' : pygame.image.load('images/cartes/type2_dark.png').convert(),
+             'carte3_dark' : pygame.image.load('images/cartes/type3_dark.png').convert(),	
              'fleche1': pygame.image.load('images/fleches/fleche1.png'),
              'fleche2': pygame.image.load('images/fleches/fleche2.png')
 			   }

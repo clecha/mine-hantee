@@ -29,28 +29,28 @@ class Plateau(object):
 			orientation=0
 			for ligne in range(0,dimension, dimension-1):
 				for col in range(2, dimension, 2):
-					self.matrice[ligne][col] = Carte(3, False, orientation, True)
+					self.matrice[ligne][col] = Carte(3, False, orientation, True, False, [ligne,col])
 				orientation+=2
 				
 			#2. placement des bords - sur les colonnes
 			orientation=3
 			for col in range(0,dimension, dimension-1):
 				for ligne in range(2, dimension, 2):
-					self.matrice[ligne][col] = Carte(3, False, orientation, True)
+					self.matrice[ligne][col] = Carte(3, False, orientation, True, False,[ligne,col])
 				orientation-=2
 					
 			#3. placement des coins
 			orientation=0
 			for ligne in range(0,dimension, dimension-1):
 				for col in range(0,dimension, dimension-1):
-					self.matrice[ligne][col] = Carte(2, False, orientation, True)
+					self.matrice[ligne][col] = Carte(2, False, orientation, True, False,[ligne,col])
 					orientation+=1
 			
 			#4. placement du centre
 			for ligne in range(2, dimension-2, 2):
 				for col in range(2, dimension-2, 2):
 					orientation = rd.randint(0,3)
-					self.matrice[ligne][col] = Carte(3, False, orientation, True)
+					self.matrice[ligne][col] = Carte(3, False, orientation, True, False,[ligne,col])
 
 			#placement des cartes aléatoires
 			nb_cartes_fixes = ((dimension +	 1)/2)**2
@@ -75,7 +75,7 @@ class Plateau(object):
 					alea = rd.randint(0,cpt_cartes_alea)
 					type_carte = liste_types.pop(alea)
 					orientation = rd.randint(0,3)
-					self.matrice[ligne][col] = Carte(type_carte, False, orientation, True)
+					self.matrice[ligne][col] = Carte(type_carte, False, orientation, True, True, [ligne,col])
 					cpt_cartes_alea-=1
 					liste_pos_carte_alea+=[[ligne,col]]
 		
@@ -86,12 +86,12 @@ class Plateau(object):
 					alea = rd.randint(0,cpt_cartes_alea)
 					type_carte = liste_types.pop(alea)
 					orientation = rd.randint(0,3)
-					self.matrice[ligne][col] = Carte(type_carte, False, orientation, True)
+					self.matrice[ligne][col] = Carte(type_carte, False, orientation, True, True, [ligne,col])
 					cpt_cartes_alea-=1
 					liste_pos_carte_alea+= [[ligne,col]]
 		
 		#carte restante
-				self.carte_jouable = Carte(liste_types[0], True, 0, False)
+				self.carte_jouable = Carte(liste_types[0], True, 0, False, True, [None,None])
 				
 				
 			# placement des joueurs
@@ -340,14 +340,16 @@ class Carte(object):
 	"""Classe des cartes constituant le plateau
 	----
 	jouable: Booléen qui indique si la carte est jouable ou non (i.e. si elle est hors du plateau ou pas)
+	bougeable : Booléen indiquant si la carte peut être bougée
 	type_carte: entier entre 1 et 3
 	orientation: entier entre 0 et 3
 	fantome: entier entre 0 et 21 -- la valeur 0 indique l'absence de fantôme
 	pepite = booléen - True par défaut, ce qui indique la présence d'une pépite
 	chasseur = entier entre 0 et 4 -- la valeur 0 indique l'absence de chasseur"""
-	def __init__(self,type_carte,jouable = False, orientation = 0, presence = True):
-		self.position = [0,0]
+	def __init__(self,type_carte,jouable = False, orientation = 0, presence = True, bougeable = False, position = [0,0]):
+		self.position = position
 		self.jouable = jouable #Booléen indiquant si la carte est jouable ou non (i.e. si elle est hors plateau ou pas)
+		self.bougeable = bougeable 
 		self.type_carte = int(type_carte) #type de carte (1,2,3)
 		self.orientation = int(orientation) #entre 0,1,2,3
 		self.fantome = 0 #fantome présent sur la carte, vaut 0 si pas de fantome
@@ -423,7 +425,6 @@ class Chasseur(object):
 	fantome: liste d entiers -- correspond aux fantomes amasses par le chasseur"""
 	def __init__(self, id,position,mission):
 		self.id = id
-
 		self.position = [0,0]
 		self.mission = []
 		self.pepite = 0

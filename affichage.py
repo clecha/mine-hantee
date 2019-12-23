@@ -291,42 +291,57 @@ def dessine_carte(Plateau, Carte, position = None):
 	#obtention des coordonnées en pixels de la carte
 	x_pixel, y_pixel = position_pixel(Carte, position)
 #	print(x_pixel, y_pixel)
-	
+
+	if Carte.bougeable == False:
+		bouge = '_dark'
+	else:
+		bouge = ''
+
 	# Affichage de la carte de type labyrinthe
 	#Carte type 1
 	if Carte.type_carte==1:
 		if Carte.orientation==0 or Carte.orientation==2:
-			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)],90)
+			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)+bouge],90)
 			gameDisplay.blit(carte_rotate,(x_pixel,y_pixel))
 		else:
-			gameDisplay.blit(IMAGES_DICT['carte'+str(Carte.type_carte)],(x_pixel,y_pixel))
+			gameDisplay.blit(IMAGES_DICT['carte'+str(Carte.type_carte)+bouge],(x_pixel,y_pixel))
 	#Carte type 2
 	if Carte.type_carte==2:
 		if Carte.orientation==0:
-			gameDisplay.blit(IMAGES_DICT['carte'+str(Carte.type_carte)],(x_pixel,y_pixel))
+			gameDisplay.blit(IMAGES_DICT['carte'+str(Carte.type_carte)+bouge],(x_pixel,y_pixel))
 		elif Carte.orientation==1:
-			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)],90)
+			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)+bouge],90)
 			gameDisplay.blit(carte_rotate,(x_pixel,y_pixel))
 		elif Carte.orientation==2:
-			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)],180)
+			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)+bouge],180)
 			gameDisplay.blit(carte_rotate,(x_pixel,y_pixel))
 		else:
-			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)],270)
+			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)+bouge],270)
 			gameDisplay.blit(carte_rotate,(x_pixel,y_pixel))
 	#Carte type 3
 	if Carte.type_carte==3:
 		if Carte.orientation==0:
-			gameDisplay.blit(IMAGES_DICT['carte'+str(Carte.type_carte)],(x_pixel,y_pixel))
+			gameDisplay.blit(IMAGES_DICT['carte'+str(Carte.type_carte)+bouge],(x_pixel,y_pixel))
 		elif Carte.orientation==1:
-			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)],90)
+			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)+bouge],90)
 			gameDisplay.blit(carte_rotate,(x_pixel,y_pixel))
 		elif Carte.orientation==2:
-			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)],180)
+			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)+bouge],180)
 			gameDisplay.blit(carte_rotate,(x_pixel,y_pixel))
 		else:
-			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)],270)
+			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)+bouge],270)
 			gameDisplay.blit(carte_rotate,(x_pixel,y_pixel))
-	
+		
+	#initialisation du foncement des cartes
+	# if Carte.bougeable == False:
+	# 	print('position:', Carte.position, 'bougeable:', Carte.bougeable)
+	# 	image = IMAGES_DICT['carte'+str(Carte.type_carte)+bouge]
+	# 	print('i',image)
+	# 	darken_percent = 0.5
+	# 	dark = pygame.Surface(image.get_size()).convert_alpha()
+	# 	dark.fill((0, 0, 0, darken_percent*255))
+	# 	image.blit(dark, (0, 0), special_flags=pygame.BLEND_RGBA_SUB)
+
 	#Affichage du chasseur
 	chasseur = Carte.chasseur
 	if chasseur != 0:
@@ -348,6 +363,7 @@ def dessine_carte(Plateau, Carte, position = None):
 	#Affichage de la pépite
 	if Carte.pepite == True:
 		gameDisplay.blit(IMAGES_DICT['pepite'],(x_pixel+40,y_pixel+40))	
+
 		
 
 def init_affichage_plateau(plateau):
@@ -366,6 +382,9 @@ def init_affichage_plateau(plateau):
 		'carte1' : pygame.transform.scale(pygame.image.load('images/cartes/type1.png').convert_alpha(),(pixel_case,pixel_case)),
 		'carte2' : pygame.transform.scale(pygame.image.load('images/cartes/type2.png').convert_alpha(),(pixel_case,pixel_case)),
 		'carte3' : pygame.transform.scale(pygame.image.load('images/cartes/type3.png').convert_alpha(),(pixel_case,pixel_case)),
+		'carte1_dark': pygame.transform.scale(IMAGES_DICT['carte1_dark'],(pixel_case,pixel_case)),
+		'carte2_dark': pygame.transform.scale(IMAGES_DICT['carte2_dark'],(pixel_case,pixel_case)),
+		'carte3_dark': pygame.transform.scale(IMAGES_DICT['carte3_dark'],(pixel_case,pixel_case)),
 		'fleche1': pygame.image.load('images/fleche1.png'),
 		'fleche2': pygame.image.load('images/fleche2.png')
 			 }

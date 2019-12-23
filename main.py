@@ -50,17 +50,14 @@ def main():
 		terminate()		  
 	
 	while True:
-		mouse = pygame.mouse.get_pos()
-		clic = pygame.mouse.get_pressed()
-		actualisation_affichage_plateau(plateau)
-		
+		actualisation_affichage_plateau(plateau)		
 		
 		for event in pygame.event.get():
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_ESCAPE:
 					terminate()
 			
-			elif clic[0]:
+			elif event.type == pygame.MOUSEBUTTONUP:
 				#gestion du clic sur les places d'insertion
 				x_souris,y_souris = event.pos #recupération des coordonnées de la souris
 				#itération sur la matrice des surfaces ou index = (ligne,colonne), surface_carte = objet Surface
@@ -272,6 +269,9 @@ def redimension_images(dimension):
 	IMAGES_DICT['carte1' ]= pygame.transform.scale(IMAGES_DICT['carte1'],(pixel_case,pixel_case))
 	IMAGES_DICT['carte2' ]= pygame.transform.scale(IMAGES_DICT['carte2'],(pixel_case,pixel_case))
 	IMAGES_DICT['carte3' ]= pygame.transform.scale(IMAGES_DICT['carte3'],(pixel_case,pixel_case))
+	IMAGES_DICT['carte1_dark' ]= pygame.transform.scale(IMAGES_DICT['carte1_dark'],(pixel_case,pixel_case))
+	IMAGES_DICT['carte2_dark' ]= pygame.transform.scale(IMAGES_DICT['carte2_dark'],(pixel_case,pixel_case))
+	IMAGES_DICT['carte3_dark' ]= pygame.transform.scale(IMAGES_DICT['carte3_dark'],(pixel_case,pixel_case))
 	IMAGES_DICT['fleche1']= pygame.transform.scale(IMAGES_DICT['fleche1'],(pixel_case,pixel_case))
 	IMAGES_DICT['fleche2']= pygame.transform.scale(IMAGES_DICT['fleche2'],(pixel_case,pixel_case))
 
