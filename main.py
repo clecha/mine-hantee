@@ -63,6 +63,10 @@ def main():
 		#gestion des évenements
 		for event in pygame.event.get():
 			if event.type == pygame.KEYDOWN:
+				#gestion du changement de perso (provisoire):
+				if event.key == pygame.K_p:
+					plateau.changer_joueur()
+					print('joueur actif',plateau.joueur_actif)
 				if event.key == pygame.K_ESCAPE:
 					terminate()
 			elif event.type == pygame.MOUSEMOTION:
@@ -74,10 +78,11 @@ def main():
 				x_souris,y_souris = event.pos
 				#itération sur la matrice des surfaces ou index = (ligne,colonne), surface_carte = objet Surface
 				for index, surface_carte in np.ndenumerate(plateau.matrice_surfaces):
-					if surface_carte.collidepoint(x_souris, y_souris):
-						print(x_souris,y_souris)
-						print(index, surface_carte)
-						print('clicked on carte['+str(index[0])+str(index[1])+']') 
+					carte = plateau.matrice[index[0],index[1]]
+					if surface_carte.collidepoint(x_souris, y_souris) and carte.bougeable:
+						if (carte.position[0] in [0,plateau.dimension-1] or carte.position[1] in [0,plateau.dimension-1]):
+							dessine_carte(plateau,carte,carte.position,True)
+
 				#gestion du clique sur les flèches pour tourner la carte jouable
 				#création des Rect associées associées avec get_rect()
 				position_fleche1, position_fleche2 = IMAGES_DICT['fleche1'].get_rect().move((150,530)),IMAGES_DICT['fleche2'].get_rect().move((275,530))
@@ -87,6 +92,7 @@ def main():
 				elif position_fleche2.collidepoint(x_souris, y_souris):
 					plateau.carte_jouable.tourner('droite')
 					plateau.carte_jouable.update_murs()
+
 
 		
 		pygame.display.update()
@@ -102,7 +108,13 @@ def main():
 
 	return terminate()
 	
+def tour_de_jeu(plateau):
+	deplacement_fait = False
+	insertion_carte_faite = False
+	termine = deplacement_fait*insertion_carte_faite
+	# while not termine:
 
+	pass
 
 def boucle_deplacement(plateau):
 	'''

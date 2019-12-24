@@ -332,7 +332,13 @@ class Plateau(object):
 			return True
 		else: #s'il y a un mur sur l'une des deux cartes
 			return False
-		
+	
+	def changer_joueur(self):
+		if self.joueur_actif == self.nb_joueurs :
+			self.joueur_actif = 1
+		else:
+			self.joueur_actif += 1
+
 			 
 
 
