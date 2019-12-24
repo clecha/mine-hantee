@@ -364,12 +364,12 @@ class Carte(object):
 		----------
 		direction : char
 		==> valeurs possibles : 'gauche' ou 'droite'"""
-		if self.orientation == 3 and direction == 'droite':
+		if self.orientation == 3 and direction == 'gauche':
 			self.orientation = 0
-		elif self.orientation == 0 and direction == 'gauche':
+		elif self.orientation == 0 and direction == 'droite':
 			self.orientation = 3
 		else:
-			if direction == 'droite':
+			if direction == 'gauche':
 				self.orientation += 1
 			else:
 				self.orientation -= 1

@@ -78,14 +78,13 @@ def main():
 						print(x_souris,y_souris)
 						print(index, surface_carte)
 						print('clicked on carte['+str(index[0])+str(index[1])+']') 
-
-#						position_image = image.get_rect().move(position_pixel(carte))
 				#gestion du clique sur les flèches pour tourner la carte jouable
+				#création des Rect associées associées avec get_rect()
 				position_fleche1, position_fleche2 = IMAGES_DICT['fleche1'].get_rect().move((150,530)),IMAGES_DICT['fleche2'].get_rect().move((275,530))
 				if position_fleche1.collidepoint(x_souris, y_souris):
-					print('clicked on fleche 1')
+					plateau.carte_jouable.tourner('gauche')
 				elif position_fleche2.collidepoint(x_souris, y_souris):
-					print('clicked on fleche 2')
+					plateau.carte_jouable.tourner('droite')
 
 		
 		pygame.display.update()
