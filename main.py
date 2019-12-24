@@ -51,15 +51,13 @@ def main():
 	
 	while True:
 		actualisation_affichage_plateau(plateau)
-		x_souris = pygame.mouse.get_pos()[0]
-		y_souris = pygame.mouse.get_pos()[1]
+        #gestion du highlight des cartes cliquables sur le plateau
+        #coordonnées de la souris
+		x_souris, y_souris = pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]
 		for index, surface_carte in np.ndenumerate(plateau.matrice_surfaces):
 			carte = plateau.matrice[index[0],index[1]]
-			x_pixel = surface_carte.left
-			y_pixel = surface_carte.top
 			if surface_carte.collidepoint(x_souris, y_souris) and carte.bougeable:
 				if (carte.position[0] in [0,plateau.dimension-1] or carte.position[1] in [0,plateau.dimension-1]):
-#					gameDisplay.blit(IMAGES_DICT['carte'+str(carte.type_carte)+'_hover'],(x_pixel,y_pixel))
 					dessine_carte(plateau,carte,carte.position,True)
 		
 		#gestion des évenements
