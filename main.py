@@ -50,16 +50,30 @@ def main():
 		terminate()		  
 	
 	while True:
-		actualisation_affichage_plateau(plateau)		
+		actualisation_affichage_plateau(plateau)
+		x_souris = pygame.mouse.get_pos()[0]
+		y_souris = pygame.mouse.get_pos()[1]
+		for index, surface_carte in np.ndenumerate(plateau.matrice_surfaces):
+			carte = plateau.matrice[index[0],index[1]]
+			x_pixel = surface_carte.left
+			y_pixel = surface_carte.top
+			if surface_carte.collidepoint(x_souris, y_souris) and carte.bougeable:
+				if (carte.position[0] in [0,plateau.dimension-1] or carte.position[1] in [0,plateau.dimension-1]):
+#					gameDisplay.blit(IMAGES_DICT['carte'+str(carte.type_carte)+'_hover'],(x_pixel,y_pixel))
+					dessine_carte(plateau,carte,carte.position,True)
+		
 		#gestion des évenements
 		for event in pygame.event.get():
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_ESCAPE:
 					terminate()
-			
+			elif event.type == pygame.MOUSEMOTION:
+				pass
+
 			elif event.type == pygame.MOUSEBUTTONUP:
 				#gestion du clic sur les places d'insertion
-				x_souris,y_souris = event.pos #recupération des coordonnées de la souris
+				 #recupération des coordonnées de la souris
+				x_souris,y_souris = event.pos
 				#itération sur la matrice des surfaces ou index = (ligne,colonne), surface_carte = objet Surface
 				for index, surface_carte in np.ndenumerate(plateau.matrice_surfaces):
 					if surface_carte.collidepoint(x_souris, y_souris):
@@ -272,6 +286,12 @@ def redimension_images(dimension):
 	IMAGES_DICT['carte1_dark' ]= pygame.transform.scale(IMAGES_DICT['carte1_dark'],(pixel_case,pixel_case))
 	IMAGES_DICT['carte2_dark' ]= pygame.transform.scale(IMAGES_DICT['carte2_dark'],(pixel_case,pixel_case))
 	IMAGES_DICT['carte3_dark' ]= pygame.transform.scale(IMAGES_DICT['carte3_dark'],(pixel_case,pixel_case))
+	IMAGES_DICT['carte1_bright' ]= pygame.transform.scale(IMAGES_DICT['carte1_bright'],(pixel_case,pixel_case))
+	IMAGES_DICT['carte2_bright' ]= pygame.transform.scale(IMAGES_DICT['carte2_bright'],(pixel_case,pixel_case))
+	IMAGES_DICT['carte3_bright' ]= pygame.transform.scale(IMAGES_DICT['carte3_bright'],(pixel_case,pixel_case))
+	IMAGES_DICT['carte1_hover' ]= pygame.transform.scale(IMAGES_DICT['carte1_hover'],(pixel_case,pixel_case))
+	IMAGES_DICT['carte2_hover' ]= pygame.transform.scale(IMAGES_DICT['carte2_hover'],(pixel_case,pixel_case))
+	IMAGES_DICT['carte3_hover' ]= pygame.transform.scale(IMAGES_DICT['carte3_hover'],(pixel_case,pixel_case))
 	IMAGES_DICT['fleche1']= pygame.transform.scale(IMAGES_DICT['fleche1'],(pixel_case,pixel_case))
 	IMAGES_DICT['fleche2']= pygame.transform.scale(IMAGES_DICT['fleche2'],(pixel_case,pixel_case))
 

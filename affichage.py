@@ -281,15 +281,18 @@ def position_pixel(Carte, position=None):
 		
 	return x_pixel, y_pixel
 	
-def dessine_carte(Plateau, Carte, position = None):
+def dessine_carte(Plateau, Carte, position = None,hover=False):
 	global gameDisplay, BLACK, espace, WINWIDTH, WINHEIGHT
 
 	#obtention des coordonnées en pixels de la carte
 	x_pixel, y_pixel = position_pixel(Carte, position)
 #	print(x_pixel, y_pixel)
-
 	if Carte.bougeable == False:
 		bouge = '_dark'
+	elif Carte.position[0] in [0,Plateau.dimension-1] or Carte.position[1] in [0,Plateau.dimension-1] :
+		bouge = '_hover'
+		if hover:
+			bouge = '_bright'
 	else:
 		bouge = ''
 
@@ -372,6 +375,12 @@ def init_affichage_plateau(plateau):
 		'carte1_dark': pygame.transform.scale(IMAGES_DICT['carte1_dark'],(pixel_case,pixel_case)),
 		'carte2_dark': pygame.transform.scale(IMAGES_DICT['carte2_dark'],(pixel_case,pixel_case)),
 		'carte3_dark': pygame.transform.scale(IMAGES_DICT['carte3_dark'],(pixel_case,pixel_case)),
+        'carte1_bright' : pygame.transform.scale(IMAGES_DICT['carte1_bright'],(pixel_case,pixel_case)),
+        'carte2_bright' : pygame.transform.scale(IMAGES_DICT['carte2_bright'],(pixel_case,pixel_case)),
+        'carte3_bright' : pygame.transform.scale(IMAGES_DICT['carte3_bright'],(pixel_case,pixel_case)),
+        'carte1_hover' : pygame.transform.scale(IMAGES_DICT['carte1_hover'],(pixel_case,pixel_case)),
+        'carte2_hover' : pygame.transform.scale(IMAGES_DICT['carte2_hover'],(pixel_case,pixel_case)),
+        'carte3_hover' : pygame.transform.scale(IMAGES_DICT['carte3_hover'],(pixel_case,pixel_case)),
 		'fleche1': pygame.image.load('images/fleche1.png'),
 		'fleche2': pygame.image.load('images/fleche2.png')
 			 }

@@ -349,7 +349,7 @@ class Carte(object):
 	def __init__(self,type_carte,jouable = False, orientation = 0, presence = True, bougeable = False, position = [0,0]):
 		self.position = position
 		self.jouable = jouable #Booléen indiquant si la carte est jouable ou non (i.e. si elle est hors plateau ou pas)
-		self.bougeable = bougeable 
+		self.bougeable = bougeable
 		self.type_carte = int(type_carte) #type de carte (1,2,3)
 		self.orientation = int(orientation) #entre 0,1,2,3
 		self.fantome = 0 #fantome présent sur la carte, vaut 0 si pas de fantome
