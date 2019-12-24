@@ -83,8 +83,10 @@ def main():
 				position_fleche1, position_fleche2 = IMAGES_DICT['fleche1'].get_rect().move((150,530)),IMAGES_DICT['fleche2'].get_rect().move((275,530))
 				if position_fleche1.collidepoint(x_souris, y_souris):
 					plateau.carte_jouable.tourner('gauche')
+					plateau.carte_jouable.update_murs()
 				elif position_fleche2.collidepoint(x_souris, y_souris):
 					plateau.carte_jouable.tourner('droite')
+					plateau.carte_jouable.update_murs()
 
 		
 		pygame.display.update()
