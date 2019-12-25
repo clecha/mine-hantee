@@ -32,7 +32,7 @@ class Plateau(object):
 			for ligne in range(0,dimension, dimension-1):
 				for col in range(2, dimension-1, 2):
 					self.matrice[ligne][col] = Carte(3, False, orientation, True, False, [ligne,col])
-					print('attributs de la carte 1b '+str(ligne)+str(col)+' ', self.matrice[ligne][col].__dict__)
+					# print('attributs de la carte 1b '+str(ligne)+str(col)+' ', self.matrice[ligne][col].__dict__)
 				orientation=1
 									
 			#2. placement des bords - sur les colonnes
@@ -212,10 +212,9 @@ class Plateau(object):
 		#1er test: on vérifie que la position d'insertion est valide, çad que l'on veut insérer la carte 
 		#sur une bordure du plateau aux endroits spécifiques d'insertions
 		positions_valides= [[x_pos,y_pos] for x_pos in range(1,dimension-1,2) for y_pos in [0,dimension-1]]+[[x_pos,y_pos] for y_pos in range(1,dimension-1,2) for x_pos in [0,dimension-1]]
-		
+		# print('positions valides', positions_valides)
 		#l'insertion est effectuée uniquement si la case est présente dans positions_valides
 		if position in positions_valides:
-		
 			#on insère sur une colonne en partant du haut du plateau (1ere ligne)
 			if x_position == 0:
 				liste_a_inserer, index_carte_a_pop = self.matrice[:,y_position], -1
@@ -250,7 +249,11 @@ class Plateau(object):
 				nvelle_carte_jouable.chasseur = 0
 				presence_chasseur = True
 				#il faudra quand même actualiser la position du chasseur
-	
+			#de même pour la pépite
+			if nvelle_carte_jouable.pepite:
+				carte.pepite = nvelle_carte_jouable.pepite
+				nvelle_carte_jouable.pepite = False
+
 			#On insère en début de ligne/colonne car on enlève le dernier élément
 			if index_carte_a_pop == -1:
 				liste_a_inserer = np.append([carte], liste_a_inserer)
@@ -276,6 +279,9 @@ class Plateau(object):
 			#Actualisation de la jouabilité des cartes
 			carte.jouable = False
 			self.carte_jouable.jouable = True
+
+			#Actualisation de la matrice des surfaces
+			self.actualisation_matrice_surfaces()
 		
 	def sauvegarde(self, num_sauvegarde = 1):
 		""" Methode qui permet de sauvegarder un plateau dans un fichier à un instant t

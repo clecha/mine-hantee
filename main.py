@@ -78,12 +78,12 @@ def main():
 					print('gauche')
 					plateau.deplacer_joueur(plateau.joueur_actif,'gauche')
 				elif event.key == pygame.K_RIGHT:
-					print('droite================================')
-					position = plateau.liste_joueurs[plateau.joueur_actif-1].position
-					print(position)
-					carte_actuelle = plateau.matrice[position[0],position[1]]
-					carte_a_cote = plateau.carte_a_cote(position[0],position[1],'droite')
-					print('#5a', carte_a_cote.__dict__)
+#					print('droite================================')
+#					position = plateau.liste_joueurs[plateau.joueur_actif-1].position
+#					print(position)
+#					carte_actuelle = plateau.matrice[position[0],position[1]]
+#					carte_a_cote = plateau.carte_a_cote(position[0],position[1],'droite')
+#					print('#5a', carte_a_cote.__dict__)
 					plateau.deplacer_joueur(plateau.joueur_actif,'droite')
 				elif event.key == pygame.K_m:
 					plateau.affichage_console()					
@@ -100,13 +100,14 @@ def main():
 				for index, surface_carte in np.ndenumerate(plateau.matrice_surfaces):
 					carte = plateau.matrice[index[0],index[1]]
 					if surface_carte.collidepoint(x_souris, y_souris):
-						print('clic sur '+str(index))
-						print('type',plateau.matrice[index[0],index[1]].type_carte)
-						print('orientation',plateau.matrice[index[0],index[1]].orientation)
-						print('carte a cote', plateau.carte_a_cote(index[0],index[1],'droite').position,plateau.carte_a_cote(index[0],index[1],'gauche').murs)
-						print('surface', plateau.matrice_surfaces[index[0],index[1]])
-						if (carte.position[0] in [0,plateau.dimension-1] or carte.position[1] in [0,plateau.dimension-1]):
+						# print('clic sur '+str(index))
+						# print('type',plateau.matrice[index[0],index[1]].type_carte)
+						# print('orientation',plateau.matrice[index[0],index[1]].orientation)
+						# print('carte a cote', plateau.carte_a_cote(index[0],index[1],'droite').position,plateau.carte_a_cote(index[0],index[1],'gauche').murs)
+						# print('surface', plateau.matrice_surfaces[index[0],index[1]])
+						if (carte.position[0] in [0,plateau.dimension-1] or carte.position[1] in [0,plateau.dimension-1]) and carte.bougeable:
 							print('clic sur '+str(index))
+							plateau.inserer_carte(plateau.carte_jouable,carte.position)
 
 				#gestion du clique sur les flèches pour tourner la carte jouable
 				#création des Rect associées associées avec get_rect()
