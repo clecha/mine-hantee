@@ -299,7 +299,7 @@ def dessine_carte(Plateau, Carte, position = None,hover=False):
 	# Affichage de la carte de type labyrinthe
 	#Carte type 1
 	if Carte.type_carte==1:
-		if Carte.orientation==0 or Carte.orientation==2:
+		if Carte.orientation==1 or Carte.orientation==3:
 			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)+bouge],90)
 			gameDisplay.blit(carte_rotate,(x_pixel,y_pixel))
 		else:
@@ -308,7 +308,7 @@ def dessine_carte(Plateau, Carte, position = None,hover=False):
 	if Carte.type_carte==2:
 		if Carte.orientation==0:
 			gameDisplay.blit(IMAGES_DICT['carte'+str(Carte.type_carte)+bouge],(x_pixel,y_pixel))
-		elif Carte.orientation==1:
+		elif Carte.orientation==3:
 			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)+bouge],90)
 			gameDisplay.blit(carte_rotate,(x_pixel,y_pixel))
 		elif Carte.orientation==2:
@@ -321,7 +321,7 @@ def dessine_carte(Plateau, Carte, position = None,hover=False):
 	if Carte.type_carte==3:
 		if Carte.orientation==0:
 			gameDisplay.blit(IMAGES_DICT['carte'+str(Carte.type_carte)+bouge],(x_pixel,y_pixel))
-		elif Carte.orientation==1:
+		elif Carte.orientation==3:
 			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)+bouge],90)
 			gameDisplay.blit(carte_rotate,(x_pixel,y_pixel))
 		elif Carte.orientation==2:
@@ -359,8 +359,7 @@ def dessine_carte(Plateau, Carte, position = None,hover=False):
 def init_affichage_plateau(plateau):
 	global espace, pixel_case, gameDisplay, WINWIDTH, WINHEIGHT, IMAGES_DICT
 	print("init plateau")
-	dimension = plateau.dimension
-	pixel_case=int(WINHEIGHT/dimension)
+	pixel_case=int(WINHEIGHT/plateau.dimension)
 	
 	#change l'échelle des images
 	IMAGES_DICT={'pepite': pygame.transform.scale(pygame.image.load('images/persos/pepite.png'),(int(pixel_case/6),int(pixel_case/6))),
@@ -393,12 +392,13 @@ def init_affichage_plateau(plateau):
 	#dessin du quadrillage en haut à gauche
 	pygame.draw.line(gameDisplay,WHITE,(10,240),(490,240),5)
 	pygame.draw.line(gameDisplay,WHITE,(240,10),(240,485),5)
-	
+	#écriture du titre au dessus de la carte jouable
 	fontObj = pygame.font.SysFont('arial',40)
 	gameDisplayDeTexte = fontObj.render('Carte: ',True,WHITE)
 	monRectangleDeTexte	 = gameDisplayDeTexte.get_rect()
 	monRectangleDeTexte .topleft = (10,550)
 	gameDisplay.blit(gameDisplayDeTexte,monRectangleDeTexte)
+	#affichage des flèches
 	gameDisplay.blit(IMAGES_DICT['fleche1'],(150,530))
 	gameDisplay.blit(IMAGES_DICT['fleche2'],(275,530))	
 

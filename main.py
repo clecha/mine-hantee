@@ -51,14 +51,14 @@ def main():
 	
 	while True:
 		actualisation_affichage_plateau(plateau)
-        #gestion du highlight des cartes cliquables sur le plateau
-        #coordonnées de la souris
+		#gestion du highlight des cartes cliquables sur le plateau
+		#coordonnées de la souris
 		x_souris, y_souris = pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]
 		for index, surface_carte in np.ndenumerate(plateau.matrice_surfaces):
 			carte = plateau.matrice[index[0],index[1]]
 			if surface_carte.collidepoint(x_souris, y_souris) and carte.bougeable:
 				if (carte.position[0] in [0,plateau.dimension-1] or carte.position[1] in [0,plateau.dimension-1]):
-					dessine_carte(plateau,carte,carte.position,True)
+					dessine_carte(plateau,carte,carte.position,True) #True est le parametre qui permet le highlight
 		
 		#gestion des évenements
 		for event in pygame.event.get():
@@ -66,7 +66,27 @@ def main():
 				#gestion du changement de perso (provisoire):
 				if event.key == pygame.K_p:
 					plateau.changer_joueur()
-					print('joueur actif',plateau.joueur_actif)
+					print('Le joueur actif est le',plateau.joueur_actif)
+					print('position',plateau.liste_joueurs[plateau.joueur_actif-1].position)
+				elif event.key == pygame.K_UP:
+					print('haut')
+					plateau.deplacer_joueur(plateau.joueur_actif,'haut')
+				elif event.key == pygame.K_DOWN:
+					print('bas')
+					plateau.deplacer_joueur(plateau.joueur_actif,'bas')
+				elif event.key == pygame.K_LEFT:
+					print('gauche')
+					plateau.deplacer_joueur(plateau.joueur_actif,'gauche')
+				elif event.key == pygame.K_RIGHT:
+					print('droite================================')
+					position = plateau.liste_joueurs[plateau.joueur_actif-1].position
+					print(position)
+					carte_actuelle = plateau.matrice[position[0],position[1]]
+					carte_a_cote = plateau.carte_a_cote(position[0],position[1],'droite')
+					print('#5a', carte_a_cote.__dict__)
+					plateau.deplacer_joueur(plateau.joueur_actif,'droite')
+				elif event.key == pygame.K_m:
+					plateau.affichage_console()					
 				if event.key == pygame.K_ESCAPE:
 					terminate()
 			elif event.type == pygame.MOUSEMOTION:
@@ -79,9 +99,14 @@ def main():
 				#itération sur la matrice des surfaces ou index = (ligne,colonne), surface_carte = objet Surface
 				for index, surface_carte in np.ndenumerate(plateau.matrice_surfaces):
 					carte = plateau.matrice[index[0],index[1]]
-					if surface_carte.collidepoint(x_souris, y_souris) and carte.bougeable:
+					if surface_carte.collidepoint(x_souris, y_souris):
+						print('clic sur '+str(index))
+						print('type',plateau.matrice[index[0],index[1]].type_carte)
+						print('orientation',plateau.matrice[index[0],index[1]].orientation)
+						print('carte a cote', plateau.carte_a_cote(index[0],index[1],'droite').position,plateau.carte_a_cote(index[0],index[1],'gauche').murs)
+						print('surface', plateau.matrice_surfaces[index[0],index[1]])
 						if (carte.position[0] in [0,plateau.dimension-1] or carte.position[1] in [0,plateau.dimension-1]):
-							dessine_carte(plateau,carte,carte.position,True)
+							print('clic sur '+str(index))
 
 				#gestion du clique sur les flèches pour tourner la carte jouable
 				#création des Rect associées associées avec get_rect()
@@ -223,28 +248,28 @@ def boucle_deplacement(plateau):
 		pygame.display.update()
 		FPSCLOCK.tick()
 
-
-def rotation_carte_jouable(Plateau,Carte):
-	mouse = pygame.mouse.get_pos()
-	clic = pygame.mouse.get_pressed()
-	fleche1= IMAGES_DICT['fleche1'].get_rect()
-	fleche2= IMAGES_DICT['fleche1'].get_rect()
-	while True:
-		for event in pygame.event.get():	
-			if event.type == QUIT:
-				terminate()		
-			elif event.type == pygame.MOUSEMOTION:
-				if clic[0] == 1 and fleche1[0]+fleche1[2] > mouse[0] > fleche1[0] and fleche1[1]+fleche1[3]> mouse[1] >fleche1[1]:
-					Plateau.carte_jouable.tourner('gauche')
-					Plateau.carte_jouable.update_murs()
-					print('tourner gauche')
-				elif clic[0] == 1 and fleche2[0]+fleche2[2] > mouse[0] > fleche2[0] and fleche2[1]+fleche2[3]> mouse[1] >fleche2[1]:
-					Plateau.carte_jouable.tourner('droite')
-					Plateau.carte_jouable.update_murs()
-					print('droite')
-		actualisation_affichage_plateau()
-		pygame.display.update()
-		FPSCLOCK.tick()
+#FONCTION INUTILE ?
+# def rotation_carte_jouable(Plateau,Carte):
+# 	mouse = pygame.mouse.get_pos()
+# 	clic = pygame.mouse.get_pressed()
+# 	fleche1= IMAGES_DICT['fleche1'].get_rect()
+# 	fleche2= IMAGES_DICT['fleche1'].get_rect()
+# 	while True:
+# 		for event in pygame.event.get():	
+# 			if event.type == QUIT:
+# 				terminate()		
+# 			elif event.type == pygame.MOUSEMOTION:
+# 				if clic[0] == 1 and fleche1[0]+fleche1[2] > mouse[0] > fleche1[0] and fleche1[1]+fleche1[3]> mouse[1] >fleche1[1]:
+# 					Plateau.carte_jouable.tourner('gauche')
+# 					Plateau.carte_jouable.update_murs()
+# 					print('tourner gauche')
+# 				elif clic[0] == 1 and fleche2[0]+fleche2[2] > mouse[0] > fleche2[0] and fleche2[1]+fleche2[3]> mouse[1] >fleche2[1]:
+# 					Plateau.carte_jouable.tourner('droite')
+# 					Plateau.carte_jouable.update_murs()
+# 					print('droite')
+# 		actualisation_affichage_plateau()
+# 		pygame.display.update()
+# 		FPSCLOCK.tick()
 
 #def insertion_carte_jouable(Plateau, Carte):
 #	global espace, pixel_case, gameDisplay, WINWIDTH, WINHEIGHT, dimension

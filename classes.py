@@ -10,41 +10,49 @@ class Plateau(object):
 	----
 	dimension: entier impair >=7
 	matrice: array de taille dimension * dimension, contenant les objets Cartes
-    matrice_surfaces :  array de taille dimension * dimension, contenant les surfaces des Cartes
+	matrice_surfaces :  array de taille dimension * dimension, contenant les surfaces des Cartes
 	carte_jouable: objet de type carte, correspond à la carte qui est hors plateau
 	joueur_actif: objet de type chasseur -- indique le joueur à qui c'est le tour de jouer
+	liste_joueurs:
 	nb_joueurs: entier allant de 1 à 4 -- indique le nb de joueurs																  
 	"""
 	def __init__(self, dimension = 7, nb_joueurs = 4):
 		self.dimension = dimension #dimension du plateau
 		self.joueur_actif = 1
+		self.liste_joueurs = []
 		self.nb_joueurs = nb_joueurs
 		if dimension % 2 == 1 and dimension >= 7:
 		#création de la matrice contenant les objets cartes
 			self.matrice = np.zeros((dimension,dimension), dtype= object)
 
 			#placement des cartes fixes
-			
+			#rappel: init de carte = Carte(type_carte,jouable = False, orientation = 0, presence_pepite = True, bougeable = False, position = [0,0])
 			#1. placement des bords - sur les lignes
-			orientation=0
-			for ligne in range(0,dimension, dimension-1):
-				for col in range(2, dimension, 2):
-					self.matrice[ligne][col] = Carte(3, False, orientation, True, False, [ligne,col])
-				orientation+=2
-				
-			#2. placement des bords - sur les colonnes
 			orientation=3
+			for ligne in range(0,dimension, dimension-1):
+				for col in range(2, dimension-1, 2):
+					self.matrice[ligne][col] = Carte(3, False, orientation, True, False, [ligne,col])
+					print('attributs de la carte 1b '+str(ligne)+str(col)+' ', self.matrice[ligne][col].__dict__)
+				orientation=1
+									
+			#2. placement des bords - sur les colonnes
+			orientation=0
 			for col in range(0,dimension, dimension-1):
-				for ligne in range(2, dimension, 2):
+				for ligne in range(2, dimension-1, 2):
+					# print('#2:', ligne, col)
 					self.matrice[ligne][col] = Carte(3, False, orientation, True, False,[ligne,col])
-				orientation-=2
+					# print('t2',self.matrice[ligne][col].murs)
+				orientation+=2
+
+					
 					
 			#3. placement des coins
-			orientation=0
-			for ligne in range(0,dimension, dimension-1):
-				for col in range(0,dimension, dimension-1):
-					self.matrice[ligne][col] = Carte(2, False, orientation, True, False,[ligne,col])
-					orientation+=1
+			self.matrice[0][0] = Carte(2, False, 0, True, False,[0,0])
+			self.matrice[0][dimension-1] = Carte(2, False, 3, True, False,[0,dimension-1])
+			self.matrice[dimension-1][0] = Carte(2, False, 1, True, False,[dimension-1,0])
+			self.matrice[dimension-1][dimension-1] = Carte(2, False, 2, True, False,[dimension-1,dimension-1])
+			# print('t3',self.matrice[0][0].murs)
+
 			
 			#4. placement du centre
 			for ligne in range(2, dimension-2, 2):
@@ -75,6 +83,7 @@ class Plateau(object):
 					alea = rd.randint(0,cpt_cartes_alea)
 					type_carte = liste_types.pop(alea)
 					orientation = rd.randint(0,3)
+					# print('#3:', ligne, col)
 					self.matrice[ligne][col] = Carte(type_carte, False, orientation, True, True, [ligne,col])
 					cpt_cartes_alea-=1
 					liste_pos_carte_alea+=[[ligne,col]]
@@ -86,6 +95,7 @@ class Plateau(object):
 					alea = rd.randint(0,cpt_cartes_alea)
 					type_carte = liste_types.pop(alea)
 					orientation = rd.randint(0,3)
+					# print('#4:', ligne, col)
 					self.matrice[ligne][col] = Carte(type_carte, False, orientation, True, True, [ligne,col])
 					cpt_cartes_alea-=1
 					liste_pos_carte_alea+= [[ligne,col]]
@@ -111,6 +121,8 @@ class Plateau(object):
 			for joueur in liste_joueurs:
 				ligne, col = liste_pos_joueurs[joueur-1]
 				self.matrice[ligne][col].chasseur = Chasseur(joueur,[ligne,col], liste_fantomes[0:3])
+				self.liste_joueurs.append(self.matrice[ligne][col].chasseur)
+				print(self.liste_joueurs)
 				
 				#On retire les fantomes déjà attribués
 				liste_fantomes.pop(0),liste_fantomes.pop(1),liste_fantomes.pop(2)
@@ -135,12 +147,14 @@ class Plateau(object):
 
 	def actualisation_matrice_surfaces(self):
 		"""Actualisation de la matrice des surfaces get_rect associées aux cartes
+		-->: /
 		"""
 		#parcourt de la matrice
 		for i in range(self.dimension):
 			for j in range(self.dimension):
 				carte = self.matrice[i,j] #on recupere l'objet carte
 				x,y = af.position_pixel(carte, (i,j)) #et ses coordonnées
+				# print('#5:', i, j)
 				self.matrice_surfaces[i,j] = IMAGES_DICT['carte'+str(carte.type_carte)].get_rect().move((x,y)) #création de l'objet Surface, placement dans la matrice 
 
 	#affichage console
@@ -292,9 +306,9 @@ class Plateau(object):
 		save.close()		
 	
 
-	def carte_a_cote(self, direction,x,y):
+	def carte_a_cote(self, x,y,direction):
 		'''Fonction renvoyant la carte à côté de la carte présente
-		x,y: position de la carte de départ
+		x,y: position de la carte de départ, x  = colonne, y = ligne (axes pygame inversés !)
 		direction : char
 		Direction dans laquelle on regarde, valeurs possibles : gauche, droite, haut, bas
 		-->: la carte à cote de la carte(x,y) pour la direction donnée
@@ -322,12 +336,17 @@ class Plateau(object):
 		return carte_a_cote
 	
 	def deplacement_possible(self, x_position,y_position, direction):
-		'''Fonction renvoyant en fonction de la position et de la direction du déplacement, si celui ci est possible ou non.
+		'''Evalue si le déplcement est possible.
+		-->: bool
 		'''
+		print('dp pos acctuelle',x_position,y_position)
 		direction_opposee = {'haut':'bas','bas':'haut','gauche':'droite','droite':'gauche'}
-#		 x_position, y_position = chasseur.position
 		carte_actuelle = self.matrice[x_position, y_position]
 		carte_visee = self.carte_a_cote(x_position, y_position,direction)
+		# print('test deplacement', carte_visee)
+		print('murs carte actuelle',carte_actuelle.murs[direction])
+		# print('murs visee', carte_visee.murs[direction_opposee[direction]])
+		print('attributs de la carte visee dans deplacement possible #7', carte_visee.__dict__)
 		if carte_actuelle.murs[direction] == False and carte_visee.murs[direction_opposee[direction]] == False: #s'il n(y a pas de murs sur les deux cartes)
 			return True
 		else: #s'il y a un mur sur l'une des deux cartes
@@ -339,7 +358,24 @@ class Plateau(object):
 		else:
 			self.joueur_actif += 1
 
-			 
+	def deplacer_joueur(self, id_joueur, direction): 
+		chasseur = self.liste_joueurs[id_joueur-1]
+		print(chasseur)
+		x,y = chasseur.position[0],chasseur.position[1]
+		print('xy',x,y)
+		carte_depart = self.matrice[x,y]
+		carte_visee = self.carte_a_cote(x,y,direction)
+		# print(carte_depart,carte_visee)
+		print('murs #6', carte_visee.__dict__)
+		print(self.deplacement_possible(x,y,direction))
+		if self.deplacement_possible(x,y,direction):
+			#on enlève le joueur de la carte de départ
+			carte_depart.chasseur = 0
+			#on l'ajoute à celle d'arrivée
+			carte_visee.chasseur = chasseur
+			#on change les attrbuts du joueur
+			chasseur.position = carte_visee.position
+			print('deplacement fait')
 
 
 class Carte(object):
@@ -352,15 +388,16 @@ class Carte(object):
 	fantome: entier entre 0 et 21 -- la valeur 0 indique l'absence de fantôme
 	pepite = booléen - True par défaut, ce qui indique la présence d'une pépite
 	chasseur = entier entre 0 et 4 -- la valeur 0 indique l'absence de chasseur"""
-	def __init__(self,type_carte,jouable = False, orientation = 0, presence = True, bougeable = False, position = [0,0]):
+	def __init__(self,type_carte,jouable = False, orientation = 0, presence_pepite = True, bougeable = False, position = [0,0]):
 		self.position = position
 		self.jouable = jouable #Booléen indiquant si la carte est jouable ou non (i.e. si elle est hors plateau ou pas)
 		self.bougeable = bougeable
 		self.type_carte = int(type_carte) #type de carte (1,2,3)
 		self.orientation = int(orientation) #entre 0,1,2,3
 		self.fantome = 0 #fantome présent sur la carte, vaut 0 si pas de fantome
-		self.pepite = presence #toutes les cartes possèdent une pépite en debut de jeu, sauf la carte jouable
+		self.pepite = presence_pepite #toutes les cartes possèdent une pépite en debut de jeu, sauf la carte jouable
 		self.chasseur = 0 #chasseur présent sur la carte, 0 par défaut
+		self.murs = {}
 		self.update_murs() #présence de mur a gauche, droite, en haut et bas de la carte
 
 	def tourner(self,direction='droite'):
@@ -385,20 +422,20 @@ class Carte(object):
 		'''Update les positions des murs en fonction du type de carte et de la position. Utilisé lors d'une rotation de carte.
 		'''
 		if self.type_carte == 1:
-			if self.orientation in [0,2]:
+			if self.orientation in [1,3]:
 				self.murs ={'haut':True, 'droite':False,'bas':True, 'gauche':False}
-			elif self.orientation in [1,3]:
+			elif self.orientation in [0,2]:
 				self.murs = {'haut':False,'droite':True,'bas':False,'gauche':True}
 
 		elif self.type_carte == 2:
 			if self.orientation == 0:
-				self.murs = {'haut':True, 'droite':True, 'bas':False, 'gauche':False}
-			if self.orientation == 1:
-				self.murs = {'haut':False, 'droite':True, 'bas':True, 'gauche':False}
-			if self.orientation == 2:
-				self.murs = {'haut':False, 'droite':False, 'bas':True, 'gauche':True}				
-			if self.orientation == 3:
 				self.murs = {'haut':True, 'droite':False, 'bas':False, 'gauche':True}
+			if self.orientation == 1:
+				self.murs = {'haut':True, 'droite':True, 'bas':False, 'gauche':False}
+			if self.orientation == 2:
+				self.murs = {'haut':False, 'droite':True, 'bas':True, 'gauche':False}				
+			if self.orientation == 3:
+				self.murs = {'haut':False, 'droite':False, 'bas':True, 'gauche':True}
 				
 		elif self.type_carte == 3:
 			if self.orientation == 0:
@@ -431,7 +468,7 @@ class Chasseur(object):
 	fantome: liste d entiers -- correspond aux fantomes amasses par le chasseur"""
 	def __init__(self, id,position,mission):
 		self.id = id
-		self.position = [0,0]
+		self.position = position
 		self.mission = []
 		self.pepite = 0
 		self.score = 0
