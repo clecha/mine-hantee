@@ -64,10 +64,12 @@ def main():
 		for event in pygame.event.get():
 			if event.type == pygame.KEYDOWN:
 				#gestion du changement de perso (provisoire):
+				#JOUEUR ACTIF
 				if event.key == pygame.K_p:
 					plateau.changer_joueur()
 					print('Le joueur actif est le',plateau.joueur_actif)
 					print('position',plateau.liste_joueurs[plateau.joueur_actif-1].position)
+				#DEPLACEMENT
 				elif event.key == pygame.K_UP:
 					print('haut')
 					plateau.deplacer_joueur(plateau.joueur_actif,'haut')
@@ -78,13 +80,11 @@ def main():
 					print('gauche')
 					plateau.deplacer_joueur(plateau.joueur_actif,'gauche')
 				elif event.key == pygame.K_RIGHT:
-#					print('droite================================')
-#					position = plateau.liste_joueurs[plateau.joueur_actif-1].position
-#					print(position)
-#					carte_actuelle = plateau.matrice[position[0],position[1]]
-#					carte_a_cote = plateau.carte_a_cote(position[0],position[1],'droite')
-#					print('#5a', carte_a_cote.__dict__)
+					print('droite')
 					plateau.deplacer_joueur(plateau.joueur_actif,'droite')
+
+				
+				#QUITTER
 				elif event.key == pygame.K_m:
 					plateau.affichage_console()					
 				if event.key == pygame.K_ESCAPE:
@@ -93,26 +93,17 @@ def main():
 				pass
 
 			elif event.type == pygame.MOUSEBUTTONUP:
-				#gestion du clic sur les places d'insertion
+				#INSERTION
 				 #recupération des coordonnées de la souris
 				x_souris,y_souris = event.pos
 				#itération sur la matrice des surfaces ou index = (ligne,colonne), surface_carte = objet Surface
 				for index, surface_carte in np.ndenumerate(plateau.matrice_surfaces):
 					carte = plateau.matrice[index[0],index[1]]
 					if surface_carte.collidepoint(x_souris, y_souris):
-						print('clic sur carte bougeable'+str(index))
-						# print('clic sur '+str(index))
-						# print('type',plateau.matrice[index[0],index[1]].type_carte)
-						# print('orientation',plateau.matrice[index[0],index[1]].orientation)
-						# print('carte a cote', plateau.carte_a_cote(index[0],index[1],'droite').position,plateau.carte_a_cote(index[0],index[1],'gauche').murs)
-						# print('surface', plateau.matrice_surfaces[index[0],index[1]])
 						if (carte.position[0] in [0,plateau.dimension-1] or carte.position[1] in [0,plateau.dimension-1]) and carte.bougeable:
-							print('clic sur carte bougeable'+str(index))
-							print(plateau.affichage_console())
 							plateau.inserer_carte(plateau.carte_jouable,carte.position)
-#							print('infos', plateau.matrice[index[0],index[1]].__dict__ )
 
-				#gestion du clique sur les flèches pour tourner la carte jouable
+				#TOURNER CARTE JOUABLE
 				#création des Rect associées associées avec get_rect()
 				position_fleche1, position_fleche2 = IMAGES_DICT['fleche1'].get_rect().move((150,530)),IMAGES_DICT['fleche2'].get_rect().move((275,530))
 				if position_fleche1.collidepoint(x_souris, y_souris):
@@ -122,8 +113,6 @@ def main():
 					plateau.carte_jouable.tourner('droite')
 					plateau.carte_jouable.update_murs()
 
-
-		
 		pygame.display.update()
 		FPSCLOCK.tick()
 	
