@@ -517,7 +517,9 @@ class Chasseur(object):
 		self.fantome = []
 
 	def bouger(self,direction):
-		"""Déplace le Chasseur en changeant la valeur de son attribut position"""
+		"""Déplace le Chasseur en changeant la valeur de son attribut position
+		'/!\' FONCTION INUTILE ? EN soit on peut s'en servir dans deplacer_joueur mais elle n'ajoute pas grand chose
+		"""
 		if direction == 'gauche':
 			self.position[0] -= 1
 		elif direction == 'droite':
