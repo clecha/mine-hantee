@@ -114,12 +114,16 @@ class Plateau(object):
 			rd.shuffle(liste_pos_joueurs)
 			
 			#on parcourt la liste des joueurs pour leur attribuer une position et une mission
-			for joueur in liste_id_joueurs:
-				ligne, col = liste_pos_joueurs[joueur-1]
-				self.matrice[ligne][col].chasseur = Chasseur(joueur,[ligne,col], liste_fantomes[0:3])
-				# self.matrice[ligne][col].chasseur = joueur #id du chasseur (type int)
+			for id_joueur in liste_id_joueurs:
+				ligne, col = liste_pos_joueurs[id_joueur-1]
+				#création du Chasseur() et ajout à la liste des joueurs
+				self.liste_joueurs.append(Chasseur(id_joueur,[ligne,col], liste_fantomes[0:3]))
+				#ajout de l'id du joueur à sa carte de départ
+				self.matrice[ligne][col].chasseur += [id_joueur] #id du chasseur (type int)
 				self.matrice[ligne][col].pepite = False #on enlève la pépite de ces cartes
-				self.liste_joueurs.append(self.matrice[ligne][col].chasseur)
+				###alternative
+				# self.matrice[ligne][col].chasseur = Chasseur(id_joueur,[ligne,col], liste_fantomes[0:3])
+				# self.liste_joueurs.append(self.matrice[ligne][col].chasseur)
 				print('liste joueurs',self.liste_joueurs)
 				
 				#On retire les fantomes déjà attribués
@@ -170,14 +174,12 @@ class Plateau(object):
 			for col in range(dimension):
 				for ligne in range(dimension):
 					carte = self.matrice[ligne][col]
+					id_joueur = carte.chasseur
 					matrice_affichage_jouabilite[ligne][col] = carte.jouable
 					matrice_affichage_type_carte[ligne][col] = carte.type_carte
 					matrice_affichage_orientation[ligne][col] = carte.orientation
-					chasseur, fantome = carte.chasseur, carte.fantome
-					if type(chasseur) != int:
-						matrice_affichage_chasseurs[ligne][col] = carte.chasseur.id
-					else:
-						matrice_affichage_chasseurs[ligne][col] = carte.chasseur
+					matrice_affichage_chasseurs[ligne][col] = carte.chasseur
+					fantome = carte.fantome
 					if type(fantome) != int:
 						matrice_affichage_fantomes[ligne][col] = carte.fantome.numero
 					else:
@@ -254,9 +256,9 @@ class Plateau(object):
 				carte_inseree.fantome = nvelle_carte_jouable.fantome
 				nvelle_carte_jouable.fantome = 0
 			#puis on fait de même pour les chasseurs
-			if nvelle_carte_jouable.chasseur != 0:
+			if nvelle_carte_jouable.chasseur != []:
 				carte_inseree.chasseur = nvelle_carte_jouable.chasseur
-				nvelle_carte_jouable.chasseur = 0
+				nvelle_carte_jouable.chasseur = []
 				presence_chasseur = True
 				#il faudra quand même actualiser la position du chasseur
 			#de même pour la pépite
@@ -276,12 +278,19 @@ class Plateau(object):
 			if insertion_colonne:
 				self.matrice[:,y_position] = liste_a_inserer
 				if presence_chasseur:
-					#Actualisation de la position du chasseur dans l'objet chasseur
-					self.matrice[index_chasseur, y_position].chasseur.position = [index_chasseur, y_position]
+					carte = self.matrice[index_chasseur, y_position]
+					for id_chasseur in carte.chasseur:
+						chasseur = self.liste_joueurs[id_chasseur]
+						#Actualisation de la position du chasseur dans l'objet chasseur
+						chasseur.position = [index_chasseur, y_position]
 			else:
 				self.matrice[x_position,:] = liste_a_inserer
 				if presence_chasseur:
-					self.matrice[x_position, index_chasseur].chasseur.position = [x_position, index_chasseur]
+					carte = self.matrice[x_position, index_chasseur]
+					for id_chasseur in carte.chasseur:
+						chasseur = self.liste_joueurs[id_chasseur]
+						#Actualisation de la position du chasseur dans l'objet chasseur
+						chasseur.position = [x_position, index_chasseur]
 			
 			#on actualise la nouvelle carte jouable
 			self.carte_jouable = nvelle_carte_jouable #carte de bout de ligne/colonne "sort"
@@ -409,10 +418,9 @@ class Plateau(object):
 		# print(self.deplacement_possible(x,y,direction))
 		if self.deplacement_possible(x,y,direction):
 			#on enlève le joueur de la carte de départ
-			carte_depart.chasseur = 0
+			carte_depart.chasseur.remove(id_joueur)
 			#on l'ajoute à celle d'arrivée
-			carte_visee.chasseur = chasseur
-			# carte_visee.chasseur = id_joueur
+			carte_visee.chasseur += [id_joueur]
 			#on change les attrbuts du joueur
 			chasseur.position = carte_visee.position
 			# chasseur.bouger(direction)
@@ -440,7 +448,7 @@ class Carte(object):
 		self.orientation = int(orientation) #entre 0,1,2,3
 		self.fantome = 0 #fantome présent sur la carte, vaut 0 si pas de fantome
 		self.pepite = presence_pepite #toutes les cartes possèdent une pépite en debut de jeu, sauf la carte jouable
-		self.chasseur = 0 #chasseur présent sur la carte, 0 par défaut
+		self.chasseur = [] #chasseur présent sur la carte, 0 par défaut
 		self.murs = {}
 		self.update_murs() #présence de mur a gauche, droite, en haut et bas de la carte
 

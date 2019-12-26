@@ -337,11 +337,9 @@ def dessine_carte(Plateau, Carte, position = None,hover=False):
 		gameDisplay.blit(IMAGES_DICT['pepite'],(x_pixel+40,y_pixel+40))	
 
 	#Affichage du chasseur
-	chasseur = Carte.chasseur
-	if chasseur != 0:
-		id_chasseur = chasseur.id
-		#print(id_chasseur)
-		gameDisplay.blit(IMAGES_DICT['chasseur'+str(id_chasseur)],(x_pixel+2*pixel_case/10,y_pixel+pixel_case/10))
+	if Carte.chasseur != []:
+		for id_chasseur in Carte.chasseur:
+			gameDisplay.blit(IMAGES_DICT['chasseur'+str(id_chasseur)],(x_pixel+2*pixel_case/10,y_pixel+pixel_case/10))
 		
 	#Affichage du fantôme
 	fantome = Carte.fantome
