@@ -123,7 +123,7 @@ class Plateau(object):
 				self.matrice[ligne][col].chasseur = Chasseur(joueur,[ligne,col], liste_fantomes[0:3])
 				self.matrice[ligne][col].pepite = False #on enlève la pépite de ces cartes
 				self.liste_joueurs.append(self.matrice[ligne][col].chasseur)
-				print(self.liste_joueurs)
+				print('liste joueurs',self.liste_joueurs)
 				
 				#On retire les fantomes déjà attribués
 				liste_fantomes.pop(0),liste_fantomes.pop(1),liste_fantomes.pop(2)
