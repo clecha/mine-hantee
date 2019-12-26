@@ -58,7 +58,7 @@ class Plateau(object):
 			for ligne in range(2, dimension-2, 2):
 				for col in range(2, dimension-2, 2):
 					orientation = rd.randint(0,3)
-					self.matrice[ligne][col] = Carte(3, False, orientation, True, False,[ligne,col])
+					self.matrice[ligne][col] = Carte(3, False, orientation, False, False,[ligne,col])
 
 			#placement des cartes aléatoires
 			nb_cartes_fixes = ((dimension +	 1)/2)**2
@@ -416,6 +416,10 @@ class Plateau(object):
 			carte_visee.chasseur = chasseur
 			#on change les attrbuts du joueur
 			chasseur.position = carte_visee.position
+			#vérification de la présence d'une pépite
+			if carte_visee.pepite:
+				chasseur.pepite += 1
+				carte_visee.pepite = False
 			print('deplacement fait')
 
 
