@@ -100,14 +100,17 @@ def main():
 				for index, surface_carte in np.ndenumerate(plateau.matrice_surfaces):
 					carte = plateau.matrice[index[0],index[1]]
 					if surface_carte.collidepoint(x_souris, y_souris):
+						print('clic sur carte bougeable'+str(index))
 						# print('clic sur '+str(index))
 						# print('type',plateau.matrice[index[0],index[1]].type_carte)
 						# print('orientation',plateau.matrice[index[0],index[1]].orientation)
 						# print('carte a cote', plateau.carte_a_cote(index[0],index[1],'droite').position,plateau.carte_a_cote(index[0],index[1],'gauche').murs)
 						# print('surface', plateau.matrice_surfaces[index[0],index[1]])
 						if (carte.position[0] in [0,plateau.dimension-1] or carte.position[1] in [0,plateau.dimension-1]) and carte.bougeable:
-							print('clic sur '+str(index))
+							print('clic sur carte bougeable'+str(index))
+							print(plateau.affichage_console())
 							plateau.inserer_carte(plateau.carte_jouable,carte.position)
+#							print('infos', plateau.matrice[index[0],index[1]].__dict__ )
 
 				#gestion du clique sur les flèches pour tourner la carte jouable
 				#création des Rect associées associées avec get_rect()

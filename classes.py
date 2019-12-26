@@ -169,8 +169,8 @@ class Plateau(object):
 			matrice_affichage_orientation = np.zeros((dimension,dimension))
 			matrice_affichage_chasseurs = np.zeros((dimension,dimension))
 			matrice_affichage_fantomes = np.zeros((dimension,dimension))
-			for ligne in range(dimension):
-				for col in range(dimension):
+			for col in range(dimension):
+				for ligne in range(dimension):
 					carte = self.matrice[ligne][col]
 					matrice_affichage_jouabilite[ligne][col] = carte.jouable
 					matrice_affichage_type_carte[ligne][col] = carte.type_carte
@@ -185,27 +185,28 @@ class Plateau(object):
 					else:
 						matrice_affichage_fantomes[ligne][col] = carte.fantome
 
-			print('matrice des jouabilites:', matrice_affichage_jouabilite)
-			print('matrice des types de carte:', matrice_affichage_type_carte)
-			print('matrice des orientations:', matrice_affichage_orientation)
-			print('matrice des chasseurs:', matrice_affichage_chasseurs)
-			print('matrice des fantomes:', matrice_affichage_fantomes)
-			print('matrice des surfaces', self.matrice_surfaces)
+			print('matrice des jouabilites:\n', matrice_affichage_jouabilite)
+			print('matrice des types de carte:\n', matrice_affichage_type_carte)
+			print('matrice des orientations:\n', matrice_affichage_orientation)
+			print('matrice des chasseurs:\n', matrice_affichage_chasseurs)
+			print('matrice des fantomes:\n', matrice_affichage_fantomes)
+			print('matrice des surfaces\n', self.matrice_surfaces)
 
 		except:
 			print('Il n y a aucun jeu en cours.')
 		pass
 
-	def inserer_carte(self,carte,position):
+	def inserer_carte(self,carte_inseree,position):
 		"""Fonction placant la carte en argument a la position en argument
 		Paramètres
 		-----------
-		carte : int
-		position: liste de coordonnées [x,y]"""
+		carte : la carte JOUABLE
+		position: liste de coordonnées [x,y] de la place d'insertion
+		"""
 		x_position = int(position[0])
 		y_position = int(position[1])
 		dimension = self.dimension
-		
+
 		#On initialise un booléen permettant de savoir si on insère sur une ligne ou sur une colonne
 		insertion_colonne = True
 		
@@ -218,50 +219,61 @@ class Plateau(object):
 			#on insère sur une colonne en partant du haut du plateau (1ere ligne)
 			if x_position == 0:
 				liste_a_inserer, index_carte_a_pop = self.matrice[:,y_position], -1
+				# deuxieme_carte = liste_a_inserer[0] #carte sur laquelle on vient de cliquer, il va falloir lui changer l'attribut bougeable
 			#on insère sur une colonne en partant du bas du plateau (dernière ligne)
 			elif x_position == dimension - 1:
 				liste_a_inserer, index_carte_a_pop = self.matrice[:,y_position], 0
+				# deuxieme_carte = liste_a_inserer[-1]
 			#on insère sur une ligne en partant de la gauche du plateau (1ere colonne)
 			elif y_position == 0:
 				liste_a_inserer, index_carte_a_pop = self.matrice[x_position,:], -1
+				# deuxieme_carte = liste_a_inserer[0]
 				insertion_colonne = False
 			#on insère sur une ligne en partant de la droite du plateau (derniere colonne)
 			elif y_position == dimension - 1:
 				liste_a_inserer, index_carte_a_pop = self.matrice[x_position,:], 0
+				# deuxieme_carte = liste_a_inserer[-1]
 				insertion_colonne = False
-	
+			# print('d2',deuxieme_carte.__dict__)
+			
 			#on retire l'élément qui a coulissé en dehors du plateau
 			nvelle_carte_jouable = liste_a_inserer[index_carte_a_pop]
-			liste_a_inserer = np.delete(liste_a_inserer, index_carte_a_pop)
-			
-			
+			liste_a_inserer = np.delete(liste_a_inserer, index_carte_a_pop)	
+			#du coup, si la carte à pop était en dernière position, la liste rétrécit 
+			#Si elle est en premier, ça décale tout ?		
+			if insertion_colonne:
+				for x in self.matrice[:,y_position]:
+					print('avant',x.position)
+			else:
+				for x in self.matrice[x_position,:]:
+					print('avant',x.position)
 			
 			#On vérifie la présence d'un fantome ou d'un joueur sur la carte qui a été sortie du tableau
 			#on initialise un booleen qui permettra d'actualiser ou non la position du chasseur
 			presence_chasseur = False
 			#si la carte qui est sortie du plateau avait un fantome, on le déplace sur la carte qu'on insère
 			if nvelle_carte_jouable.fantome !=0:
-				carte.fantome = nvelle_carte_jouable.fantome
+				carte_inseree.fantome = nvelle_carte_jouable.fantome
 				nvelle_carte_jouable.fantome = 0
 			#puis on fait de même pour les chasseurs
 			if nvelle_carte_jouable.chasseur != 0:
-				carte.chasseur = nvelle_carte_jouable.chasseur
+				carte_inseree.chasseur = nvelle_carte_jouable.chasseur
 				nvelle_carte_jouable.chasseur = 0
 				presence_chasseur = True
 				#il faudra quand même actualiser la position du chasseur
 			#de même pour la pépite
 			if nvelle_carte_jouable.pepite:
-				carte.pepite = nvelle_carte_jouable.pepite
+				carte_inseree.pepite = nvelle_carte_jouable.pepite
 				nvelle_carte_jouable.pepite = False
 
 			#On insère en début de ligne/colonne car on enlève le dernier élément
 			if index_carte_a_pop == -1:
-				liste_a_inserer = np.append([carte], liste_a_inserer)
+				liste_a_inserer = np.append([carte_inseree], liste_a_inserer)
 				index_chasseur = 0
 			else:
-				liste_a_inserer = np.append(liste_a_inserer, [carte])
+				liste_a_inserer = np.append(liste_a_inserer, [carte_inseree])
 				index_chasseur = -1
-				
+			
 			#Modification de la colonne/ligne où a été inséré la nouvelle liste
 			if insertion_colonne:
 				self.matrice[:,y_position] = liste_a_inserer
@@ -274,14 +286,37 @@ class Plateau(object):
 					self.matrice[x_position, index_chasseur].chasseur.position = [x_position, index_chasseur]
 			
 			#on actualise la nouvelle carte jouable
-			self.carte_jouable = nvelle_carte_jouable
+			self.carte_jouable = nvelle_carte_jouable #carte de bout de ligne/colonne "sort"
 			
 			#Actualisation de la jouabilité des cartes
-			carte.jouable = False
+			carte_inseree.jouable = False
 			self.carte_jouable.jouable = True
 
+			# #Actualisation de la bougeabilité des cartes
+			carte_inseree.bougeable = True #nouvelle carte insérer
+			
+			#Actualisation de la position de la carte nouvellement insérée
+			carte_inseree.position = [x_position,y_position]
 			#Actualisation de la matrice des surfaces
 			self.actualisation_matrice_surfaces()
+			for x in liste_a_inserer:
+				print(x.position, x)
+			nouvel_index=0
+			if insertion_colonne:
+				for x in self.matrice[:,y_position]:
+					print('apres',x.position[0])
+					x.position[0] = nouvel_index
+					print('apres',x.position[0])
+					nouvel_index+=1
+			else:
+				for x in self.matrice[x_position,:]:
+					print('apres',x.position[1])
+					x.position[1] = nouvel_index
+					print('apres',x.position[1])
+					nouvel_index+=1
+			# print(self.affichage_console())
+			# print('nouvelle carte inseree infos', carte_inseree.__dict__)
+			
 		
 	def sauvegarde(self, num_sauvegarde = 1):
 		""" Methode qui permet de sauvegarder un plateau dans un fichier à un instant t

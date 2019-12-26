@@ -288,47 +288,47 @@ def dessine_carte(Plateau, Carte, position = None,hover=False):
 	x_pixel, y_pixel = position_pixel(Carte, position)
 #	print(x_pixel, y_pixel)
 	if Carte.bougeable == False:
-		bouge = '_dark'
+		couleur = '_dark'
 	elif Carte.position[0] in [0,Plateau.dimension-1] or Carte.position[1] in [0,Plateau.dimension-1] :
-		bouge = '_hover'
+		couleur = '_hover'
 		if hover:
-			bouge = '_bright'
+			couleur = '_bright'
 	else:
-		bouge = ''
+		couleur = ''
 
 	# Affichage de la carte de type labyrinthe
 	#Carte type 1
 	if Carte.type_carte==1:
 		if Carte.orientation==1 or Carte.orientation==3:
-			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)+bouge],90)
+			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)+couleur],90)
 			gameDisplay.blit(carte_rotate,(x_pixel,y_pixel))
 		else:
-			gameDisplay.blit(IMAGES_DICT['carte'+str(Carte.type_carte)+bouge],(x_pixel,y_pixel))
+			gameDisplay.blit(IMAGES_DICT['carte'+str(Carte.type_carte)+couleur],(x_pixel,y_pixel))
 	#Carte type 2
 	if Carte.type_carte==2:
 		if Carte.orientation==0:
-			gameDisplay.blit(IMAGES_DICT['carte'+str(Carte.type_carte)+bouge],(x_pixel,y_pixel))
+			gameDisplay.blit(IMAGES_DICT['carte'+str(Carte.type_carte)+couleur],(x_pixel,y_pixel))
 		elif Carte.orientation==3:
-			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)+bouge],90)
+			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)+couleur],90)
 			gameDisplay.blit(carte_rotate,(x_pixel,y_pixel))
 		elif Carte.orientation==2:
-			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)+bouge],180)
+			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)+couleur],180)
 			gameDisplay.blit(carte_rotate,(x_pixel,y_pixel))
 		else:
-			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)+bouge],270)
+			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)+couleur],270)
 			gameDisplay.blit(carte_rotate,(x_pixel,y_pixel))
 	#Carte type 3
 	if Carte.type_carte==3:
 		if Carte.orientation==0:
-			gameDisplay.blit(IMAGES_DICT['carte'+str(Carte.type_carte)+bouge],(x_pixel,y_pixel))
+			gameDisplay.blit(IMAGES_DICT['carte'+str(Carte.type_carte)+couleur],(x_pixel,y_pixel))
 		elif Carte.orientation==3:
-			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)+bouge],90)
+			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)+couleur],90)
 			gameDisplay.blit(carte_rotate,(x_pixel,y_pixel))
 		elif Carte.orientation==2:
-			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)+bouge],180)
+			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)+couleur],180)
 			gameDisplay.blit(carte_rotate,(x_pixel,y_pixel))
 		else:
-			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)+bouge],270)
+			carte_rotate=pygame.transform.rotate(IMAGES_DICT['carte'+str(Carte.type_carte)+couleur],270)
 			gameDisplay.blit(carte_rotate,(x_pixel,y_pixel))
 		
 
