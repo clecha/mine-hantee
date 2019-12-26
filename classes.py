@@ -299,8 +299,7 @@ class Plateau(object):
 			carte_inseree.position = [x_position,y_position]
 			#Actualisation de la matrice des surfaces
 			self.actualisation_matrice_surfaces()
-			for x in liste_a_inserer:
-				print(x.position, x)
+			#Mise à jour des indexs des cartes de la ligne/colonne changée
 			nouvel_index=0
 			if insertion_colonne:
 				for x in self.matrice[:,y_position]:
@@ -314,8 +313,9 @@ class Plateau(object):
 					x.position[1] = nouvel_index
 					print('apres',x.position[1])
 					nouvel_index+=1
-			# print(self.affichage_console())
-			# print('nouvelle carte inseree infos', carte_inseree.__dict__)
+			#Mise à jour de la position de la carte nouvellement jouable
+			self.carte_jouable.position = [None,None]
+
 			
 		
 	def sauvegarde(self, num_sauvegarde = 1):
@@ -448,12 +448,12 @@ class Carte(object):
 		----------
 		direction : char
 		==> valeurs possibles : 'gauche' ou 'droite'"""
-		if self.orientation == 3 and direction == 'gauche':
+		if self.orientation == 3 and direction == 'droite':
 			self.orientation = 0
-		elif self.orientation == 0 and direction == 'droite':
+		elif self.orientation == 0 and direction == 'gauche':
 			self.orientation = 3
 		else:
-			if direction == 'gauche':
+			if direction == 'droite':
 				self.orientation += 1
 			else:
 				self.orientation -= 1
