@@ -13,7 +13,7 @@ class Plateau(object):
 	matrice_surfaces :  array de taille dimension * dimension, contenant les surfaces des Cartes
 	carte_jouable: objet de type carte, correspond à la carte qui est hors plateau
 	joueur_actif: objet de type chasseur -- indique le joueur à qui c'est le tour de jouer
-	liste_joueurs:
+	liste_joueurs: liste des objets Chasseur
 	nb_joueurs: entier allant de 1 à 4 -- indique le nb de joueurs																  
 	"""
 	def __init__(self, dimension = 7, nb_joueurs = 4):
@@ -25,7 +25,7 @@ class Plateau(object):
 		#création de la matrice contenant les objets cartes
 			self.matrice = np.zeros((dimension,dimension), dtype= object)
 
-			#placement des cartes fixes
+			# PLACEMENT DES CARTES FIXES
 			#rappel: init de carte = Carte(type_carte,jouable = False, orientation = 0, presence_pepite = True, bougeable = False, position = [0,0])
 			#1. placement des bords - sur les lignes
 			orientation=3
@@ -43,16 +43,12 @@ class Plateau(object):
 					self.matrice[ligne][col] = Carte(3, False, orientation, True, False,[ligne,col])
 					# print('t2',self.matrice[ligne][col].murs)
 				orientation+=2
-
-					
-					
+	
 			#3. placement des coins
 			self.matrice[0][0] = Carte(2, False, 0, True, False,[0,0])
 			self.matrice[0][dimension-1] = Carte(2, False, 3, True, False,[0,dimension-1])
 			self.matrice[dimension-1][0] = Carte(2, False, 1, True, False,[dimension-1,0])
 			self.matrice[dimension-1][dimension-1] = Carte(2, False, 2, True, False,[dimension-1,dimension-1])
-			# print('t3',self.matrice[0][0].murs)
-
 			
 			#4. placement du centre
 			for ligne in range(2, dimension-2, 2):
@@ -60,7 +56,7 @@ class Plateau(object):
 					orientation = rd.randint(0,3)
 					self.matrice[ligne][col] = Carte(3, False, orientation, True, False,[ligne,col])
 
-			#placement des cartes aléatoires
+			# PLACEMENT DES CARTES MOBILES
 			nb_cartes_fixes = ((dimension +	 1)/2)**2
 			nb_cartes_alea = dimension**2 - nb_cartes_fixes + 1
 		
@@ -100,13 +96,13 @@ class Plateau(object):
 					cpt_cartes_alea-=1
 					liste_pos_carte_alea+= [[ligne,col]]
 		
-		#carte restante
+		# CARTE JOUABLE
 				self.carte_jouable = Carte(liste_types[0], True, 0, False, True, [None,None])
 				
 				
-			# placement des joueurs
+			# PLACEMENT DES JOUEURS
 			# cree la liste des joueurs
-			liste_joueurs = [k for k in range(1,self.nb_joueurs + 1)]
+			liste_id_joueurs = [k for k in range(1,self.nb_joueurs + 1)]
 			
 			# on crée une liste des fantomes qui servira pour l'attribut des missions
 			liste_fantomes = [k for k in range(0,21)]
@@ -118,9 +114,10 @@ class Plateau(object):
 			rd.shuffle(liste_pos_joueurs)
 			
 			#on parcourt la liste des joueurs pour leur attribuer une position et une mission
-			for joueur in liste_joueurs:
+			for joueur in liste_id_joueurs:
 				ligne, col = liste_pos_joueurs[joueur-1]
 				self.matrice[ligne][col].chasseur = Chasseur(joueur,[ligne,col], liste_fantomes[0:3])
+				# self.matrice[ligne][col].chasseur = joueur #id du chasseur (type int)
 				self.matrice[ligne][col].pepite = False #on enlève la pépite de ces cartes
 				self.liste_joueurs.append(self.matrice[ligne][col].chasseur)
 				print('liste joueurs',self.liste_joueurs)
@@ -415,6 +412,7 @@ class Plateau(object):
 			carte_depart.chasseur = 0
 			#on l'ajoute à celle d'arrivée
 			carte_visee.chasseur = chasseur
+			# carte_visee.chasseur = id_joueur
 			#on change les attrbuts du joueur
 			chasseur.position = carte_visee.position
 			# chasseur.bouger(direction)
