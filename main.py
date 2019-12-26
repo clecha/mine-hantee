@@ -54,6 +54,7 @@ def main():
 		#gestion du highlight des cartes cliquables sur le plateau
 		#coordonnées de la souris
 		x_souris, y_souris = pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]
+		#HIGHLIGHT SUR LES CARTES EN HOVER
 		for index, surface_carte in np.ndenumerate(plateau.matrice_surfaces):
 			carte = plateau.matrice[index[0],index[1]]
 			if surface_carte.collidepoint(x_souris, y_souris) and carte.bougeable:
@@ -68,7 +69,12 @@ def main():
 				if event.key == pygame.K_p:
 					plateau.changer_joueur()
 					print('Le joueur actif est le',plateau.joueur_actif)
-					print('position',plateau.liste_joueurs[plateau.joueur_actif-1].position)
+				elif event.key == pygame.K_f:
+					chasseur = plateau.liste_joueurs[plateau.joueur_actif-1]
+					chasseur.attraper_fantome(plateau)
+					print('fantome attrapés du j'+str(plateau.joueur_actif),chasseur.fantomes)
+
+
 				#DEPLACEMENT
 				elif event.key == pygame.K_UP:
 					print('haut')

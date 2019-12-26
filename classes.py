@@ -58,7 +58,7 @@ class Plateau(object):
 			for ligne in range(2, dimension-2, 2):
 				for col in range(2, dimension-2, 2):
 					orientation = rd.randint(0,3)
-					self.matrice[ligne][col] = Carte(3, False, orientation, False, False,[ligne,col])
+					self.matrice[ligne][col] = Carte(3, False, orientation, True, False,[ligne,col])
 
 			#placement des cartes aléatoires
 			nb_cartes_fixes = ((dimension +	 1)/2)**2
@@ -121,6 +121,7 @@ class Plateau(object):
 			for joueur in liste_joueurs:
 				ligne, col = liste_pos_joueurs[joueur-1]
 				self.matrice[ligne][col].chasseur = Chasseur(joueur,[ligne,col], liste_fantomes[0:3])
+				self.matrice[ligne][col].pepite = False #on enlève la pépite de ces cartes
 				self.liste_joueurs.append(self.matrice[ligne][col].chasseur)
 				print(self.liste_joueurs)
 				
@@ -403,12 +404,12 @@ class Plateau(object):
 		chasseur = self.liste_joueurs[id_joueur-1]
 		print(chasseur)
 		x,y = chasseur.position[0],chasseur.position[1]
-		print('xy',x,y)
+		# print('xy',x,y)
 		carte_depart = self.matrice[x,y]
 		carte_visee = self.carte_a_cote(x,y,direction)
 		# print(carte_depart,carte_visee)
-		print('murs #6', carte_visee.__dict__)
-		print(self.deplacement_possible(x,y,direction))
+		# print('murs #6', carte_visee.__dict__)
+		# print(self.deplacement_possible(x,y,direction))
 		if self.deplacement_possible(x,y,direction):
 			#on enlève le joueur de la carte de départ
 			carte_depart.chasseur = 0
@@ -416,10 +417,10 @@ class Plateau(object):
 			carte_visee.chasseur = chasseur
 			#on change les attrbuts du joueur
 			chasseur.position = carte_visee.position
+			# chasseur.bouger(direction)
 			#vérification de la présence d'une pépite
 			if carte_visee.pepite:
-				chasseur.pepite += 1
-				carte_visee.pepite = False
+				chasseur.attraper_pepite(carte_visee)
 			print('deplacement fait')
 
 
@@ -518,7 +519,7 @@ class Chasseur(object):
 		self.pepite = 0
 		self.score = 0
 		self.joker = True
-		self.fantome = []
+		self.fantomes = []
 
 	def bouger(self,direction):
 		"""Déplace le Chasseur en changeant la valeur de son attribut position
@@ -532,16 +533,14 @@ class Chasseur(object):
 			self.position[1] -= 1
 		if direction == 'bas':
 			self.position[1] += 1
-		pass
-		
 
-	def attraper_pepite(self,Plateau):
+	def attraper_pepite(self,Carte):
 		'''Augmente le nombre de pepite attrapées par le chasseur, enleve la pepite de la carte concernee'''
 		x_position, y_position = self.position
 		self.pepite += 1
 		self.score +=1
 		#Mise à jour de la valeur de la pepite sur la carte où est présent le chasseur
-		Plateau.matrice[x_position, y_position].pepite = False
+		Carte.pepite = False
 
 	def utiliser_joker(self):
 		######instructions utilisation joker########
@@ -560,7 +559,7 @@ class Chasseur(object):
 		fantome = carte.fantome
 		#ajout du numero du fantome a la liste des fantomes collectés par le chasseur
 		num_fantome = fantome.numero
-		self.fantome += [num_fantome]
+		self.fantomes += [num_fantome]
 		fantome.attrape = True
 		carte.fantome = 0
 		
