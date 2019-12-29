@@ -43,104 +43,35 @@ def main():
 		redimension_images(parametres_jeu['dimension'])
 		init_affichage_plateau(plateau)
 		plateau.actualisation_matrice_surfaces()
+		gagne = False
 	elif choix_accueil == 'reprendre_jeu':
 		#/!\ à ajouter : doit mettre la fonction appelant l'écran du choix des parties sauvegardées
 		terminate()
 	elif choix_accueil == 'quitter':
 		terminate()		  
 	
-	while True:
+	while not gagne:
 		actualisation_affichage_plateau(plateau)
 		plateau,gagne = tour_de_jeu(plateau)
-		if gagne:
-			print("C'est gagné!")
-			terminate()
-		else:
-			plateau.changer_joueur()
-		# #gestion du highlight des cartes cliquables sur le plateau
-		# #coordonnées de la souris
-		# x_souris, y_souris = pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]
-		# #HIGHLIGHT SUR LES CARTES EN HOVER
-		# for index, surface_carte in np.ndenumerate(plateau.matrice_surfaces):
-		# 	carte = plateau.matrice[index[0],index[1]]
-		# 	if surface_carte.collidepoint(x_souris, y_souris) and carte.bougeable:
-		# 		if (carte.position[0] in [0,plateau.dimension-1] or carte.position[1] in [0,plateau.dimension-1]):
-		# 			dessine_carte(plateau,carte,carte.position,True) #True est le parametre qui permet le highlight
-		
-		# #gestion des évenements
+		plateau.changer_joueur()
+
 		for event in pygame.event.get():
-			if event.type == pygame.KEYDOWN:
-		# 		#gestion du changement de perso (provisoire):
-		# 		#JOUEUR ACTIF
-		# 		if event.key == pygame.K_p:
-		# 			plateau.changer_joueur()
-		# 			print('Le joueur actif est le',plateau.joueur_actif)
-		# 		elif event.key == pygame.K_f:
-		# 			chasseur = plateau.liste_joueurs[plateau.joueur_actif-1]
-		# 			chasseur.attraper_fantome(plateau)
-		# 			print('fantome attrapés du j'+str(plateau.joueur_actif),chasseur.fantomes)
-
-
-		# 		#DEPLACEMENT
-		# 		elif event.key == pygame.K_UP:
-		# 			print('haut')
-		# 			plateau.deplacer_joueur(plateau.joueur_actif,'haut')
-		# 		elif event.key == pygame.K_DOWN:
-		# 			print('bas')
-		# 			plateau.deplacer_joueur(plateau.joueur_actif,'bas')
-		# 		elif event.key == pygame.K_LEFT:
-		# 			print('gauche')
-		# 			plateau.deplacer_joueur(plateau.joueur_actif,'gauche')
-		# 		elif event.key == pygame.K_RIGHT:
-		# 			print('droite')
-		# 			plateau.deplacer_joueur(plateau.joueur_actif,'droite')
-
-				
-		# 		#QUITTER
-		# 		elif event.key == pygame.K_m:
-		# 			plateau.affichage_console()					
+			if event.type == pygame.KEYDOWN:				
 				if event.key == pygame.K_ESCAPE:
 					terminate()
-		# 	elif event.type == pygame.MOUSEMOTION:
-		# 		pass
-
-		# 	elif event.type == pygame.MOUSEBUTTONUP:
-		# 		#INSERTION
-		# 		 #recupération des coordonnées de la souris
-		# 		x_souris,y_souris = event.pos
-		# 		#itération sur la matrice des surfaces ou index = (ligne,colonne), surface_carte = objet Surface
-		# 		for index, surface_carte in np.ndenumerate(plateau.matrice_surfaces):
-		# 			carte = plateau.matrice[index[0],index[1]]
-		# 			if surface_carte.collidepoint(x_souris, y_souris):
-		# 				if (carte.position[0] in [0,plateau.dimension-1] or carte.position[1] in [0,plateau.dimension-1]) and carte.bougeable:
-		# 					plateau.inserer_carte(plateau.carte_jouable,carte.position)
-
-		# 		#TOURNER CARTE JOUABLE
-		# 		#création des Rect associées associées avec get_rect()
-		# 		position_fleche1, position_fleche2 = IMAGES_DICT['fleche1'].get_rect().move((150,530)),IMAGES_DICT['fleche2'].get_rect().move((275,530))
-		# 		if position_fleche1.collidepoint(x_souris, y_souris):
-		# 			plateau.carte_jouable.tourner('gauche')
-		# 			plateau.carte_jouable.update_murs()
-		# 		elif position_fleche2.collidepoint(x_souris, y_souris):
-		# 			plateau.carte_jouable.tourner('droite')
-		# 			plateau.carte_jouable.update_murs()
 
 		pygame.display.update()
 		FPSCLOCK.tick()
-	
-	
-	"""À ce stade on a créé le plateau et les joueurs, contenus dans la variable plateau et dico_joueur
-	plateau : contient les cartes"""
-	# while True:
-	# 	print("joueur{} est le joueur actif".format())
-	# 	print("J{} est le joueur actif")
-	# 	plateau.joueur_actif = 1
-
-	return terminate()
+	#si gagne, on sort de la boucle et...
+	podium = qui_a_gagne()
+	print(podium)
+	# afficher_fin_jeu()
 	
 def tour_de_jeu(plateau):
 	print('===========================================')
 	print('Au tour du joueur'+str(plateau.joueur_actif))
+	print('Mission: ', plateau.liste_joueurs[plateau.joueur_actif-1].mission)
+	print('Fantomes attrapés:', plateau.liste_joueurs[plateau.joueur_actif-1].fantomes)
 	print('Score actuel: ',plateau.liste_joueurs[plateau.joueur_actif-1].score)
 	deplacement_fait = False
 	insertion_carte_faite = False
@@ -181,18 +112,18 @@ def tour_de_jeu(plateau):
 					plateau.carte_jouable.update_murs()
 		pygame.display.update()
 		FPSCLOCK.tick()
+	#=======================================	
 	#DEPLACEMENT
 	chasseur = plateau.liste_joueurs[plateau.joueur_actif-1]
 	position_initiale = chasseur.position
-	print('po',position_initiale)
 	carte_initiale = plateau.matrice[position_initiale[0],position_initiale[1]]
-	print('type',type(carte_initiale))
 	suivi_deplacement = [carte_initiale]
 	cartes_fantomes_pris = []
 	carte_pepite_prises = []
 	derniere_direction = None
 	while not deplacement_fait:
 		actualisation_affichage_plateau(plateau)
+		carte_jouable_jouee(plateau)
 		if len(suivi_deplacement) != 1:
 			affichage_deplacement(suivi_deplacement[:-1],plateau)
 		#gestion des évenements
@@ -205,50 +136,61 @@ def tour_de_jeu(plateau):
 				# 	print('Le joueur actif est le',plateau.joueur_actif)
 
 				#Deplacement
+				#BAS
 				if event.key == pygame.K_UP and derniere_direction != 'bas':
-					print('haut')
-					suivi_deplacement += [plateau.deplacer_joueur(plateau.joueur_actif,'haut')]
+					carte_arrivee, pepite_attrapee = plateau.deplacer_joueur(plateau.joueur_actif,'haut')
+					suivi_deplacement += [carte_arrivee]
+					if pepite_attrapee:
+						carte_pepite_prises += [carte_arrivee]
 					if suivi_deplacement[-1] == None:
 						del suivi_deplacement[-1]
 					else:
 						derniere_direction = 'haut'
+				#HAUT
 				elif event.key == pygame.K_DOWN and derniere_direction != 'haut':
-					print('bas')
-					suivi_deplacement += [plateau.deplacer_joueur(plateau.joueur_actif,'bas')]
+					carte_arrivee, pepite_attrapee = plateau.deplacer_joueur(plateau.joueur_actif,'bas')
+					suivi_deplacement += [carte_arrivee]
+					if pepite_attrapee:
+						carte_pepite_prises += [carte_arrivee]
 					if suivi_deplacement[-1] == None:
 						del suivi_deplacement[-1]
 					else:
 						derniere_direction = 'bas'
+				#GAUCHE
 				elif event.key == pygame.K_LEFT and derniere_direction != 'droite':
-					print('gauche')
-					suivi_deplacement += [plateau.deplacer_joueur(plateau.joueur_actif,'gauche')]
+					carte_arrivee, pepite_attrapee = plateau.deplacer_joueur(plateau.joueur_actif,'gauche')
+					suivi_deplacement += [carte_arrivee]
+					if pepite_attrapee:
+						carte_pepite_prises += [carte_arrivee]
 					if suivi_deplacement[-1] == None:
 						del suivi_deplacement[-1]
 					else:
 						derniere_direction = 'gauche'
+				#DROITE
 				elif event.key == pygame.K_RIGHT and derniere_direction != 'gauche':
-					print('droite')
-					suivi_deplacement += [plateau.deplacer_joueur(plateau.joueur_actif,'droite')]
+					carte_arrivee, pepite_attrapee = plateau.deplacer_joueur(plateau.joueur_actif,'droite')
+					suivi_deplacement += [carte_arrivee]
+					if pepite_attrapee:
+						carte_pepite_prises += [carte_arrivee]
 					if suivi_deplacement[-1] == None:
 						del suivi_deplacement[-1]
 					else:
 						derniere_direction = 'droite'
-				#Fantome
-				elif event.key == pygame.K_f:
+				#PRISE FANTOME
+				elif event.key == pygame.K_f and plateau.matrice[chasseur.position[0],chasseur.position[1]].fantome != 0:
 					chasseur = plateau.liste_joueurs[plateau.joueur_actif-1]
-					cartes_fantomes_pris = [chasseur.attraper_fantome(plateau)]
+					cartes_fantomes_pris += [chasseur.attraper_fantome(plateau)]
 					print('fantome attrapés du j'+str(plateau.joueur_actif),chasseur.fantomes)
 				#VALIDATION
 				elif event.key == pygame.K_RETURN:
-					if len(suivi_deplacement) == 1:
-						print('Vous devez vous déplacer')
-					else:
-						print('Deplacement terminé')
-						deplacement_fait = True
+					print('Deplacement terminé')
+					print('Score final du tour: ',plateau.liste_joueurs[plateau.joueur_actif-1].score)
+					deplacement_fait = True
 				#ANNULATION
 				elif event.key == pygame.K_ESCAPE: #annulation du déplacement
 					#remise des fantomes sur les cartes
 					while cartes_fantomes_pris != []:
+						print(cartes_fantomes_pris)
 						num_fantome = chasseur.fantomes[-1]
 						cartes_fantomes_pris[-1].fantome = cl.Fantome(num_fantome) #recréarion des fantomes
 						if num_fantome in chasseur.mission:
@@ -262,7 +204,12 @@ def tour_de_jeu(plateau):
 							chasseur.score-=5
 						del cartes_fantomes_pris[-1]
 						del chasseur.fantomes[-1]
+					print('apres1',cartes_fantomes_pris)
 					#remise des pepites sur les cartes
+					for carte in carte_pepite_prises:
+						carte.pepite = True
+						chasseur.score -= -1
+					carte_pepite_prises = []
 					#reposition du chasseur
 					chasseur.position = position_initiale
 					carte_initiale.chasseur += [chasseur.id]
@@ -270,14 +217,36 @@ def tour_de_jeu(plateau):
 					#vidange des listes de suivi
 					suivi_deplacement = [carte_initiale]
 					derniere_direction = None
-				elif event.key == pygame.QUIT:
+				elif event.key == QUIT:
 					terminate()
 		pygame.display.update()
 		FPSCLOCK.tick()
 	#TEST PARTIE GAGNE
-	if 1:
+	if plateau.fantomes_restants ==0:
+		gagne = True
+	else:
 		gagne = False
 	return plateau, gagne
+
+def qui_a_gagne(plateau):
+	"""Definit qui a gagne.
+	Arguments:
+		plateau {Plateau()} -- plateau du jeu
+	"""
+	scores_joueurs = []
+	for joueur in plateau.liste_joueurs:
+		scores_joueurs += [(joueur, joueur.score)]
+	sorted(scores_joueurs, key=lambda scores_joueurs: scores_joueurs[1])
+	dico = {}
+	for rang in range(1,plateau.nb_joueurs+1):
+		dico[rang] = scores_joueurs[0]
+	return dico
+
+
+
+
+
+
 
 
 # def boucle_deplacement(plateau):

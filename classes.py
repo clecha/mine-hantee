@@ -17,7 +17,7 @@ class Plateau(object):
 	nb_joueurs: entier allant de 1 à 4 -- indique le nb de joueurs																  
 	"""
 	def __init__(self, dimension = 7, nb_joueurs = 4):
-		
+		self.fantomes_restants = 21
 		self.dimension = dimension #dimension du plateau
 		self.joueur_actif = 1
 		self.liste_joueurs = []
@@ -105,7 +105,7 @@ class Plateau(object):
 			liste_id_joueurs = [k for k in range(1,self.nb_joueurs + 1)]
 			
 			# on crée une liste des fantomes qui servira pour l'attribut des missions
-			liste_fantomes = [k for k in range(0,21)]
+			liste_fantomes = [k for k in range(1,22)]
 			rd.shuffle(liste_fantomes)
 			
 			#liste des positions possibles, que l'on va randomiser pour attribuer aléatoirement aux joueurs
@@ -125,7 +125,6 @@ class Plateau(object):
 				# self.matrice[ligne][col].chasseur = Chasseur(id_joueur,[ligne,col], liste_fantomes[0:3])
 				# self.liste_joueurs.append(self.matrice[ligne][col].chasseur)
 				print('liste joueurs',self.liste_joueurs)
-				
 				#On retire les fantomes déjà attribués
 				liste_fantomes.pop(0),liste_fantomes.pop(1),liste_fantomes.pop(2)
 				
@@ -387,14 +386,14 @@ class Plateau(object):
 		'''Evalue si le déplcement est possible.
 		-->: bool
 		'''
-		print('dp pos acctuelle',x_position,y_position)
+		# print('dp pos acctuelle',x_position,y_position)
 		direction_opposee = {'haut':'bas','bas':'haut','gauche':'droite','droite':'gauche'}
 		carte_actuelle = self.matrice[x_position, y_position]
 		carte_visee = self.carte_a_cote(x_position, y_position,direction)
 		# print('test deplacement', carte_visee)
-		print('murs carte actuelle',carte_actuelle.murs[direction])
+		# print('murs carte actuelle',carte_actuelle.murs[direction])
 		# print('murs visee', carte_visee.murs[direction_opposee[direction]])
-		print('attributs de la carte visee dans deplacement possible #7', carte_visee.__dict__)
+		# print('attributs de la carte visee dans deplacement possible #7', carte_visee.__dict__)
 		if carte_actuelle.murs[direction] == False and carte_visee.murs[direction_opposee[direction]] == False: #s'il n(y a pas de murs sur les deux cartes)
 			return True
 		else: #s'il y a un mur sur l'une des deux cartes
@@ -408,7 +407,7 @@ class Plateau(object):
 
 	def deplacer_joueur(self, id_joueur, direction): 
 		chasseur = self.liste_joueurs[id_joueur-1]
-		print(chasseur)
+		# print(chasseur)
 		x,y = chasseur.position[0],chasseur.position[1]
 		# print('xy',x,y)
 		carte_depart = self.matrice[x,y]
@@ -427,8 +426,13 @@ class Plateau(object):
 			#vérification de la présence d'une pépite
 			if carte_visee.pepite:
 				chasseur.attraper_pepite(carte_visee)
-			print('deplacement fait')
-			return carte_visee
+				pepite_attrapee = True
+			else:
+				pepite_attrapee = False
+			# print('deplacement fait')
+			return carte_visee, pepite_attrapee
+		else:
+			return None, False
 
 
 class Carte(object):
@@ -522,7 +526,7 @@ class Chasseur(object):
 	def __init__(self, identifiant,position,mission):
 		self.id = identifiant
 		self.position = position
-		self.mission = []
+		self.mission = mission
 		self.pepite = 0
 		self.score = 0
 		self.joker = True
@@ -543,11 +547,12 @@ class Chasseur(object):
 
 	def attraper_pepite(self,Carte):
 		'''Augmente le nombre de pepite attrapées par le chasseur, enleve la pepite de la carte concernee'''
-		x_position, y_position = self.position
-		self.pepite += 1
-		self.score +=1
-		#Mise à jour de la valeur de la pepite sur la carte où est présent le chasseur
-		Carte.pepite = False
+		if Carte.pepite:
+			x_position, y_position = self.position
+			self.pepite += 1
+			self.score +=1
+			#Mise à jour de la valeur de la pepite sur la carte où est présent le chasseur
+			Carte.pepite = False
 
 	def utiliser_joker(self):
 		######instructions utilisation joker########
@@ -564,21 +569,23 @@ class Chasseur(object):
 		#on recupere le fantome sur la case du plateau où est situé le chasseur
 		carte = Plateau.matrice[x_position,y_position]
 		fantome = carte.fantome
-		#ajout du numero du fantome a la liste des fantomes collectés par le chasseur
-		num_fantome = fantome.numero
-		self.fantomes += [num_fantome]
-		fantome.attrape = True
-		carte.fantome = 0
-		#si le fantome fait partie de la mission du chasseur, le score est actualise a +20, sinon à +5
-		if num_fantome in self.mission:
-			self.score+= 20
-		# 	self.mission.remove(num_fantome)
-		# 	if self.mission == []:
-		# 		self.score+=40
-			if self.mission_complete():
-				self.score += 40
-		else:
-			self.score+=5
+		if carte.fantome != 0:
+			#ajout du numero du fantome a la liste des fantomes collectés par le chasseur
+			num_fantome = fantome.numero
+			self.fantomes += [num_fantome]
+			fantome.attrape = True
+			carte.fantome = 0
+			#si le fantome fait partie de la mission du chasseur, le score est actualise a +20, sinon à +5
+			if num_fantome in self.mission:
+				self.score+= 20
+			# 	self.mission.remove(num_fantome)
+			# 	if self.mission == []:
+			# 		self.score+=40
+				if self.mission_complete():
+					self.score += 40
+			else:
+				self.score+=5
+			Plateau.fantomes_restants-=1
 		return carte
 
 	def mission_complete(self):

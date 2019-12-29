@@ -417,10 +417,6 @@ def actualisation_affichage_plateau(plateau):
 	#affichage de la carte jouable
 	carte_jouable = plateau.carte_jouable
 	dessine_carte(plateau,carte_jouable)
-			
-
-		
-		
 
 	#affichage des données spécifiques à chaque joueur
 	'''l=[(10,20),(255,20),(10,265),(255,265)] #liste des positions du texte
@@ -466,5 +462,33 @@ def affichage_deplacement(liste_cartes, plateau):
 		# print('bb',int(x_position-pixel_case/2),int(y_position-pixel_case/2))
 		# surface = plateau.matrice_surfaces[carte.position[0],carte.position[1]]
 		# print('s',surface.top, surface.left)
-		pygame.draw.circle(gameDisplay, (50,205,50, 100), position_cercle,int(size), 10)
+		pygame.draw.circle(gameDisplay, (50,205,50, 100), position_cercle,int(size), 8)
 	return plateau
+
+def carte_jouable_jouee(plateau):
+	global gameDisplay, pixel_case
+	carte = plateau.carte_jouable
+	marge = 5
+	# x_topleft, y_topleft = position_pixel(carte)
+	# x_topright, y_topright = x_topleft+pixel_case, y_topleft
+	# x_bottomleft, y_bottomleft = x_topleft, y_topleft+pixel_case
+	# x-bottomright, y_bottomright = x_topleft+pixel_case, y_topleft+pixel_case
+	topleft = position_pixel(carte)
+	topright = (topleft[0]+pixel_case-marge, topleft[1]+marge)
+	bottomright = (topright[0]-marge,topright[1]+pixel_case-marge)
+	bottomleft = (topleft[0]+marge,topleft[1]+pixel_case-marge)
+	pygame.draw.line(gameDisplay,RED,topleft,bottomright,10)
+	pygame.draw.line(gameDisplay,RED,topright,bottomleft,10)
+	return plateau
+
+def affichage_fin_jeu():
+	#écriture du titre au dessus de la carte jouable
+	fontObj = pygame.font.SysFont('arial',40)
+	gameDisplayDeTexte = fontObj.render("C'est gagné ! ",True,WHITE)
+	monRectangleDeTexte	 = gameDisplayDeTexte.get_rect()
+	monRectangleDeTexte .topleft = (WINWIDTH/2,WINHEIGHT/2)
+	gameDisplay.blit(gameDisplayDeTexte,monRectangleDeTexte)
+	for event in pygame.event.get():
+		if event.type == pygame.KEYDOWN:
+			terminate()
+

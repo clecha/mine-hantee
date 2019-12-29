@@ -18,6 +18,7 @@ BLUE = (0,80,255)
 WHITE = (255, 255, 255)
 BLACK = (0,0,0)
 GREY=(50,50,50)
+RED = (139,0,0)
 
 espace = 500
 pixel_case=int(WINHEIGHT/7)
