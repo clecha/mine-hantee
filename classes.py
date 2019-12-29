@@ -199,7 +199,7 @@ class Plateau(object):
 		"""Fonction placant la carte en argument a la position en argument
 		Paramètres
 		-----------
-		carte : la carte JOUABLE
+		carte_inseree : la carte JOUABLE qui va être inseree
 		position: liste de coordonnées [x,y] de la place d'insertion
 		"""
 		x_position = int(position[0])
@@ -233,7 +233,6 @@ class Plateau(object):
 				liste_a_inserer, index_carte_a_pop = self.matrice[x_position,:], 0
 				# deuxieme_carte = liste_a_inserer[-1]
 				insertion_colonne = False
-			# print('d2',deuxieme_carte.__dict__)
 			
 			#on retire l'élément qui a coulissé en dehors du plateau
 			nvelle_carte_jouable = liste_a_inserer[index_carte_a_pop]
@@ -257,6 +256,7 @@ class Plateau(object):
 			#puis on fait de même pour les chasseurs
 			if nvelle_carte_jouable.chasseur != []:
 				carte_inseree.chasseur = nvelle_carte_jouable.chasseur
+				# print('test1',carte_inseree.chasseur, nvelle_carte_jouable.chasseur)
 				nvelle_carte_jouable.chasseur = []
 				presence_chasseur = True
 				#il faudra quand même actualiser la position du chasseur
@@ -279,7 +279,7 @@ class Plateau(object):
 				if presence_chasseur:
 					carte = self.matrice[index_chasseur, y_position]
 					for id_chasseur in carte.chasseur:
-						chasseur = self.liste_joueurs[id_chasseur]
+						chasseur = self.liste_joueurs[id_chasseur-1]
 						#Actualisation de la position du chasseur dans l'objet chasseur
 						chasseur.position = [index_chasseur, y_position]
 			else:
@@ -287,7 +287,7 @@ class Plateau(object):
 				if presence_chasseur:
 					carte = self.matrice[x_position, index_chasseur]
 					for id_chasseur in carte.chasseur:
-						chasseur = self.liste_joueurs[id_chasseur]
+						chasseur = self.liste_joueurs[id_chasseur-1]
 						#Actualisation de la position du chasseur dans l'objet chasseur
 						chasseur.position = [x_position, index_chasseur]
 			
@@ -321,6 +321,7 @@ class Plateau(object):
 					nouvel_index+=1
 			#Mise à jour de la position de la carte nouvellement jouable
 			self.carte_jouable.position = [None,None]
+			# print("test fin d'insertion",carte_inseree.position ,carte_inseree.chasseur)
 
 			
 		
@@ -407,6 +408,7 @@ class Plateau(object):
 
 	def deplacer_joueur(self, id_joueur, direction): 
 		chasseur = self.liste_joueurs[id_joueur-1]
+		# print('1a id chasseur deplacement', chasseur.id)
 		# print(chasseur)
 		x,y = chasseur.position[0],chasseur.position[1]
 		# print('xy',x,y)
@@ -417,6 +419,7 @@ class Plateau(object):
 		# print(self.deplacement_possible(x,y,direction))
 		if self.deplacement_possible(x,y,direction):
 			#on enlève le joueur de la carte de départ
+			# print('1b test dans deplacement joueur, carte depart: ', carte_depart.chasseur, 'id_joueur: ',id_joueur)
 			carte_depart.chasseur.remove(id_joueur)
 			#on l'ajoute à celle d'arrivée
 			carte_visee.chasseur += [id_joueur]

@@ -94,16 +94,23 @@ def tour_de_jeu(plateau):
 						dessine_carte(plateau,carte,carte.position,True) #True est le parametre qui permet le highlight
 		for event in pygame.event.get():
 			if event.type == pygame.MOUSEBUTTONUP:
+				if event.button == 3:
+					#TEST
+					for index, surface_carte in np.ndenumerate(plateau.matrice_surfaces):
+						carte = plateau.matrice[index[0],index[1]]
+						if surface_carte.collidepoint(x_souris, y_souris):
+							print('test4',carte.__dict__)
 				#INSERTION
 				#recupération des coordonnées de la souris
 				x_souris,y_souris = event.pos
 				#itération sur la matrice des surfaces ou index = (ligne,colonne), surface_carte = objet Surface
-				for index, surface_carte in np.ndenumerate(plateau.matrice_surfaces):
-					carte = plateau.matrice[index[0],index[1]]
-					if surface_carte.collidepoint(x_souris, y_souris):
-						if (carte.position[0] in [0,plateau.dimension-1] or carte.position[1] in [0,plateau.dimension-1]) and carte.bougeable:
-							plateau.inserer_carte(plateau.carte_jouable,carte.position)
-							insertion_carte_faite = True
+				if event.button ==1:
+					for index, surface_carte in np.ndenumerate(plateau.matrice_surfaces):
+						carte = plateau.matrice[index[0],index[1]]
+						if surface_carte.collidepoint(x_souris, y_souris):
+							if (carte.position[0] in [0,plateau.dimension-1] or carte.position[1] in [0,plateau.dimension-1]) and carte.bougeable:
+								plateau.inserer_carte(plateau.carte_jouable,carte.position)
+								insertion_carte_faite = True
 				#TOURNER CARTE JOUABLE
 				#création des Rect associées associées avec get_rect()
 				position_fleche1, position_fleche2 = IMAGES_DICT['fleche1'].get_rect().move((150,530)),IMAGES_DICT['fleche2'].get_rect().move((275,530))
@@ -132,6 +139,14 @@ def tour_de_jeu(plateau):
 			affichage_deplacement(suivi_deplacement[:-1],plateau)
 		#gestion des évenements
 		for event in pygame.event.get():
+			if event.type == pygame.MOUSEBUTTONUP:
+				if event.button == 3:
+					#TEST
+					for index, surface_carte in np.ndenumerate(plateau.matrice_surfaces):
+						carte1 = plateau.matrice[index[0],index[1]]
+						# print('cartes', carte1.position)
+						if surface_carte.collidepoint(x_souris, y_souris):
+							print('test4',carte1.__dict__)
 			if event.type == pygame.KEYDOWN:
 				#gestion du changement de perso (provisoire):
 				#JOUEUR ACTIF
