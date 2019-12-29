@@ -11,7 +11,7 @@ from main import terminate
 
 
 def affiche_accueil():
-	global gameDisplay
+	# global gameDisplay
 	'''Fonction permettant l'affichage de l'écran d'accueil du jeu, ou on peut faire les choix suivants : nouveau jeu, reprendre, quitter
 	-->: 'nouveau_jeu', 'reprendre_jeu' : c'est 2 valeurs sont utilisées dans main() pour appeler les fonctions adéquates
 	/!\ il faut encore écrire l'éveneement cliquer sur reprendre le jeu 
@@ -454,3 +454,17 @@ def actualisation_affichage_plateau(plateau):
 		gameDisplay.blit(gameDisplayDeTexte,monRectangleDeTexte)
 		
 		i+=1'''
+
+def affichage_deplacement(liste_cartes, plateau):
+	global gameDisplay, pixel_case
+	size = 20
+	for carte in liste_cartes:
+		# position_carte = carte.position
+		x_position, y_position = position_pixel(carte,carte.position)
+		# print('aa',x_position, y_position)
+		position_cercle = (int(x_position+pixel_case/2),int(y_position+pixel_case/2))
+		# print('bb',int(x_position-pixel_case/2),int(y_position-pixel_case/2))
+		# surface = plateau.matrice_surfaces[carte.position[0],carte.position[1]]
+		# print('s',surface.top, surface.left)
+		pygame.draw.circle(gameDisplay, (50,205,50, 100), position_cercle,int(size), 10)
+	return plateau

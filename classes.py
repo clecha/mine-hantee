@@ -17,6 +17,7 @@ class Plateau(object):
 	nb_joueurs: entier allant de 1 à 4 -- indique le nb de joueurs																  
 	"""
 	def __init__(self, dimension = 7, nb_joueurs = 4):
+		
 		self.dimension = dimension #dimension du plateau
 		self.joueur_actif = 1
 		self.liste_joueurs = []
@@ -24,7 +25,6 @@ class Plateau(object):
 		if dimension % 2 == 1 and dimension >= 7:
 		#création de la matrice contenant les objets cartes
 			self.matrice = np.zeros((dimension,dimension), dtype= object)
-
 			# PLACEMENT DES CARTES FIXES
 			#rappel: init de carte = Carte(type_carte,jouable = False, orientation = 0, presence_pepite = True, bougeable = False, position = [0,0])
 			#1. placement des bords - sur les lignes
@@ -241,12 +241,12 @@ class Plateau(object):
 			liste_a_inserer = np.delete(liste_a_inserer, index_carte_a_pop)	
 			#du coup, si la carte à pop était en dernière position, la liste rétrécit 
 			#Si elle est en premier, ça décale tout ?		
-			if insertion_colonne:
-				for x in self.matrice[:,y_position]:
-					print('avant',x.position)
-			else:
-				for x in self.matrice[x_position,:]:
-					print('avant',x.position)
+			# if insertion_colonne:
+			# 	for x in self.matrice[:,y_position]:
+			# 		# print('avant',x.position)
+			# else:
+			# 	for x in self.matrice[x_position,:]:
+			# 		# print('avant',x.position)
 			
 			#On vérifie la présence d'un fantome ou d'un joueur sur la carte qui a été sortie du tableau
 			#on initialise un booleen qui permettra d'actualiser ou non la position du chasseur
@@ -310,15 +310,15 @@ class Plateau(object):
 			nouvel_index=0
 			if insertion_colonne:
 				for x in self.matrice[:,y_position]:
-					print('apres',x.position[0])
+					# print('apres',x.position[0])
 					x.position[0] = nouvel_index
-					print('apres',x.position[0])
+					# print('apres',x.position[0])
 					nouvel_index+=1
 			else:
 				for x in self.matrice[x_position,:]:
-					print('apres',x.position[1])
+					# print('apres',x.position[1])
 					x.position[1] = nouvel_index
-					print('apres',x.position[1])
+					# print('apres',x.position[1])
 					nouvel_index+=1
 			#Mise à jour de la position de la carte nouvellement jouable
 			self.carte_jouable.position = [None,None]
@@ -428,6 +428,7 @@ class Plateau(object):
 			if carte_visee.pepite:
 				chasseur.attraper_pepite(carte_visee)
 			print('deplacement fait')
+			return carte_visee
 
 
 class Carte(object):
@@ -518,8 +519,8 @@ class Chasseur(object):
 	score: entier -- score amassé par le chasseur
 	joker : Booléen -- True si le chasseur dispose encore de son joker
 	fantome: liste d entiers -- correspond aux fantomes amasses par le chasseur"""
-	def __init__(self, id,position,mission):
-		self.id = id
+	def __init__(self, identifiant,position,mission):
+		self.id = identifiant
 		self.position = position
 		self.mission = []
 		self.pepite = 0
@@ -568,16 +569,24 @@ class Chasseur(object):
 		self.fantomes += [num_fantome]
 		fantome.attrape = True
 		carte.fantome = 0
-		
 		#si le fantome fait partie de la mission du chasseur, le score est actualise a +20, sinon à +5
 		if num_fantome in self.mission:
 			self.score+= 20
-			self.mission.remove(num_fantome)
-			if self.mission == []:
-				self.score+=40
+		# 	self.mission.remove(num_fantome)
+		# 	if self.mission == []:
+		# 		self.score+=40
+			if self.mission_complete():
+				self.score += 40
 		else:
 			self.score+=5
+		return carte
 
+	def mission_complete(self):
+		output = True
+		for fantome in self.mission:
+			if fantome not in self.fantomes:
+				output = False
+		return output
 
 ##partie test
 		
