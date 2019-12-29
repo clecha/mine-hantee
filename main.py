@@ -237,6 +237,8 @@ def tour_de_jeu(plateau):
 					#vidange des listes de suivi
 					suivi_deplacement = [carte_initiale]
 					derniere_direction = None
+			if event.type == pygame.QUIT:
+				terminate()
 		pygame.display.update()
 		FPSCLOCK.tick()
 	#TEST PARTIE GAGNE
