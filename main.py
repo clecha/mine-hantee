@@ -52,7 +52,7 @@ def main():
 	
 	while not gagne:
 		actualisation_affichage_plateau(plateau)
-		plateau,gagne = tour_de_jeu(plateau)
+		plateau, gagne = tour_de_jeu(plateau)
 		plateau.changer_joueur()
 
 		for event in pygame.event.get():
@@ -62,9 +62,11 @@ def main():
 
 		pygame.display.update()
 		FPSCLOCK.tick()
-	#si gagne, on sort de la boucle et...
-	podium = qui_a_gagne()
-	print(podium)
+	#JEU TERMINE
+	podium = qui_a_gagne(plateau)
+	print('CLASSEMENT')
+	for rang in range(1,plateau.nb_joueurs+1):
+		print(str(rang)+'. ', podium[rang-1])
 	# afficher_fin_jeu()
 	
 def tour_de_jeu(plateau):
@@ -76,6 +78,7 @@ def tour_de_jeu(plateau):
 	deplacement_fait = False
 	insertion_carte_faite = False
 	termine = deplacement_fait*insertion_carte_faite
+	#PREMIERE PARTIE DU TOUR : INSERTION DE LA CARTE (OBLIGATOIRE)
 	while not insertion_carte_faite:
 		# print('Il faut placer la carte')
 		actualisation_affichage_plateau(plateau)
@@ -113,7 +116,8 @@ def tour_de_jeu(plateau):
 		pygame.display.update()
 		FPSCLOCK.tick()
 	#=======================================	
-	#DEPLACEMENT
+	#DEUXIEME PARTIE DU TOUR : DEPLACEMENT (FACULTATIF)
+	gagne = False
 	chasseur = plateau.liste_joueurs[plateau.joueur_actif-1]
 	position_initiale = chasseur.position
 	carte_initiale = plateau.matrice[position_initiale[0],position_initiale[1]]
@@ -190,9 +194,10 @@ def tour_de_jeu(plateau):
 				elif event.key == pygame.K_ESCAPE: #annulation du déplacement
 					#remise des fantomes sur les cartes
 					while cartes_fantomes_pris != []:
-						print(cartes_fantomes_pris)
+						# print(cartes_fantomes_pris)
 						num_fantome = chasseur.fantomes[-1]
 						cartes_fantomes_pris[-1].fantome = cl.Fantome(num_fantome) #recréarion des fantomes
+						plateau.fantomes_restants +=1
 						if num_fantome in chasseur.mission:
 							chasseur.score-= 20
 						# 	self.mission.remove(num_fantome)
@@ -204,7 +209,7 @@ def tour_de_jeu(plateau):
 							chasseur.score-=5
 						del cartes_fantomes_pris[-1]
 						del chasseur.fantomes[-1]
-					print('apres1',cartes_fantomes_pris)
+					# print('apres1',cartes_fantomes_pris)
 					#remise des pepites sur les cartes
 					for carte in carte_pepite_prises:
 						carte.pepite = True
@@ -217,12 +222,10 @@ def tour_de_jeu(plateau):
 					#vidange des listes de suivi
 					suivi_deplacement = [carte_initiale]
 					derniere_direction = None
-				elif event.key == QUIT:
-					terminate()
 		pygame.display.update()
 		FPSCLOCK.tick()
 	#TEST PARTIE GAGNE
-	if plateau.fantomes_restants ==0:
+	if plateau.fantomes_restants == 0:
 		gagne = True
 	else:
 		gagne = False
@@ -233,21 +236,18 @@ def qui_a_gagne(plateau):
 	Arguments:
 		plateau {Plateau()} -- plateau du jeu
 	"""
-	scores_joueurs = []
-	for joueur in plateau.liste_joueurs:
-		scores_joueurs += [(joueur, joueur.score)]
-	sorted(scores_joueurs, key=lambda scores_joueurs: scores_joueurs[1])
-	dico = {}
-	for rang in range(1,plateau.nb_joueurs+1):
-		dico[rang] = scores_joueurs[0]
-	return dico
-
-
-
-
-
-
-
+	# scores_joueurs = []
+	# for joueur in plateau.liste_joueurs:
+	# 	scores_joueurs += [(joueur, joueur.score)]
+	# sorted(scores_joueurs, key=lambda scores_joueurs: scores_joueurs[1])
+	# print(scores_joueurs)
+	# dico = {}
+	# for rang in range(1,plateau.nb_joueurs+1):
+	# 	dico[rang] = scores_joueurs[rang-1][0]
+	joueurs = plateau.liste_joueurs
+	sorted(joueurs, key=lambda joueurs:joueurs.score)
+	# print([joueur.id for joueur in joueurs])
+	return [joueur.id for joueur in joueurs]
 
 # def boucle_deplacement(plateau):
 # 	'''
