@@ -1,8 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Dec 17 00:20:01 2019
-
-@author: SARREGUEMINES
+CONTENU
+affiche_accueil() - Affichage de la page d'accueil
+init_jeu() - Affichage de la page d'initialisation des paramètres du jeu
+position_pixel() - Permet d'obtenir la position x,y en pixel d'une carte du plateau 
+dessine_carte() - Permet de dessiner une carte
+init_affichage_plateau() - Init du plateau (juste le fond, sans les cartes)
+actualisation_affichage_plateau() - Actualisation du pateau (cartes seulement)
+affichage_deplacement() - Affichage la trace du déplacement d'un joueur pdt son tour de jeu
+carte_jouable_jouee() - Affiche une croix sur la carte jouable si elle a déjà été jouée (ie insérée) pdt le tour
+affichage_fin_jeu() - Affiche la fin de jeu (scores et classement)
 """
 import pygame
 from variables import *
@@ -453,6 +460,7 @@ def actualisation_affichage_plateau(plateau):
 
 def affichage_deplacement(liste_cartes, plateau):
 	global gameDisplay, pixel_case
+	#VERIFICATION DE LA VALIDITE DU DEPLACEMENT
 	size = 20
 	for carte in liste_cartes:
 		# position_carte = carte.position
