@@ -50,6 +50,7 @@ class Plateau(object):
 		self.joueur_actif = 1
 		self.liste_joueurs = []
 		self.nb_joueurs = nb_joueurs
+		#INITIALISATION DU PLATEAU
 		if dimension % 2 == 1 and dimension >= 7:
 		#création de la matrice contenant les objets cartes
 			self.matrice = np.zeros((dimension,dimension), dtype= object)
@@ -178,12 +179,11 @@ class Plateau(object):
 		"""Actualisation de la matrice des surfaces get_rect associées aux cartes
 		-->: /
 		"""
-		#parcourt de la matrice
+		#Parcours de la matrice
 		for i in range(self.dimension):
 			for j in range(self.dimension):
 				carte = self.matrice[i,j] #on recupere l'objet carte
 				x,y = af.position_pixel(carte, (i,j)) #et ses coordonnées
-				# print('#5:', i, j)
 				self.matrice_surfaces[i,j] = IMAGES_DICT['carte'+str(carte.type_carte)].get_rect().move((x,y)) #création de l'objet Surface, placement dans la matrice 
 
 	#affichage console
@@ -468,14 +468,23 @@ class Plateau(object):
 
 class Carte(object):
 	"""Classe des cartes constituant le plateau
-	----
+	------------
+	Attributs:
+	------------
 	jouable: Booléen qui indique si la carte est jouable ou non (i.e. si elle est hors du plateau ou pas)
 	bougeable : Booléen indiquant si la carte peut être bougée
 	type_carte: entier entre 1 et 3
 	orientation: entier entre 0 et 3
 	fantome: entier entre 0 et 21 -- la valeur 0 indique l'absence de fantôme
 	pepite = booléen - True par défaut, ce qui indique la présence d'une pépite
-	chasseur = entier entre 0 et 4 -- la valeur 0 indique l'absence de chasseur"""
+	chasseur = entier entre 0 et 4 -- la valeur 0 indique l'absence de chasseur
+	------------
+	Fonctions:
+	------------
+	__init__
+	tourner
+	update_murs
+	"""
 	def __init__(self,type_carte,jouable = False, orientation = 0, presence_pepite = True, bougeable = False, position = [0,0]):
 		self.position = position
 		self.jouable = jouable #Booléen indiquant si la carte est jouable ou non (i.e. si elle est hors plateau ou pas)
@@ -537,7 +546,9 @@ class Carte(object):
 	
 class Fantome(object):
 	"""Fantomes
-	---
+	------------
+	Attributs:
+	------------
 	numero: entier identifiant le fantome
 	attrape: booléen indiquant si le fantome a été attrapé ou non
 	"""
