@@ -1,3 +1,14 @@
+"""
+CONTENU
+Classes du jeu:
+-----------------
+Plateau()
+Carte()
+Fantome()
+Chasseur()
+-----------------
+"""
+
 import numpy as np
 import random as rd
 import shelve as sh
@@ -7,14 +18,31 @@ from variables import IMAGES_DICT
 class Plateau(object):
 	"""
 	Plateau de jeu
-	----
-	dimension: entier impair >=7
-	matrice: array de taille dimension * dimension, contenant les objets Cartes
-	matrice_surfaces :  array de taille dimension * dimension, contenant les surfaces des Cartes
-	carte_jouable: objet de type carte, correspond à la carte qui est hors plateau
-	joueur_actif: objet de type chasseur -- indique le joueur à qui c'est le tour de jouer
-	liste_joueurs: liste des objets Chasseur
-	nb_joueurs: entier allant de 1 à 4 -- indique le nb de joueurs																  
+	--------------
+	Attributs:
+	--------------
+	fantomes_restants [int] - nombre de fantome non capturés
+	dimension [int] - dimension du plateau, >= 7
+	matrice [array] -  taille dimension * dimension, contient les objets Cartes du plateau
+	matrice_surfaces [array] :  array de taille dimension * dimension, contenant les Rect associés aux Cartes
+	carte_jouable [Carte] - la carte inserable qui est hors plateau
+	joueur_actif [int] - objet de type chasseur -- indique le joueur à qui c'est le tour de jouer
+	liste_joueurs [list] - liste des objets Chasseur du plateau
+	nb_joueurs [int] - entre 1 et 4 -- indique le nb de joueurs	
+	--------------
+	Fonctions:	
+	--------------
+	__init__
+	actualisation_matrice_surfaces
+	affichage_console
+	inserer_carte
+	sauvegarde
+	charer_sauvegarde
+	carte_a_cote
+	deplacement_possible
+	changer_joueur
+	deplacer_joueur
+
 	"""
 	def __init__(self, dimension = 7, nb_joueurs = 4):
 		self.fantomes_restants = 21
