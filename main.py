@@ -65,7 +65,7 @@ def main():
 
 		pygame.display.update()
 		FPSCLOCK.tick()
-		
+
 	#JEU TERMINE
 	podium = qui_a_gagne(plateau)
 	print('CLASSEMENT')
@@ -74,40 +74,42 @@ def main():
 	# afficher_fin_jeu()
 	
 def tour_de_jeu(plateau):
+	#AFFICHAGE DES INFORMARIONS DU JOUEUR
 	print('===========================================')
 	print('Au tour du joueur'+str(plateau.joueur_actif))
 	print('Mission: ', plateau.liste_joueurs[plateau.joueur_actif-1].mission)
 	print('Fantomes attrapés:', plateau.liste_joueurs[plateau.joueur_actif-1].fantomes)
 	print('Score actuel: ',plateau.liste_joueurs[plateau.joueur_actif-1].score)
+	#INITIALISATION DES TESTS
 	deplacement_fait = False
 	insertion_carte_faite = False
-	termine = deplacement_fait*insertion_carte_faite
+	gagne = False
 	#PREMIERE PARTIE DU TOUR : INSERTION DE LA CARTE (OBLIGATOIRE)
 	while not insertion_carte_faite:
-		# print('Il faut placer la carte')
 		actualisation_affichage_plateau(plateau)
-		#gestion du highlight des cartes cliquables sur le plateau
-		#coordonnées de la souris
+		#Gestion du highlight des cartes cliquables sur le plateau
+		#Coordonnées de la souris
 		x_souris, y_souris = pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]
-		#HIGHLIGHT SUR LES CARTES EN HOVER SI 
+		#Highlight sur les cartes en hover 
 		if not insertion_carte_faite:
 			for index, surface_carte in np.ndenumerate(plateau.matrice_surfaces):
 				carte = plateau.matrice[index[0],index[1]]
 				if surface_carte.collidepoint(x_souris, y_souris) and carte.bougeable:
 					if (carte.position[0] in [0,plateau.dimension-1] or carte.position[1] in [0,plateau.dimension-1]):
 						dessine_carte(plateau,carte,carte.position,True) #True est le parametre qui permet le highlight
+		#Gestion des events
 		for event in pygame.event.get():
 			if event.type == pygame.MOUSEBUTTONUP:
-				if event.button == 3:
-					#TEST
+				if event.button == 3: #si clic droit
+					#Test (provisoire)
 					for index, surface_carte in np.ndenumerate(plateau.matrice_surfaces):
 						carte = plateau.matrice[index[0],index[1]]
 						if surface_carte.collidepoint(x_souris, y_souris):
 							print('test4',carte.__dict__)
 				#INSERTION
-				#recupération des coordonnées de la souris
+				#Recupération des coordonnées de la souris
 				x_souris,y_souris = event.pos
-				#itération sur la matrice des surfaces ou index = (ligne,colonne), surface_carte = objet Surface
+				#Itération sur la matrice des surfaces ou index = (ligne,colonne), surface_carte = objet Surface
 				if event.button ==1:
 					for index, surface_carte in np.ndenumerate(plateau.matrice_surfaces):
 						carte = plateau.matrice[index[0],index[1]]
@@ -128,21 +130,23 @@ def tour_de_jeu(plateau):
 		FPSCLOCK.tick()
 	#=======================================	
 	#DEUXIEME PARTIE DU TOUR : DEPLACEMENT (FACULTATIF)
-	gagne = False
-	chasseur = plateau.liste_joueurs[plateau.joueur_actif-1]
-	position_initiale = chasseur.position
-	carte_initiale = plateau.matrice[position_initiale[0],position_initiale[1]]
-	suivi_deplacement = [carte_initiale]
-	cartes_fantomes_pris = []
-	carte_pepite_prises = []
-	derniere_direction = None
+	#Initialisation des variables utiles
+	chasseur = plateau.liste_joueurs[plateau.joueur_actif-1] #chasseur actif
+	position_initiale = chasseur.position #position de départ
+	carte_initiale = plateau.matrice[position_initiale[0],position_initiale[1]]  #carte de départ
+	suivi_deplacement = [carte_initiale] #liste contenant les cartes traversées lors du déplacement
+	cartes_fantomes_pris = [] #liste contenant les cartes ou un fantome est capturé
+	carte_pepite_prises = [] #liste contenant les cartes ou une pépite est ramassée
+	derniere_direction = None #dernière direction (utile pour éviter les retours en arrière)
 	while not deplacement_fait:
 		actualisation_affichage_plateau(plateau)
-		carte_jouable_jouee(plateau)
+		carte_jouable_jouee(plateau) #affiche une croix sur la carte jouable pour montrer qu'elle a déjà été insérée
+		#affichage de la trace du déplacement du joueur 
 		if len(suivi_deplacement) != 1:
 			affichage_deplacement(suivi_deplacement[:-1],plateau)
 		#gestion des évenements
 		for event in pygame.event.get():
+			#gestion des clics
 			if event.type == pygame.MOUSEBUTTONUP:
 				if event.button == 3:
 					#TEST
@@ -165,10 +169,11 @@ def tour_de_jeu(plateau):
 					suivi_deplacement += [carte_arrivee]
 					if pepite_attrapee:
 						carte_pepite_prises += [carte_arrivee]
+					#si le déplacement n'a pas été possible (mur) (la fonction déplacer_joueur renvoie alors None, qu'il faut supprimer de la liste suivi_deplacements)
 					if suivi_deplacement[-1] == None:
 						del suivi_deplacement[-1]
 					else:
-						derniere_direction = 'haut'
+						derniere_direction = 'haut' #mise à jour de la dernière direction si le déplacement a eu lieu
 				#HAUT
 				elif event.key == pygame.K_DOWN and derniere_direction != 'haut':
 					carte_arrivee, pepite_attrapee = plateau.deplacer_joueur(plateau.joueur_actif,'bas')
