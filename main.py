@@ -221,29 +221,29 @@ def tour_de_jeu(plateau):
 						# print(cartes_fantomes_pris)
 						num_fantome = chasseur.fantomes[-1]
 						cartes_fantomes_pris[-1].fantome = cl.Fantome(num_fantome) #recréarion des fantomes
+						#remise à jour des fantomes restants
 						plateau.fantomes_restants +=1
+						#Remise à jour du score du joueur
 						if num_fantome in chasseur.mission:
 							chasseur.score-= 20
-						# 	self.mission.remove(num_fantome)
-						# 	if self.mission == []:
-						# 		self.score+=40
 							if chasseur.mission_complete():
 								chasseur.score -= 40
 						else:
 							chasseur.score-=5
+						#Suppression des cartes
 						del cartes_fantomes_pris[-1]
 						del chasseur.fantomes[-1]
-					# print('apres1',cartes_fantomes_pris)
-					#remise des pepites sur les cartes
+					#Remise des pepites sur les cartes et màj du score
 					for carte in carte_pepite_prises:
 						carte.pepite = True
 						chasseur.score -= -1
+					#Réinit de la liste des pepites
 					carte_pepite_prises = []
-					#reposition du chasseur
+					#Reposition du chasseur
 					chasseur.position = position_initiale
 					carte_initiale.chasseur += [chasseur.id]
 					suivi_deplacement[-1].chasseur.remove(plateau.joueur_actif)
-					#vidange des listes de suivi
+					#Vidange des listes de suivi et de la derniere direction
 					suivi_deplacement = [carte_initiale]
 					derniere_direction = None
 			if event.type == pygame.QUIT:
