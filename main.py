@@ -23,33 +23,36 @@ def main():
 	'''Fonction principale du jeu
 	'''
 	global IMAGES_DICT, FPSCLOCK, gameDisplay
-	# Pygame initialization and basic set up of the global variables.
+	#INITIALISATION DE PYGAME
 	pygame.init()
 	FPSCLOCK = pygame.time.Clock()
 	
-	#création de la fenêtre
+	#FENETRE
 #	gameDisplay = pygame.display.set_mode((0, 0), pygame.FULLSCREEN, pygame.RESIZABLE)
 	gameDisplay = pygame.display.set_mode((WINWIDTH, WINHEIGHT),pygame.RESIZABLE) 
 	#titre de la fenetre
 	pygame.display.set_caption('La Mine Hantée')
 	
-	#appel de la fonction affichant l'écran d'accueil
+	#AFFICHAGE DE L'ACCUEIL
 	choix_accueil = affiche_accueil() #choix_accueil prend la valeur retournée par affiche_accueil(), soit 'nouveau_jeu', soit 'reprendre_jeu'
 	
 	#gestion du choix fait par l'utilisateur sur l'écran d'accueil ('nouveau_jeu','reprendre_jeu' ou 'quitter')
 	if choix_accueil == 'nouveau_jeu':
 		parametres_jeu = init_jeu() #parametres_jeu prend la valeur retournée par init_jeu, un dictionnaire contenant (dimension, joueur1,joueur2,joueur3,joueur4,go)
+		#création du plateau
 		plateau = cl.Plateau(parametres_jeu['dimension'],parametres_jeu['nb_joueurs'])
+		#redimension des surfaces des images des cartes
 		redimension_images(parametres_jeu['dimension'])
+		#initialisation du plateau (fond sans les cartes)
 		init_affichage_plateau(plateau)
-		plateau.actualisation_matrice_surfaces()
+		#initialisation du test de continuation de la boucle du jeu
 		gagne = False
 	elif choix_accueil == 'reprendre_jeu':
 		#/!\ à ajouter : doit mettre la fonction appelant l'écran du choix des parties sauvegardées
 		terminate()
 	elif choix_accueil == 'quitter':
 		terminate()		  
-	
+	#BOUCLE PRINCIPALE
 	while not gagne:
 		actualisation_affichage_plateau(plateau)
 		plateau, gagne = tour_de_jeu(plateau)
@@ -62,6 +65,7 @@ def main():
 
 		pygame.display.update()
 		FPSCLOCK.tick()
+		
 	#JEU TERMINE
 	podium = qui_a_gagne(plateau)
 	print('CLASSEMENT')
