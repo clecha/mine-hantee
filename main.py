@@ -126,6 +126,8 @@ def tour_de_jeu(plateau):
 				elif position_fleche2.collidepoint(x_souris, y_souris):
 					plateau.carte_jouable.tourner('droite')
 					plateau.carte_jouable.update_murs()
+			if event.type == pygame.QUIT:
+				terminate()		
 		pygame.display.update()
 		FPSCLOCK.tick()
 	#=======================================	
@@ -205,10 +207,14 @@ def tour_de_jeu(plateau):
 					else:
 						derniere_direction = 'droite'
 				#PRISE FANTOME
-				elif event.key == pygame.K_f and plateau.matrice[chasseur.position[0],chasseur.position[1]].fantome != 0:
+				elif event.key == pygame.K_f and plateau.matrice[chasseur.position[0],chasseur.position[1]].fantome != 0  and len(cartes_fantomes_pris)==0:
 					chasseur = plateau.liste_joueurs[plateau.joueur_actif-1]
-					cartes_fantomes_pris += [chasseur.attraper_fantome(plateau)]
+					fantome_pris = chasseur.attraper_fantome(plateau)
+					#Verification que le fantome soit effectivement attrapable
+					if fantome_pris != False:
+						cartes_fantomes_pris += [fantome_pris]
 					print('fantome attrapés du j'+str(plateau.joueur_actif),chasseur.fantomes)
+					print('cartes_fantomes_pris'+str(plateau.joueur_actif),cartes_fantomes_pris)
 				#VALIDATION
 				elif event.key == pygame.K_RETURN:
 					print('Deplacement terminé')
@@ -220,7 +226,7 @@ def tour_de_jeu(plateau):
 					while cartes_fantomes_pris != []:
 						# print(cartes_fantomes_pris)
 						num_fantome = chasseur.fantomes[-1]
-						cartes_fantomes_pris[-1].fantome = cl.Fantome(num_fantome) #recréarion des fantomes
+						cartes_fantomes_pris[-1].fantome = cl.Fantome(num_fantome) #recréation des fantomes
 						#remise à jour des fantomes restants
 						plateau.fantomes_restants +=1
 						#Remise à jour du score du joueur

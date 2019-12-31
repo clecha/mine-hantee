@@ -50,7 +50,6 @@ class Plateau(object):
 		self.joueur_actif = 1
 		self.liste_joueurs = []
 		self.nb_joueurs = nb_joueurs
-		#INITIALISATION DU PLATEAU
 		if dimension % 2 == 1 and dimension >= 7:
 		#création de la matrice contenant les objets cartes
 			self.matrice = np.zeros((dimension,dimension), dtype= object)
@@ -164,8 +163,8 @@ class Plateau(object):
 			liste_pos_carte_alea=liste_pos_carte_alea[0:21]
 			
 			#On parcourt ensuite cette liste de position pour y placer les fantomes
-			for k in range(21):
-				ligne, col = liste_pos_carte_alea[k]
+			for k in range(1,22):
+				ligne, col = liste_pos_carte_alea[k-1]
 				self.matrice[ligne][col].fantome = Fantome(int(k))
 			
 		else:
@@ -179,11 +178,12 @@ class Plateau(object):
 		"""Actualisation de la matrice des surfaces get_rect associées aux cartes
 		-->: /
 		"""
-		#Parcours de la matrice
+		#parcourt de la matrice
 		for i in range(self.dimension):
 			for j in range(self.dimension):
 				carte = self.matrice[i,j] #on recupere l'objet carte
 				x,y = af.position_pixel(carte, (i,j)) #et ses coordonnées
+				# print('#5:', i, j)
 				self.matrice_surfaces[i,j] = IMAGES_DICT['carte'+str(carte.type_carte)].get_rect().move((x,y)) #création de l'objet Surface, placement dans la matrice 
 
 	#affichage console
@@ -468,23 +468,14 @@ class Plateau(object):
 
 class Carte(object):
 	"""Classe des cartes constituant le plateau
-	------------
-	Attributs:
-	------------
+	----
 	jouable: Booléen qui indique si la carte est jouable ou non (i.e. si elle est hors du plateau ou pas)
 	bougeable : Booléen indiquant si la carte peut être bougée
 	type_carte: entier entre 1 et 3
 	orientation: entier entre 0 et 3
 	fantome: entier entre 0 et 21 -- la valeur 0 indique l'absence de fantôme
 	pepite = booléen - True par défaut, ce qui indique la présence d'une pépite
-	chasseur = entier entre 0 et 4 -- la valeur 0 indique l'absence de chasseur
-	------------
-	Fonctions:
-	------------
-	__init__
-	tourner
-	update_murs
-	"""
+	chasseur = entier entre 0 et 4 -- la valeur 0 indique l'absence de chasseur"""
 	def __init__(self,type_carte,jouable = False, orientation = 0, presence_pepite = True, bougeable = False, position = [0,0]):
 		self.position = position
 		self.jouable = jouable #Booléen indiquant si la carte est jouable ou non (i.e. si elle est hors plateau ou pas)
@@ -546,9 +537,7 @@ class Carte(object):
 	
 class Fantome(object):
 	"""Fantomes
-	------------
-	Attributs:
-	------------
+	---
 	numero: entier identifiant le fantome
 	attrape: booléen indiquant si le fantome a été attrapé ou non
 	"""
@@ -611,24 +600,26 @@ class Chasseur(object):
 		#on recupere le fantome sur la case du plateau où est situé le chasseur
 		carte = Plateau.matrice[x_position,y_position]
 		fantome = carte.fantome
-		if carte.fantome != 0:
+		num_fantome = fantome.numero
+		fantome_attrapable = 22-Plateau.fantomes_restants
+		#on verifie qu'un fantome existe sur la case et qu'il correspond au fantome attrapable
+		if fantome != 0 and num_fantome == fantome_attrapable:
 			#ajout du numero du fantome a la liste des fantomes collectés par le chasseur
-			num_fantome = fantome.numero
 			self.fantomes += [num_fantome]
 			fantome.attrape = True
 			carte.fantome = 0
 			#si le fantome fait partie de la mission du chasseur, le score est actualise a +20, sinon à +5
 			if num_fantome in self.mission:
 				self.score+= 20
-			# 	self.mission.remove(num_fantome)
-			# 	if self.mission == []:
-			# 		self.score+=40
 				if self.mission_complete():
 					self.score += 40
 			else:
 				self.score+=5
 			Plateau.fantomes_restants-=1
-		return carte
+			return carte
+		#Renvoie False si le fantome n'est pas attrapable (ou qu'il n'y a pas de fantome)
+		else:
+			return False
 
 	def mission_complete(self):
 		output = True
