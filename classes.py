@@ -29,6 +29,9 @@ class Plateau(object):
 	joueur_actif [int] -- id du joueur actif
 	liste_joueurs [list] - liste des objets Chasseur du plateau
 	nb_joueurs [int] - entre 1 et 4 -- indique le nb de joueurs	
+	deplacement_fait [booléen] -- indique si le déplacement du joueur actif a été réalisé ou non
+	insertion_carte_faite [booléen] -- indique si le joueur actif a déjà inséré sa carte ou non
+	gagne [booléen] -- indique si le jeu est encore en cours ou non
 	--------------
 	Fonctions:	
 	--------------
@@ -36,8 +39,6 @@ class Plateau(object):
 	actualisation_matrice_surfaces
 	affichage_console
 	inserer_carte
-	sauvegarde
-	charer_sauvegarde
 	carte_a_cote
 	deplacement_possible
 	changer_joueur
@@ -50,6 +51,9 @@ class Plateau(object):
 		self.joueur_actif = 1
 		self.liste_joueurs = []
 		self.nb_joueurs = nb_joueurs
+		self.deplacement_fait = False
+		self.insertion_carte_faite = False
+		self.gagne = False
 		if dimension % 2 == 1 and dimension >= 7:
 		#création de la matrice contenant les objets cartes
 			self.matrice = np.zeros((dimension,dimension), dtype= object)
@@ -351,37 +355,6 @@ class Plateau(object):
 			self.carte_jouable.position = [None,None]
 			# print("test fin d'insertion",carte_inseree.position ,carte_inseree.chasseur)
 
-			
-		
-	def sauvegarde(self, num_sauvegarde = 1):
-		""" Methode qui permet de sauvegarder un plateau dans un fichier à un instant t
-		Utilise le module shelf qui store des fichiers pythons dans une sorte de dictionnaire
-		---
-		num_sauvegarde: entier entre 1 et 3 --- permet de creer une sauvegarde parmi les 3 fichiers de sauvegarde proposés
-		"""
-		filename = 'save_'+str(num_sauvegarde)
-		
-		#Ouverture du fichier de sauvegarde
-		save = sh.open(filename)
-		
-		#On stocke les fichiers dans le "dictionnaire" qui sert de sauvegarde
-		save['dimension'] = self.dimension
-		save['matrice'] = self.matrice
-		save ['carte_jouable'] = self.carte_jouable
-		save ['joueur_actif'] = self.joueur_actif
-		
-		save.close()
-		
-	def charger_sauvegarde(self, num_sauvegarde = 1):
-		filename = 'save_'+str(num_sauvegarde)
-		save = sh.open(filename)
-		self.dimension = save['dimension']
-		self.matrice = save['matrice']
-		self.carte_jouable = save ['carte_jouable']
-		self.joueur_actif = save ['joueur_actif']
-		save.close()		
-	
-
 	def carte_a_cote(self, x,y,direction):
 		'''Fonction renvoyant la carte à côté de la carte présente
 		x,y: position de la carte de départ, x  = colonne, y = ligne (axes pygame inversés !)
@@ -433,6 +406,9 @@ class Plateau(object):
 			self.joueur_actif = 1
 		else:
 			self.joueur_actif += 1
+		self.deplacement_fait = False
+		self.insertion_carte_faite = False
+		
 
 	def deplacer_joueur(self, id_joueur, direction): 
 		chasseur = self.liste_joueurs[id_joueur-1]

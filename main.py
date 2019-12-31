@@ -18,6 +18,7 @@ import classes as cl
 from math import *
 from variables import *
 from affichage import *
+import shelve as sh
 
 def main():
 	'''Fonction principale du jeu
@@ -41,19 +42,17 @@ def main():
 		parametres_jeu = init_jeu() #parametres_jeu prend la valeur retournée par init_jeu, un dictionnaire contenant (dimension, joueur1,joueur2,joueur3,joueur4,go)
 		#création du plateau
 		plateau = cl.Plateau(parametres_jeu['dimension'],parametres_jeu['nb_joueurs'])
-		#redimension des surfaces des images des cartes
-		redimension_images(parametres_jeu['dimension'])
-		#initialisation du plateau (fond sans les cartes)
-		init_affichage_plateau(plateau)
-		#initialisation du test de continuation de la boucle du jeu
-		gagne = False
 	elif choix_accueil == 'reprendre_jeu':
 		#/!\ à ajouter : doit mettre la fonction appelant l'écran du choix des parties sauvegardées
 		terminate()
 	elif choix_accueil == 'quitter':
 		terminate()		  
-	#BOUCLE PRINCIPALE
-	while not gagne:
+	#BOUCLE PRINCIPALE	
+	#redimension des surfaces des images des cartes
+	redimension_images(parametres_jeu['dimension'])
+	#initialisation du plateau (fond sans les cartes)
+	init_affichage_plateau(plateau)
+	while not plateau.gagne:
 		actualisation_affichage_plateau(plateau)
 		plateau, gagne = tour_de_jeu(plateau)
 		plateau.changer_joueur()
@@ -74,24 +73,21 @@ def main():
 	# afficher_fin_jeu()
 	
 def tour_de_jeu(plateau):
-	#AFFICHAGE DES INFORMARIONS DU JOUEUR
+	#AFFICHAGE DES INFORMATIONS DU JOUEUR
 	print('===========================================')
 	print('Au tour du joueur'+str(plateau.joueur_actif))
 	print('Mission: ', plateau.liste_joueurs[plateau.joueur_actif-1].mission)
 	print('Fantomes attrapés:', plateau.liste_joueurs[plateau.joueur_actif-1].fantomes)
 	print('Score actuel: ',plateau.liste_joueurs[plateau.joueur_actif-1].score)
-	#INITIALISATION DES TESTS
-	deplacement_fait = False
-	insertion_carte_faite = False
-	gagne = False
+
 	#PREMIERE PARTIE DU TOUR : INSERTION DE LA CARTE (OBLIGATOIRE)
-	while not insertion_carte_faite:
+	while not plateau.insertion_carte_faite:
 		actualisation_affichage_plateau(plateau)
 		#Gestion du highlight des cartes cliquables sur le plateau
 		#Coordonnées de la souris
 		x_souris, y_souris = pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]
 		#Highlight sur les cartes en hover 
-		if not insertion_carte_faite:
+		if not plateau.insertion_carte_faite:
 			for index, surface_carte in np.ndenumerate(plateau.matrice_surfaces):
 				carte = plateau.matrice[index[0],index[1]]
 				if surface_carte.collidepoint(x_souris, y_souris) and carte.bougeable:
@@ -116,7 +112,7 @@ def tour_de_jeu(plateau):
 						if surface_carte.collidepoint(x_souris, y_souris):
 							if (carte.position[0] in [0,plateau.dimension-1] or carte.position[1] in [0,plateau.dimension-1]) and carte.bougeable:
 								plateau.inserer_carte(plateau.carte_jouable,carte.position)
-								insertion_carte_faite = True
+								plateau.insertion_carte_faite = True
 				#TOURNER CARTE JOUABLE
 				#création des Rect associées associées avec get_rect()
 				position_fleche1, position_fleche2 = IMAGES_DICT['fleche1'].get_rect().move((150,530)),IMAGES_DICT['fleche2'].get_rect().move((275,530))
@@ -141,7 +137,7 @@ def tour_de_jeu(plateau):
 	carte_pepite_prises = [] #liste contenant les cartes ou une pépite est ramassée
 	derniere_direction = None #dernière direction (utile pour éviter les retours en arrière)
 	
-	while not deplacement_fait:
+	while not plateau.deplacement_fait:
 		actualisation_affichage_plateau(plateau)
 		carte_jouable_jouee(plateau) #affiche une croix sur la carte jouable pour montrer qu'elle a déjà été insérée
 		#affichage de la trace du déplacement du joueur 
@@ -200,7 +196,7 @@ def tour_de_jeu(plateau):
 				elif event.key == pygame.K_RETURN:
 					print('Deplacement terminé')
 					print('Score final du tour: ',plateau.liste_joueurs[plateau.joueur_actif-1].score)
-					deplacement_fait = True
+					plateau.deplacement_fait = True
 				#ANNULATION
 				elif event.key == pygame.K_ESCAPE: #annulation du déplacement
 					#remise des fantomes sur les cartes
@@ -239,10 +235,10 @@ def tour_de_jeu(plateau):
 		FPSCLOCK.tick()
 	#TEST PARTIE GAGNE
 	if plateau.fantomes_restants == 0:
-		gagne = True
+		plateau.gagne = True
 	else:
-		gagne = False
-	return plateau, gagne
+		plateau.gagne = False
+	return plateau, plateau.gagne
 
 def qui_a_gagne(plateau):
 	"""Definit qui a gagne.
@@ -289,8 +285,29 @@ def deplacement_licite(plateau,id_joueur,suivi_deplacement,direction,derniere_di
 	else:
 		licite = False
 	return licite
-	
 
+def sauvegarde(plateau,num_sauvegarde = 1):
+	""" Fonction qui permet de sauvegarder un plateau dans un fichier à un instant t
+	Utilise le module shelf qui store des fichiers pythons dans une sorte de dictionnaire
+	---
+	num_sauvegarde: entier entre 1 et 4 --- permet de creer une sauvegarde parmi les 4 fichiers de sauvegarde proposés
+	"""
+	filename = 'save_'+str(num_sauvegarde)
+	
+	#Ouverture du fichier de sauvegarde
+	save = sh.open(filename)
+	
+	#On stocke les fichiers dans le "dictionnaire" qui sert de sauvegarde
+	save['plateau'] = plateau
+	save.close()
+	
+def charger_sauvegarde(self, num_sauvegarde = 1):
+	filename = 'save_'+str(num_sauvegarde)
+	save = sh.open(filename)
+	plateau=save['plateau']
+	save.close()
+	return plateau
+	
 # def boucle_deplacement(plateau):
 # 	'''
 # 	Fonction permettant d'enregistrer le déplacement potentiel du joueur actif pendant son tour, en retournant une liste de directions.
