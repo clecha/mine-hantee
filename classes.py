@@ -26,7 +26,7 @@ class Plateau(object):
 	matrice [array] -  taille dimension * dimension, contient les objets Cartes du plateau
 	matrice_surfaces [array] :  array de taille dimension * dimension, contenant les Rect associés aux Cartes
 	carte_jouable [Carte] - la carte inserable qui est hors plateau
-	joueur_actif [int] - objet de type chasseur -- indique le joueur à qui c'est le tour de jouer
+	joueur_actif [int] -- id du joueur actif
 	liste_joueurs [list] - liste des objets Chasseur du plateau
 	nb_joueurs [int] - entre 1 et 4 -- indique le nb de joueurs	
 	--------------

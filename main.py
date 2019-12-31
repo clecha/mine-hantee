@@ -140,6 +140,7 @@ def tour_de_jeu(plateau):
 	cartes_fantomes_pris = [] #liste contenant les cartes ou un fantome est capturé
 	carte_pepite_prises = [] #liste contenant les cartes ou une pépite est ramassée
 	derniere_direction = None #dernière direction (utile pour éviter les retours en arrière)
+	
 	while not deplacement_fait:
 		actualisation_affichage_plateau(plateau)
 		carte_jouable_jouee(plateau) #affiche une croix sur la carte jouable pour montrer qu'elle a déjà été insérée
@@ -164,48 +165,28 @@ def tour_de_jeu(plateau):
 				# 	plateau.changer_joueur()
 				# 	print('Le joueur actif est le',plateau.joueur_actif)
 
-				#Deplacement
-				#BAS
-				if event.key == pygame.K_UP and derniere_direction != 'bas':
-					carte_arrivee, pepite_attrapee = plateau.deplacer_joueur(plateau.joueur_actif,'haut')
-					suivi_deplacement += [carte_arrivee]
-					if pepite_attrapee:
-						carte_pepite_prises += [carte_arrivee]
-					#si le déplacement n'a pas été possible (mur) (la fonction déplacer_joueur renvoie alors None, qu'il faut supprimer de la liste suivi_deplacements)
-					if suivi_deplacement[-1] == None:
-						del suivi_deplacement[-1]
-					else:
-						derniere_direction = 'haut' #mise à jour de la dernière direction si le déplacement a eu lieu
-				#HAUT
-				elif event.key == pygame.K_DOWN and derniere_direction != 'haut':
-					carte_arrivee, pepite_attrapee = plateau.deplacer_joueur(plateau.joueur_actif,'bas')
-					suivi_deplacement += [carte_arrivee]
-					if pepite_attrapee:
-						carte_pepite_prises += [carte_arrivee]
-					if suivi_deplacement[-1] == None:
-						del suivi_deplacement[-1]
-					else:
-						derniere_direction = 'bas'
-				#GAUCHE
-				elif event.key == pygame.K_LEFT and derniere_direction != 'droite':
-					carte_arrivee, pepite_attrapee = plateau.deplacer_joueur(plateau.joueur_actif,'gauche')
-					suivi_deplacement += [carte_arrivee]
-					if pepite_attrapee:
-						carte_pepite_prises += [carte_arrivee]
-					if suivi_deplacement[-1] == None:
-						del suivi_deplacement[-1]
-					else:
-						derniere_direction = 'gauche'
-				#DROITE
-				elif event.key == pygame.K_RIGHT and derniere_direction != 'gauche':
-					carte_arrivee, pepite_attrapee = plateau.deplacer_joueur(plateau.joueur_actif,'droite')
-					suivi_deplacement += [carte_arrivee]
-					if pepite_attrapee:
-						carte_pepite_prises += [carte_arrivee]
-					if suivi_deplacement[-1] == None:
-						del suivi_deplacement[-1]
-					else:
-						derniere_direction = 'droite'
+				#Traduction de l'event (déplacement) en chaine de caractère
+				if event.key in [pygame.K_UP,pygame.K_DOWN,pygame.K_LEFT,pygame.K_RIGHT]:
+					if event.key == pygame.K_UP:
+						direction = 'haut'
+					elif event.key == pygame.K_DOWN:
+						direction = 'bas'
+					elif event.key == pygame.K_LEFT:
+						direction = 'gauche'
+					elif event.key == pygame.K_RIGHT:
+						direction = 'droite'
+				
+					#DEPLACEMENT
+					if deplacement_licite(plateau,plateau.joueur_actif,suivi_deplacement,direction,derniere_direction):
+						carte_arrivee, pepite_attrapee = plateau.deplacer_joueur(plateau.joueur_actif,direction)
+						suivi_deplacement += [carte_arrivee]
+						if pepite_attrapee:
+							carte_pepite_prises += [carte_arrivee]
+						#si le déplacement n'a pas été possible (mur) (la fonction déplacer_joueur renvoie alors None, qu'il faut supprimer de la liste suivi_deplacements)
+						if suivi_deplacement[-1] == None:
+							del suivi_deplacement[-1]
+						else:
+							derniere_direction = direction #mise à jour de la dernière direction si le déplacement a eu lieu
 				#PRISE FANTOME
 				elif event.key == pygame.K_f and plateau.matrice[chasseur.position[0],chasseur.position[1]].fantome != 0  and len(cartes_fantomes_pris)==0:
 					chasseur = plateau.liste_joueurs[plateau.joueur_actif-1]
@@ -280,6 +261,35 @@ def qui_a_gagne(plateau):
 	sorted(joueurs, key=lambda joueurs:joueurs.score)
 	# print([joueur.id for joueur in joueurs])
 	return [joueur.id for joueur in joueurs]
+
+def deplacement_licite(plateau,id_joueur,suivi_deplacement,direction,derniere_direction):
+	"""Fonction permettant de savoir si un déplacement est licite ou non (déplacement sur plusieurs cases ou non)
+	Arguments:
+		plateau: objet de type plateau
+		joueur: objet de type chasseur
+		suivi_deplacement: déplacement du joueur en cours
+		direction: direction vers laquelle veut se déplacer le joueur
+		event: evenement pygame (ici, uniquement pygame.K_up, etc = 4 directions de l'espace plan)
+		derniere_direction: derniere direction opérée par le joueur (= None ou une des 4 directions de l'espace plan)
+	---
+	return Booléen
+	"""
+	#Recuperation des évenements et traduction en chaine de caractère
+	direction_opposee = {'haut':'bas','bas':'haut','gauche':'droite','droite':'gauche'}
+	joueur = plateau.liste_joueurs[id_joueur-1]
+	#on verifie que l'utilisateur ne fait pas marche arrière
+	if derniere_direction != direction_opposee[direction]:
+		x_joueur, y_joueur = joueur.position
+		carte_visee = plateau.carte_a_cote(x_joueur,y_joueur,direction)
+		#si l'utilisateur ne fait pas marche arrière, on vérifie qu'il ne va pas sur une case où il est déjà passé dans le même tour
+		if carte_visee in suivi_deplacement:
+			licite = False
+		else:
+			licite = True
+	else:
+		licite = False
+	return licite
+	
 
 # def boucle_deplacement(plateau):
 # 	'''
