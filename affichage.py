@@ -3,6 +3,7 @@
 CONTENU
 affiche_accueil() - Affichage de la page d'accueil
 init_jeu() - Affichage de la page d'initialisation des paramètres du jeu
+interface_choix_sauvegarde() - affiche la page de reprise des sauvegardes
 position_pixel() - Permet d'obtenir la position x,y en pixel d'une carte du plateau 
 dessine_carte() - Permet de dessiner une carte
 init_affichage_plateau() - Init du plateau (juste le fond, sans les cartes)
@@ -12,9 +13,9 @@ carte_jouable_jouee() - Affiche une croix sur la carte jouable si elle a déjà 
 affichage_fin_jeu() - Affiche la fin de jeu (scores et classement)
 """
 import pygame
+import os, sys, glob
 from variables import *
-from main import terminate
-
+from main import terminate, charger_sauvegarde
 
 
 def affiche_accueil():
@@ -60,7 +61,9 @@ def affiche_accueil():
 		for event in pygame.event.get():
 			if clic[0] and bouton_nouveau_jeuRect.collidepoint(mouse):
 				return 'nouveau_jeu'
-			if event.type == pygame.QUIT:
+			elif clic[0] and bouton_reprendreRect.collidepoint(mouse):
+				return 'reprendre_jeu'
+			elif event.type == pygame.QUIT:
 				return 'quitter'
 			elif event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_ESCAPE:
@@ -68,6 +71,7 @@ def affiche_accueil():
 			elif clic[0] and bouton_quitterRect.collidepoint(mouse):
 				terminate()
 				return # user has pressed a key, so return.
+			
 		
 
 		# Display the gameDisplay contents to the actual screen.
@@ -256,7 +260,7 @@ def init_jeu():
 					nb_joueurs -= 1
 					print('nbm',nb_joueurs)
 				
-				#Gestion du bouton valider
+				#Gestion du bouton valider // Renvoie True si le joueur accepte un nouveau jeu
 				if validerRect.collidepoint(mouse):
 					print('dim,j1,j2,j3,j4:',dimension, joueur1, joueur2, joueur3, joueur4)
 					return {'dimension':dimension, 'nb_joueurs':nb_joueurs,'joueur1': joueur1, 'joueur2':joueur2, 'joueur3':joueur3, 'joueur4':joueur4}
@@ -269,6 +273,132 @@ def init_jeu():
 		pygame.display.update()
 		FPSCLOCK.tick()
 		
+def interface_choix_sauvegarde():
+	"""Fonction permettant d'afficher l'interface où la sauvegarde à partir de laquelle on veut jouer sera sélectionnée
+	""" 
+	#Sauvegarde sélectionnée par l'utilisateur
+	sauvegarde_selectionnee = None
+	envie_de_jouer = True
+	
+	#Initialisation des variables images
+	titre_reprendre_jeu = IMAGES_DICT['titre_sauvegardes']
+	text_save1 = IMAGES_DICT['save1']
+	text_save2 = IMAGES_DICT['save2']
+	text_save3 = IMAGES_DICT['save3']
+	text_save4 = IMAGES_DICT['save4']
+	button_save_vide = IMAGES_DICT['save_vide']
+	bouton_reprendre = IMAGES_DICT['reprendre']
+	bouton_reprendre_bright = IMAGES_DICT['reprendre_bright']
+	
+	#Initialisation des surfaces liées aux images
+	titreRect = IMAGES_DICT['titre_sauvegardes'].get_rect(center=(HALF_WINWIDTH, HALF_WINHEIGHT/4))
+	save1Rect = text_save1.get_rect(center=(HALF_WINWIDTH*0.9, HALF_WINHEIGHT*11/20))
+	save2Rect = text_save2.get_rect(center=(HALF_WINWIDTH*0.9, HALF_WINHEIGHT*11/20+75))
+	save3Rect = text_save3.get_rect(center=(HALF_WINWIDTH*0.9, HALF_WINHEIGHT*11/20+2*75))
+	save4Rect = text_save4.get_rect(center=(HALF_WINWIDTH*0.9, HALF_WINHEIGHT*11/20+3*75))
+	bouton_reprendreRect = bouton_reprendre.get_rect(topright=(HALF_WINWIDTH+2*(save1Rect.width+10),WINHEIGHT-150))
+	
+	#Recuperation du chemin du fichier
+	dirname, filename = os.path.split(os.path.abspath(sys.argv[0]))
+	os.chdir(dirname)
+	
+	#Recuperation des noms de fichiers pour l'affichage et création des boutons + rectangles associés + les boutons pour les hovers // pour les sauvegardes existantes
+	font = pygame.font.SysFont("comicsansms", 24)
+	liste_bouton = []
+	liste_bouton_hover = []
+	liste_rect=[]
+	liste_sauvegarde=[]
+	#créations des boutons contenant des sauvegardes pleines
+	for file in glob.glob("*.dat"):
+		nom_sauvegarde = file[0:-4]
+		button = font.render(nom_sauvegarde, True, (255, 255, 255),(80,80,80))
+		buttonHover = font.render(nom_sauvegarde, True, (255, 255, 255),(51,255,102))
+		rect = button.get_rect(center=(HALF_WINWIDTH*1.15+save1Rect.width, HALF_WINHEIGHT*11/20+75*len(liste_bouton)))
+		liste_bouton+=[button]
+		liste_bouton_hover+=[buttonHover]
+		liste_rect+=[rect]
+		liste_sauvegarde+=[nom_sauvegarde]
+	
+	#Création des boutons (non-cliquables) des sauvegardes vides
+	nb_save_pleines = len(liste_bouton)
+	liste_save_vides = []
+	for num_save_vide in range(nb_save_pleines,4):
+		save_videRect = button_save_vide.get_rect(center=(HALF_WINWIDTH*1.15+save1Rect.width, HALF_WINHEIGHT*11/20+75*num_save_vide))
+		liste_save_vides+=[(button_save_vide,save_videRect)]
+	
+	#Initialisation de la condition d'affichage
+	afficher = True
+	#les deux booléens qui suivent permettent de gérer la sélection des sauvegardes
+	selection_en_cours = False
+	index_precedent = None
+	
+	while afficher:
+		gameDisplay.fill(BLACK)
+		
+		#Affichage des surfaces fixes
+		gameDisplay.blit(titre_reprendre_jeu,titreRect)
+		gameDisplay.blit(text_save1,save1Rect)
+		gameDisplay.blit(text_save2,save2Rect)
+		gameDisplay.blit(text_save3,save3Rect)
+		gameDisplay.blit(text_save4,save4Rect)
+		
+		#Affichage des boutons
+		for index in range(len(liste_bouton)):
+			gameDisplay.blit(liste_bouton[index],liste_rect[index])
+			
+		for button,rect in liste_save_vides:
+			gameDisplay.blit(button,rect)
+		gameDisplay.blit(bouton_reprendre,bouton_reprendreRect)
+
+		#Récupération des events position de la souris et clic de la souris
+		mouse = pygame.mouse.get_pos()
+		clic = pygame.mouse.get_pressed()
+				
+		#Gestion des évènements
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				afficher = False
+				envie_de_jouer = False
+			if event.type == MOUSEBUTTONUP:
+				for index in range(len(liste_bouton)):
+					#gestion de la collision des boutons (sauvegardes pleines) et de la souris
+					if liste_rect[index].collidepoint(mouse):
+						#lorsque l'on sélectionne un bouton, celui-ci devient vert ou inversement
+						liste_bouton[index],liste_bouton_hover[index] = liste_bouton_hover[index], liste_bouton[index]
+						
+						#1er cas: pas de sélection en cours
+						if not selection_en_cours:
+							sauvegarde_selectionnee = liste_sauvegarde[index]
+							selection_en_cours = True
+						#2e cas: lorsque l'on clique sur un bouton différent du précédent, le bouton précédent reprend sa couleur originelle
+						elif selection_en_cours and index != index_precedent:
+							liste_bouton[index_precedent],liste_bouton_hover[index_precedent] = liste_bouton_hover[index_precedent], liste_bouton[index_precedent]
+							selection_en_cours = True
+							sauvegarde_selectionnee = liste_sauvegarde[index]
+						#3e cas: on clique sur un bouton déjà sélectionnée -- cad qu'on déselectionne	
+						elif selection_en_cours and index == index_precedent:
+							sauvegarde_selectionnee = None
+							selection_en_cours = False
+							
+						index_precedent = index
+				
+				#gestion du bouton "reprendre"
+				if bouton_reprendreRect.collidepoint(mouse):
+					#interaction possible que si une sélection est réalisée
+					if selection_en_cours:
+						plateau = charger_sauvegarde(sauvegarde_selectionnee)
+						afficher = False
+		
+		#gestion du bouton reprendre // affichage en vert foncé lorsqu'une sauvegarde est selectionnée
+		if selection_en_cours:
+			bouton_reprendre = IMAGES_DICT['reprendre']
+		else:
+			bouton_reprendre = IMAGES_DICT['reprendre_bright']
+		
+		pygame.display.update()
+		FPSCLOCK.tick()
+	return envie_de_jouer, plateau
+
 def position_pixel(Carte, position=None):
 	global espace
 	marge = 5

@@ -8,6 +8,8 @@ init_jeu : appelée dans main SI l'utilisateur clique sur nouveau jeu dans la fo
 initialisation_partie: en fonction des paramètres choisie par les joueurs, crée le plateau, initialisa les joueurs et leur mission
 boucle_deplacement : appelée dans main pendant le jeu, pour gérer le déplacement du joueur_actif. 
 terminate : appelée lorque le joueur appuie sur échap. Ferme la fenetre de jeu.
+sauvegarde: fonction permettant de sauvegarder le plateau dans un fichier .db
+charger_sauvegarde: renvoie un plateau de jeu sauvegardé précédemment
 """
 
 import random, sys, copy, os, pygame
@@ -36,41 +38,45 @@ def main():
 	
 	#AFFICHAGE DE L'ACCUEIL
 	choix_accueil = affiche_accueil() #choix_accueil prend la valeur retournée par affiche_accueil(), soit 'nouveau_jeu', soit 'reprendre_jeu'
-	
+	#initialisation du choix utilisateur, permet de quitter le menu sans message d'erreur
+	envie_de_jouer = False
 	#gestion du choix fait par l'utilisateur sur l'écran d'accueil ('nouveau_jeu','reprendre_jeu' ou 'quitter')
 	if choix_accueil == 'nouveau_jeu':
-		parametres_jeu = init_jeu() #parametres_jeu prend la valeur retournée par init_jeu, un dictionnaire contenant (dimension, joueur1,joueur2,joueur3,joueur4,go)
+		parametres_jeu= init_jeu() #parametres_jeu prend la valeur retournée par init_jeu, un dictionnaire contenant (dimension, joueur1,joueur2,joueur3,joueur4,go)
+		envie_de_jouer = True
 		#création du plateau
 		plateau = cl.Plateau(parametres_jeu['dimension'],parametres_jeu['nb_joueurs'])
 	elif choix_accueil == 'reprendre_jeu':
-		#/!\ à ajouter : doit mettre la fonction appelant l'écran du choix des parties sauvegardées
-		terminate()
+		envie_de_jouer, plateau = interface_choix_sauvegarde()
 	elif choix_accueil == 'quitter':
-		terminate()		  
-	#BOUCLE PRINCIPALE	
-	#redimension des surfaces des images des cartes
-	redimension_images(parametres_jeu['dimension'])
-	#initialisation du plateau (fond sans les cartes)
-	init_affichage_plateau(plateau)
-	while not plateau.gagne:
-		actualisation_affichage_plateau(plateau)
-		plateau, gagne = tour_de_jeu(plateau)
-		plateau.changer_joueur()
+		envie_de_jouer = False		  
+	#BOUCLE PRINCIPALE
+	if envie_de_jouer:
+		#redimension des surfaces des images des cartes
+		redimension_images(plateau.dimension)
+		#initialisation du plateau (fond sans les cartes)
+		init_affichage_plateau(plateau)
+		#la partie continue de jouer tant que l'utilisateur n'a pas choisi d'arrêter de jouer ou que la partie n'est pas finie
+		#la valeur d'envie_de_jouer est actualisée lors du tour de jeu:
+		#si l'utilisateur décide de fermer la fenetre, cette valeur devient False
+		while envie_de_jouer and not plateau.gagne:
+			actualisation_affichage_plateau(plateau)
+			plateau, gagne, envie_de_jouer = tour_de_jeu(plateau)
+			plateau.changer_joueur()
+			
+			pygame.display.update()
+			FPSCLOCK.tick()
 
-		for event in pygame.event.get():
-			if event.type == pygame.KEYDOWN:				
-				if event.key == pygame.K_ESCAPE:
-					terminate()
-
-		pygame.display.update()
-		FPSCLOCK.tick()
-
-	#JEU TERMINE
-	podium = qui_a_gagne(plateau)
-	print('CLASSEMENT')
-	for rang in range(1,plateau.nb_joueurs+1):
-		print(str(rang)+'. ', podium[rang-1])
-	# afficher_fin_jeu()
+		#JEU TERMINE
+		if plateau.gagne:
+			podium = qui_a_gagne(plateau)
+			print('CLASSEMENT')
+			for rang in range(1,plateau.nb_joueurs+1):
+				print(str(rang)+'. ', podium[rang-1])
+			# afficher_fin_jeu()
+	
+	pygame.quit()
+	sys.exit(0)
 	
 def tour_de_jeu(plateau):
 	#AFFICHAGE DES INFORMATIONS DU JOUEUR
@@ -79,9 +85,12 @@ def tour_de_jeu(plateau):
 	print('Mission: ', plateau.liste_joueurs[plateau.joueur_actif-1].mission)
 	print('Fantomes attrapés:', plateau.liste_joueurs[plateau.joueur_actif-1].fantomes)
 	print('Score actuel: ',plateau.liste_joueurs[plateau.joueur_actif-1].score)
-
+	
+	#on initialise une variable indiquant que le joueur souhaite jouer -- cela permet d'arrêter les boucles proprement lorsque le joueur quitte le jeu
+	envie_de_jouer = True
+	
 	#PREMIERE PARTIE DU TOUR : INSERTION DE LA CARTE (OBLIGATOIRE)
-	while not plateau.insertion_carte_faite:
+	while not plateau.insertion_carte_faite and envie_de_jouer:
 		actualisation_affichage_plateau(plateau)
 		#Gestion du highlight des cartes cliquables sur le plateau
 		#Coordonnées de la souris
@@ -123,7 +132,7 @@ def tour_de_jeu(plateau):
 					plateau.carte_jouable.tourner('droite')
 					plateau.carte_jouable.update_murs()
 			if event.type == pygame.QUIT:
-				terminate()		
+				envie_de_jouer = False	
 		pygame.display.update()
 		FPSCLOCK.tick()
 	#=======================================	
@@ -137,7 +146,7 @@ def tour_de_jeu(plateau):
 	carte_pepite_prises = [] #liste contenant les cartes ou une pépite est ramassée
 	derniere_direction = None #dernière direction (utile pour éviter les retours en arrière)
 	
-	while not plateau.deplacement_fait:
+	while not plateau.deplacement_fait and envie_de_jouer:
 		actualisation_affichage_plateau(plateau)
 		carte_jouable_jouee(plateau) #affiche une croix sur la carte jouable pour montrer qu'elle a déjà été insérée
 		#affichage de la trace du déplacement du joueur 
@@ -230,7 +239,7 @@ def tour_de_jeu(plateau):
 					suivi_deplacement = [carte_initiale]
 					derniere_direction = None
 			if event.type == pygame.QUIT:
-				terminate()
+				envie_de_jouer = False
 		pygame.display.update()
 		FPSCLOCK.tick()
 	#TEST PARTIE GAGNE
@@ -238,7 +247,7 @@ def tour_de_jeu(plateau):
 		plateau.gagne = True
 	else:
 		plateau.gagne = False
-	return plateau, plateau.gagne
+	return plateau, plateau.gagne, envie_de_jouer
 
 def qui_a_gagne(plateau):
 	"""Definit qui a gagne.
@@ -286,24 +295,21 @@ def deplacement_licite(plateau,id_joueur,suivi_deplacement,direction,derniere_di
 		licite = False
 	return licite
 
-def sauvegarde(plateau,num_sauvegarde = 1):
+def sauvegarde(plateau,nom_sauvegarde):
 	""" Fonction qui permet de sauvegarder un plateau dans un fichier à un instant t
 	Utilise le module shelf qui store des fichiers pythons dans une sorte de dictionnaire
 	---
-	num_sauvegarde: entier entre 1 et 4 --- permet de creer une sauvegarde parmi les 4 fichiers de sauvegarde proposés
+	nom_sauvegarde: nom de la sauvegarde
 	"""
-	filename = 'save_'+str(num_sauvegarde)
-	
 	#Ouverture du fichier de sauvegarde
-	save = sh.open(filename)
+	save = sh.open(nom_sauvegarde)
 	
 	#On stocke les fichiers dans le "dictionnaire" qui sert de sauvegarde
 	save['plateau'] = plateau
 	save.close()
 	
-def charger_sauvegarde(self, num_sauvegarde = 1):
-	filename = 'save_'+str(num_sauvegarde)
-	save = sh.open(filename)
+def charger_sauvegarde(nom_sauvegarde):
+	save = sh.open(nom_sauvegarde)
 	plateau=save['plateau']
 	save.close()
 	return plateau

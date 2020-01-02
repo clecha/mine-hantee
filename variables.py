@@ -74,5 +74,14 @@ IMAGES_DICT = {'titre': pygame.image.load('images/ecran_titre/titre.png'),
              'carte2_hover' : pygame.image.load('images/cartes/type2_hover.png').convert_alpha(),
              'carte3_hover' : pygame.image.load('images/cartes/type3_hover.png').convert_alpha(),	
              'fleche1': pygame.image.load('images/fleches/fleche1.png'),
-             'fleche2': pygame.image.load('images/fleches/fleche2.png')
+             'fleche2': pygame.image.load('images/fleches/fleche2.png'),
+			 #########images interface reprendre jeu##########
+			 'titre_sauvegardes':pygame.image.load('images/choix_sauvegarde/titre_sauvegardes.png'),
+			 'save1':pygame.image.load('images/choix_sauvegarde/save1.png'),
+			 'save2':pygame.image.load('images/choix_sauvegarde/save2.png'),
+			 'save3':pygame.image.load('images/choix_sauvegarde/save3.png'),
+			 'save4':pygame.image.load('images/choix_sauvegarde/save4.png'),
+			 'save_vide':pygame.image.load('images/choix_sauvegarde/save_vide.png'),
+			 'reprendre':pygame.image.load('images/choix_sauvegarde/reprendre.png'),
+			 'reprendre_bright':pygame.image.load('images/choix_sauvegarde/reprendre_bright.png')
 			   }
