@@ -20,8 +20,8 @@ from main import terminate
 def affiche_accueil():
 	# global gameDisplay
 	'''Fonction permettant l'affichage de l'écran d'accueil du jeu, ou on peut faire les choix suivants : nouveau jeu, reprendre, quitter
-	-->: 'nouveau_jeu', 'reprendre_jeu' : c'est 2 valeurs sont utilisées dans main() pour appeler les fonctions adéquates
-	/!\ il faut encore écrire l'éveneement cliquer sur reprendre le jeu 
+	-->: 'nouveau_jeu', 'reprendre_jeu' : ces 2 valeurs sont utilisées dans main() pour appeler les fonctions adéquates
+	/!\ il faut encore écrire l'évenement cliquer sur reprendre le jeu 
 	'''
 #	gameDisplay = pygame.display.set_mode((WINWIDTH, WINHEIGHT),pygame.RESIZABLE)
 	gameDisplay.fill(BLACK)
