@@ -73,8 +73,9 @@ IMAGES_DICT = {'titre': pygame.image.load('images/ecran_titre/titre.png'),
              'carte1_hover' : pygame.image.load('images/cartes/type1_hover.png').convert_alpha(),
              'carte2_hover' : pygame.image.load('images/cartes/type2_hover.png').convert_alpha(),
              'carte3_hover' : pygame.image.load('images/cartes/type3_hover.png').convert_alpha(),	
-             'fleche1': pygame.image.load('images/fleches/fleche1.png'),
-             'fleche2': pygame.image.load('images/fleches/fleche2.png'),
+             'fleche1': pygame.image.load('images/plateau/fleche1.png'),
+             'fleche2': pygame.image.load('images/plateau/fleche2.png'),
+			 'sauvegarder_plateau':pygame.image.load('images/plateau/sauvegarder_plateau.png'),
 			 #########images interface reprendre jeu##########
 			 'titre_sauvegardes':pygame.image.load('images/choix_sauvegarde/titre_sauvegardes.png'),
 			 'save1':pygame.image.load('images/choix_sauvegarde/save1.png'),
@@ -83,5 +84,9 @@ IMAGES_DICT = {'titre': pygame.image.load('images/ecran_titre/titre.png'),
 			 'save4':pygame.image.load('images/choix_sauvegarde/save4.png'),
 			 'save_vide':pygame.image.load('images/choix_sauvegarde/save_vide.png'),
 			 'reprendre':pygame.image.load('images/choix_sauvegarde/reprendre.png'),
-			 'reprendre_bright':pygame.image.load('images/choix_sauvegarde/reprendre_bright.png')
+			 'reprendre_bright':pygame.image.load('images/choix_sauvegarde/reprendre_bright.png'),
+			 'save_vide_hover':pygame.image.load('images/choix_sauvegarde/save_vide_hover.png'),
+			 'sauvegarder':pygame.image.load('images/choix_sauvegarde/sauvegarder.png'),
+			 'sauvegarder_bright':pygame.image.load('images/choix_sauvegarde/sauvegarder_bright.png'),
+			 'bouton_retour':pygame.image.load('images/choix_sauvegarde/retour.png')	 
 			   }

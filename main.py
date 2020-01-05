@@ -21,6 +21,7 @@ from math import *
 from variables import *
 from affichage import *
 import shelve as sh
+from datetime import datetime
 
 def main():
 	'''Fonction principale du jeu
@@ -59,13 +60,11 @@ def main():
 		#la partie continue de jouer tant que l'utilisateur n'a pas choisi d'arrêter de jouer ou que la partie n'est pas finie
 		#la valeur d'envie_de_jouer est actualisée lors du tour de jeu:
 		#si l'utilisateur décide de fermer la fenetre, cette valeur devient False
-		while envie_de_jouer and not plateau.gagne:
-			actualisation_affichage_plateau(plateau)
-			plateau, gagne, envie_de_jouer = tour_de_jeu(plateau)
-			plateau.changer_joueur()
-			
-			pygame.display.update()
-			FPSCLOCK.tick()
+			#actualisation_affichage_plateau(plateau)
+		tour_de_jeu(plateau)
+		
+		pygame.display.update()
+		FPSCLOCK.tick()
 
 		#JEU TERMINE
 		if plateau.gagne:
@@ -74,9 +73,9 @@ def main():
 			for rang in range(1,plateau.nb_joueurs+1):
 				print(str(rang)+'. ', podium[rang-1])
 			# afficher_fin_jeu()
-	
 	pygame.quit()
 	sys.exit(0)
+	
 	
 def tour_de_jeu(plateau):
 	#AFFICHAGE DES INFORMATIONS DU JOUEUR
@@ -88,9 +87,14 @@ def tour_de_jeu(plateau):
 	
 	#on initialise une variable indiquant que le joueur souhaite jouer -- cela permet d'arrêter les boucles proprement lorsque le joueur quitte le jeu
 	envie_de_jouer = True
+	#Variables servant à arrêter l'affichage des cartes lors de l'ouverture de l'interface de sauvegarde
+	affichage_sauvegarde = False
+	retour_au_jeu = False
+	#rectangle associé au bouton de sauvegarde:
+	bouton_sauvegarde = IMAGES_DICT['sauvegarder_plateau'].get_rect(topleft=(0,0))
 	
 	#PREMIERE PARTIE DU TOUR : INSERTION DE LA CARTE (OBLIGATOIRE)
-	while not plateau.insertion_carte_faite and envie_de_jouer:
+	while not plateau.insertion_carte_faite and envie_de_jouer and not affichage_sauvegarde:
 		actualisation_affichage_plateau(plateau)
 		#Gestion du highlight des cartes cliquables sur le plateau
 		#Coordonnées de la souris
@@ -131,8 +135,20 @@ def tour_de_jeu(plateau):
 				elif position_fleche2.collidepoint(x_souris, y_souris):
 					plateau.carte_jouable.tourner('droite')
 					plateau.carte_jouable.update_murs()
+				#SAUVEGARDE
+				if bouton_sauvegarde.collidepoint(x_souris,y_souris):
+					#la variable affichage sauvegarde permet d'arrêter l'affichage des cartes
+					affichage_sauvegarde = True
 			if event.type == pygame.QUIT:
 				envie_de_jouer = False	
+		#affichage de l'interface de sauvegarde si l'utilisateur en fait le choix
+		if affichage_sauvegarde:
+			retour_au_jeu = sauvegarde_pdt_partie(plateau)
+			affichage_sauvegarde = False
+		if retour_au_jeu:
+			init_affichage_plateau(plateau)
+			tour_de_jeu(plateau)
+				
 		pygame.display.update()
 		FPSCLOCK.tick()
 	#=======================================	
@@ -146,9 +162,11 @@ def tour_de_jeu(plateau):
 	carte_pepite_prises = [] #liste contenant les cartes ou une pépite est ramassée
 	derniere_direction = None #dernière direction (utile pour éviter les retours en arrière)
 	
-	while not plateau.deplacement_fait and envie_de_jouer:
+	while not plateau.deplacement_fait and envie_de_jouer and not affichage_sauvegarde:
 		actualisation_affichage_plateau(plateau)
 		carte_jouable_jouee(plateau) #affiche une croix sur la carte jouable pour montrer qu'elle a déjà été insérée
+		#Coordonnées de la souris
+		x_souris, y_souris = pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]
 		#affichage de la trace du déplacement du joueur 
 		if len(suivi_deplacement) != 1:
 			affichage_deplacement(suivi_deplacement[:-1],plateau)
@@ -163,6 +181,11 @@ def tour_de_jeu(plateau):
 						# print('cartes', carte1.position)
 						if surface_carte.collidepoint(x_souris, y_souris):
 							print('test4',carte1.__dict__)
+				#SAUVEGARDE
+				elif bouton_sauvegarde.collidepoint(x_souris,y_souris):
+					print('o')
+					#la variable affichage sauvegarde permet d'arrêter l'affichage des cartes
+					affichage_sauvegarde = True
 			if event.type == pygame.KEYDOWN:
 				#gestion du changement de perso (provisoire):
 				#JOUEUR ACTIF
@@ -240,6 +263,13 @@ def tour_de_jeu(plateau):
 					derniere_direction = None
 			if event.type == pygame.QUIT:
 				envie_de_jouer = False
+		#affichage de l'interface de sauvegarde si l'utilisateur en fait le choix
+		if affichage_sauvegarde:
+			retour_au_jeu = sauvegarde_pdt_partie(plateau)
+			affichage_sauvegarde = False
+		if retour_au_jeu:
+			init_affichage_plateau(plateau)
+			tour_de_jeu(plateau)
 		pygame.display.update()
 		FPSCLOCK.tick()
 	#TEST PARTIE GAGNE
@@ -247,7 +277,12 @@ def tour_de_jeu(plateau):
 		plateau.gagne = True
 	else:
 		plateau.gagne = False
-	return plateau, plateau.gagne, envie_de_jouer
+	if not plateau.gagne and envie_de_jouer and plateau.insertion_carte_faite and plateau.deplacement_fait:
+		plateau.changer_joueur()
+		tour_de_jeu(plateau)
+	else:# a completer avec l'ecran de fin de jeu
+		pygame.quit()
+		sys.exit(0)
 
 def qui_a_gagne(plateau):
 	"""Definit qui a gagne.
@@ -295,12 +330,19 @@ def deplacement_licite(plateau,id_joueur,suivi_deplacement,direction,derniere_di
 		licite = False
 	return licite
 
-def sauvegarde(plateau,nom_sauvegarde):
+def sauvegarde(plateau):
 	""" Fonction qui permet de sauvegarder un plateau dans un fichier à un instant t
 	Utilise le module shelf qui store des fichiers pythons dans une sorte de dictionnaire
 	---
-	nom_sauvegarde: nom de la sauvegarde
+	plateau: objet de type plateau
+	sauvegarder: booléen indiquant si l'utilisateur veut sauvegarder ou non
 	"""
+	#recuperation de la date et de l'heure pour nommer le fichier
+	now = datetime.now()
+	nom_sauvegarde = now.strftime("%d-%m-%Y %Hh%Mm%Ss")
+	print(nom_sauvegarde)
+	print(type(nom_sauvegarde))
+	
 	#Ouverture du fichier de sauvegarde
 	save = sh.open(nom_sauvegarde)
 	
@@ -313,7 +355,17 @@ def charger_sauvegarde(nom_sauvegarde):
 	plateau=save['plateau']
 	save.close()
 	return plateau
-	
+
+def delete_sauvegarde(nom_sauvegarde):
+	if nom_sauvegarde != None:
+		#Recuperation du chemin du fichier
+		dirname, filename = os.path.split(os.path.abspath(sys.argv[0]))
+		os.chdir(dirname)
+		
+		#délétion des fichiers avec le nom de sauvegarde
+		for file in glob.glob(nom_sauvegarde+'.*'):
+			os.remove(file)
+
 # def boucle_deplacement(plateau):
 # 	'''
 # 	Fonction permettant d'enregistrer le déplacement potentiel du joueur actif pendant son tour, en retournant une liste de directions.
