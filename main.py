@@ -55,8 +55,6 @@ def main():
 	if envie_de_jouer:
 		#redimension des surfaces des images des cartes
 		redimension_images(plateau.dimension)
-		#initialisation du plateau (fond sans les cartes)
-		init_affichage_plateau(plateau)
 		#la partie continue de jouer tant que l'utilisateur n'a pas choisi d'arrêter de jouer ou que la partie n'est pas finie
 		#la valeur d'envie_de_jouer est actualisée lors du tour de jeu:
 		#si l'utilisateur décide de fermer la fenetre, cette valeur devient False
@@ -95,6 +93,8 @@ def tour_de_jeu(plateau):
 	
 	#PREMIERE PARTIE DU TOUR : INSERTION DE LA CARTE (OBLIGATOIRE)
 	while not plateau.insertion_carte_faite and envie_de_jouer and not affichage_sauvegarde:
+		#initialisation du plateau (fond sans les cartes)
+		init_affichage_plateau(plateau)
 		actualisation_affichage_plateau(plateau)
 		#Gestion du highlight des cartes cliquables sur le plateau
 		#Coordonnées de la souris
@@ -148,6 +148,7 @@ def tour_de_jeu(plateau):
 		if retour_au_jeu:
 			init_affichage_plateau(plateau)
 			tour_de_jeu(plateau)
+			retour_au_jeu = False
 				
 		pygame.display.update()
 		FPSCLOCK.tick()
@@ -163,6 +164,8 @@ def tour_de_jeu(plateau):
 	derniere_direction = None #dernière direction (utile pour éviter les retours en arrière)
 	
 	while not plateau.deplacement_fait and envie_de_jouer and not affichage_sauvegarde:
+		#initialisation du plateau (fond sans les cartes)
+		init_affichage_plateau(plateau)
 		actualisation_affichage_plateau(plateau)
 		carte_jouable_jouee(plateau) #affiche une croix sur la carte jouable pour montrer qu'elle a déjà été insérée
 		#Coordonnées de la souris
@@ -270,6 +273,7 @@ def tour_de_jeu(plateau):
 		if retour_au_jeu:
 			init_affichage_plateau(plateau)
 			tour_de_jeu(plateau)
+			retour_au_jeu = False
 		pygame.display.update()
 		FPSCLOCK.tick()
 	#TEST PARTIE GAGNE

@@ -639,7 +639,6 @@ def dessine_carte(Plateau, Carte, position = None,hover=False):
 
 def init_affichage_plateau(plateau):
 	global espace, pixel_case, gameDisplay, WINWIDTH, WINHEIGHT, IMAGES_DICT
-	print("init plateau")
 	pixel_case=int(WINHEIGHT/plateau.dimension)
 	
 	#change l'échelle des images
