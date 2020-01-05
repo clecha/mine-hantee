@@ -37,7 +37,7 @@ class Plateau(object):
 	affichage_console
 	inserer_carte
 	sauvegarde
-	charer_sauvegarde
+	charger_sauvegarde
 	carte_a_cote
 	deplacement_possible
 	changer_joueur
@@ -146,7 +146,9 @@ class Plateau(object):
 			for id_joueur in liste_id_joueurs:
 				ligne, col = liste_pos_joueurs[id_joueur-1]
 				#création du Chasseur() et ajout à la liste des joueurs
-				self.liste_joueurs.append(Chasseur(id_joueur,[ligne,col], liste_fantomes[0:3]))
+				mission=liste_fantomes[0:3]
+				mission.sort()
+				self.liste_joueurs.append(Chasseur(id_joueur,[ligne,col],mission))
 				#ajout de l'id du joueur à sa carte de départ
 				self.matrice[ligne][col].chasseur += [id_joueur] #id du chasseur (type int)
 				self.matrice[ligne][col].pepite = False #on enlève la pépite de ces cartes
@@ -326,7 +328,7 @@ class Plateau(object):
 			carte_inseree.jouable = False
 			self.carte_jouable.jouable = True
 
-			# #Actualisation de la bougeabilité des cartes
+			#Actualisation de la bougeabilité des cartes
 			carte_inseree.bougeable = True #nouvelle carte insérer
 			
 			#Actualisation de la position de la carte nouvellement insérée
@@ -637,7 +639,36 @@ class Chasseur(object):
 				output = False
 		return output
 
-##partie test
+class Noeud():
+	"""Chaque case du jeu est représentée par un objet noeud qui contient :
+		- sa position dans la grille
+		- son cout G : distance entre elle et son ascendant + cout G de son
+		ascendant
+		- son cout H : distance entre elle et le noeud final
+		- son cout F : somme de G et H"""
+	def __init__(self,position):
+		self.x_position = int(position[0])
+		self.y_position = int(position[1])
+		self.coutF = 0
+		self.coutG = 0
+		self.coutH = 0
+		self.parent = self
+		
+	def AjouterListeFermee(self):
+		"""Ajoute un noeud à la liste fermée et le supprime de la liste ouverte"""
+		global listeOuverte,listeFermee
+		
+		listeFermee.append(self)
+		listeOuverte.remove(self)
+	
+	def DejaPresentDansListe(self,liste):
+		"""Fonction qui cherche si un noeud est deja présent dans un liste"""
+		for n in liste:
+			if n.x_position == self.x_position and n.y_position == self.y_position:
+				return n
+		return False
+		
+	##partie test
 		
 #1. test de la mise en place des cartes
 #test = Plateau(nb_joueurs = 4)

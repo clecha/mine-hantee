@@ -84,6 +84,7 @@ def tour_de_jeu(plateau):
 	deplacement_fait = False
 	insertion_carte_faite = False
 	gagne = False
+	fantomes_attrapes=[]
 	#PREMIERE PARTIE DU TOUR : INSERTION DE LA CARTE (OBLIGATOIRE)
 	while not insertion_carte_faite:
 		actualisation_affichage_plateau(plateau)
@@ -99,7 +100,18 @@ def tour_de_jeu(plateau):
 						dessine_carte(plateau,carte,carte.position,True) #True est le parametre qui permet le highlight
 		#Gestion des events
 		for event in pygame.event.get():
-			if event.type == pygame.MOUSEBUTTONUP:
+			if event.type == pygame.KEYDOWN: #JOKER
+				if event.key == pygame.K_j:
+					chasseur = plateau.liste_joueurs[plateau.joueur_actif-1] #chasseur actif
+					noeudDepart=cl.Noeud(chasseur.position)
+					if chasseur.mission != []:
+						id_fantome=chasseur.mission[0]
+					else:
+						id_fantome=int(fantomes_attrapes[-1]+1)
+					noeudFinal=cl.Noeud(position_fantome(plateau,id_fantome))
+					i_a(noeudDepart,noeudFinal,plateau)
+					chasseur.joker=False
+			elif event.type == pygame.MOUSEBUTTONUP:
 				if event.button == 3: #si clic droit
 					#Test (provisoire)
 					for index, surface_carte in np.ndenumerate(plateau.matrice_surfaces):
@@ -208,6 +220,10 @@ def tour_de_jeu(plateau):
 				elif event.key == pygame.K_f and plateau.matrice[chasseur.position[0],chasseur.position[1]].fantome != 0:
 					chasseur = plateau.liste_joueurs[plateau.joueur_actif-1]
 					cartes_fantomes_pris += [chasseur.attraper_fantome(plateau)]
+					carte=plateau.matrice[chasseur.position[0],chasseur.position[1]]
+					if carte.fantome != 0:
+						num_fantome = fantome.numero
+						fantomes_attrapes.append(num_fantome)
 					print('fantome attrapés du j'+str(plateau.joueur_actif),chasseur.fantomes)
 				#VALIDATION
 				elif event.key == pygame.K_RETURN:
@@ -226,6 +242,7 @@ def tour_de_jeu(plateau):
 						#Remise à jour du score du joueur
 						if num_fantome in chasseur.mission:
 							chasseur.score-= 20
+							chasseur.mission.remove(num_fantome)
 							if chasseur.mission_complete():
 								chasseur.score -= 40
 						else:
