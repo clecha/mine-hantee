@@ -26,9 +26,12 @@ class Plateau(object):
 	matrice [array] -  taille dimension * dimension, contient les objets Cartes du plateau
 	matrice_surfaces [array] :  array de taille dimension * dimension, contenant les Rect associés aux Cartes
 	carte_jouable [Carte] - la carte inserable qui est hors plateau
-	joueur_actif [int] - objet de type chasseur -- indique le joueur à qui c'est le tour de jouer
+	joueur_actif [int] -- id du joueur actif
 	liste_joueurs [list] - liste des objets Chasseur du plateau
 	nb_joueurs [int] - entre 1 et 4 -- indique le nb de joueurs	
+	deplacement_fait [booléen] -- indique si le déplacement du joueur actif a été réalisé ou non
+	insertion_carte_faite [booléen] -- indique si le joueur actif a déjà inséré sa carte ou non
+	gagne [booléen] -- indique si le jeu est encore en cours ou non
 	--------------
 	Fonctions:	
 	--------------
@@ -36,8 +39,6 @@ class Plateau(object):
 	actualisation_matrice_surfaces
 	affichage_console
 	inserer_carte
-	sauvegarde
-	charer_sauvegarde
 	carte_a_cote
 	deplacement_possible
 	changer_joueur
@@ -50,7 +51,9 @@ class Plateau(object):
 		self.joueur_actif = 1
 		self.liste_joueurs = []
 		self.nb_joueurs = nb_joueurs
-		#INITIALISATION DU PLATEAU
+		self.deplacement_fait = False
+		self.insertion_carte_faite = False
+		self.gagne = False
 		if dimension % 2 == 1 and dimension >= 7:
 		#création de la matrice contenant les objets cartes
 			self.matrice = np.zeros((dimension,dimension), dtype= object)
@@ -164,8 +167,8 @@ class Plateau(object):
 			liste_pos_carte_alea=liste_pos_carte_alea[0:21]
 			
 			#On parcourt ensuite cette liste de position pour y placer les fantomes
-			for k in range(21):
-				ligne, col = liste_pos_carte_alea[k]
+			for k in range(1,22):
+				ligne, col = liste_pos_carte_alea[k-1]
 				self.matrice[ligne][col].fantome = Fantome(int(k))
 			
 		else:
@@ -179,11 +182,12 @@ class Plateau(object):
 		"""Actualisation de la matrice des surfaces get_rect associées aux cartes
 		-->: /
 		"""
-		#Parcours de la matrice
+		#parcourt de la matrice
 		for i in range(self.dimension):
 			for j in range(self.dimension):
 				carte = self.matrice[i,j] #on recupere l'objet carte
 				x,y = af.position_pixel(carte, (i,j)) #et ses coordonnées
+				# print('#5:', i, j)
 				self.matrice_surfaces[i,j] = IMAGES_DICT['carte'+str(carte.type_carte)].get_rect().move((x,y)) #création de l'objet Surface, placement dans la matrice 
 
 	#affichage console
@@ -351,37 +355,6 @@ class Plateau(object):
 			self.carte_jouable.position = [None,None]
 			# print("test fin d'insertion",carte_inseree.position ,carte_inseree.chasseur)
 
-			
-		
-	def sauvegarde(self, num_sauvegarde = 1):
-		""" Methode qui permet de sauvegarder un plateau dans un fichier à un instant t
-		Utilise le module shelf qui store des fichiers pythons dans une sorte de dictionnaire
-		---
-		num_sauvegarde: entier entre 1 et 3 --- permet de creer une sauvegarde parmi les 3 fichiers de sauvegarde proposés
-		"""
-		filename = 'save_'+str(num_sauvegarde)
-		
-		#Ouverture du fichier de sauvegarde
-		save = sh.open(filename)
-		
-		#On stocke les fichiers dans le "dictionnaire" qui sert de sauvegarde
-		save['dimension'] = self.dimension
-		save['matrice'] = self.matrice
-		save ['carte_jouable'] = self.carte_jouable
-		save ['joueur_actif'] = self.joueur_actif
-		
-		save.close()
-		
-	def charger_sauvegarde(self, num_sauvegarde = 1):
-		filename = 'save_'+str(num_sauvegarde)
-		save = sh.open(filename)
-		self.dimension = save['dimension']
-		self.matrice = save['matrice']
-		self.carte_jouable = save ['carte_jouable']
-		self.joueur_actif = save ['joueur_actif']
-		save.close()		
-	
-
 	def carte_a_cote(self, x,y,direction):
 		'''Fonction renvoyant la carte à côté de la carte présente
 		x,y: position de la carte de départ, x  = colonne, y = ligne (axes pygame inversés !)
@@ -433,6 +406,9 @@ class Plateau(object):
 			self.joueur_actif = 1
 		else:
 			self.joueur_actif += 1
+		self.deplacement_fait = False
+		self.insertion_carte_faite = False
+		
 
 	def deplacer_joueur(self, id_joueur, direction): 
 		chasseur = self.liste_joueurs[id_joueur-1]
@@ -468,23 +444,14 @@ class Plateau(object):
 
 class Carte(object):
 	"""Classe des cartes constituant le plateau
-	------------
-	Attributs:
-	------------
+	----
 	jouable: Booléen qui indique si la carte est jouable ou non (i.e. si elle est hors du plateau ou pas)
 	bougeable : Booléen indiquant si la carte peut être bougée
 	type_carte: entier entre 1 et 3
 	orientation: entier entre 0 et 3
 	fantome: entier entre 0 et 21 -- la valeur 0 indique l'absence de fantôme
 	pepite = booléen - True par défaut, ce qui indique la présence d'une pépite
-	chasseur = entier entre 0 et 4 -- la valeur 0 indique l'absence de chasseur
-	------------
-	Fonctions:
-	------------
-	__init__
-	tourner
-	update_murs
-	"""
+	chasseur = entier entre 0 et 4 -- la valeur 0 indique l'absence de chasseur"""
 	def __init__(self,type_carte,jouable = False, orientation = 0, presence_pepite = True, bougeable = False, position = [0,0]):
 		self.position = position
 		self.jouable = jouable #Booléen indiquant si la carte est jouable ou non (i.e. si elle est hors plateau ou pas)
@@ -546,9 +513,7 @@ class Carte(object):
 	
 class Fantome(object):
 	"""Fantomes
-	------------
-	Attributs:
-	------------
+	---
 	numero: entier identifiant le fantome
 	attrape: booléen indiquant si le fantome a été attrapé ou non
 	"""
@@ -611,24 +576,26 @@ class Chasseur(object):
 		#on recupere le fantome sur la case du plateau où est situé le chasseur
 		carte = Plateau.matrice[x_position,y_position]
 		fantome = carte.fantome
-		if carte.fantome != 0:
+		num_fantome = fantome.numero
+		fantome_attrapable = 22-Plateau.fantomes_restants
+		#on verifie qu'un fantome existe sur la case et qu'il correspond au fantome attrapable
+		if fantome != 0 and num_fantome == fantome_attrapable:
 			#ajout du numero du fantome a la liste des fantomes collectés par le chasseur
-			num_fantome = fantome.numero
 			self.fantomes += [num_fantome]
 			fantome.attrape = True
 			carte.fantome = 0
 			#si le fantome fait partie de la mission du chasseur, le score est actualise a +20, sinon à +5
 			if num_fantome in self.mission:
 				self.score+= 20
-			# 	self.mission.remove(num_fantome)
-			# 	if self.mission == []:
-			# 		self.score+=40
 				if self.mission_complete():
 					self.score += 40
 			else:
 				self.score+=5
 			Plateau.fantomes_restants-=1
-		return carte
+			return carte
+		#Renvoie False si le fantome n'est pas attrapable (ou qu'il n'y a pas de fantome)
+		else:
+			return False
 
 	def mission_complete(self):
 		output = True
