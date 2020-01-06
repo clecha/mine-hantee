@@ -15,7 +15,7 @@ affichage_fin_jeu() - Affiche la fin de jeu (scores et classement)
 import pygame
 import os, sys, glob
 from variables import *
-from main import terminate, charger_sauvegarde, sauvegarde, delete_sauvegarde, tour_de_jeu
+from main import *#terminate, charger_sauvegarde, sauvegarde, delete_sauvegarde, tour_de_jeu
 
 
 def affiche_accueil():
