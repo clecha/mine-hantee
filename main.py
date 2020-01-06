@@ -8,6 +8,8 @@ init_jeu : appelée dans main SI l'utilisateur clique sur nouveau jeu dans la fo
 initialisation_partie: en fonction des paramètres choisie par les joueurs, crée le plateau, initialisa les joueurs et leur mission
 boucle_deplacement : appelée dans main pendant le jeu, pour gérer le déplacement du joueur_actif. 
 terminate : appelée lorque le joueur appuie sur échap. Ferme la fenetre de jeu.
+sauvegarde: fonction permettant de sauvegarder le plateau dans un fichier .db
+charger_sauvegarde: renvoie un plateau de jeu sauvegardé précédemment
 """
 
 import random, sys, copy, os, pygame
@@ -18,6 +20,8 @@ import classes as cl
 from math import *
 from variables import *
 from affichage import *
+import shelve as sh
+from datetime import datetime
 
 def main():
 	'''Fonction principale du jeu
@@ -35,64 +39,68 @@ def main():
 	
 	#AFFICHAGE DE L'ACCUEIL
 	choix_accueil = affiche_accueil() #choix_accueil prend la valeur retournée par affiche_accueil(), soit 'nouveau_jeu', soit 'reprendre_jeu'
-	
+	#initialisation du choix utilisateur, permet de quitter le menu sans message d'erreur
+	envie_de_jouer = False
 	#gestion du choix fait par l'utilisateur sur l'écran d'accueil ('nouveau_jeu','reprendre_jeu' ou 'quitter')
 	if choix_accueil == 'nouveau_jeu':
-		parametres_jeu = init_jeu() #parametres_jeu prend la valeur retournée par init_jeu, un dictionnaire contenant (dimension, joueur1,joueur2,joueur3,joueur4,go)
+		parametres_jeu= init_jeu() #parametres_jeu prend la valeur retournée par init_jeu, un dictionnaire contenant (dimension, joueur1,joueur2,joueur3,joueur4,go)
+		envie_de_jouer = True
 		#création du plateau
 		plateau = cl.Plateau(parametres_jeu['dimension'],parametres_jeu['nb_joueurs'])
-		#redimension des surfaces des images des cartes
-		redimension_images(parametres_jeu['dimension'])
-		#initialisation du plateau (fond sans les cartes)
-		init_affichage_plateau(plateau)
-		#initialisation du test de continuation de la boucle du jeu
-		gagne = False
 	elif choix_accueil == 'reprendre_jeu':
-		#/!\ à ajouter : doit mettre la fonction appelant l'écran du choix des parties sauvegardées
-		terminate()
+		envie_de_jouer, plateau = interface_choix_sauvegarde()
 	elif choix_accueil == 'quitter':
-		terminate()		  
+		envie_de_jouer = False		  
 	#BOUCLE PRINCIPALE
-	while not gagne:
-		actualisation_affichage_plateau(plateau)
-		plateau, gagne = tour_de_jeu(plateau)
-		plateau.changer_joueur()
-
-		for event in pygame.event.get():
-			if event.type == pygame.KEYDOWN:				
-				if event.key == pygame.K_ESCAPE:
-					terminate()
-
+	if envie_de_jouer:
+		#redimension des surfaces des images des cartes
+		redimension_images(plateau.dimension)
+		#la partie continue de jouer tant que l'utilisateur n'a pas choisi d'arrêter de jouer ou que la partie n'est pas finie
+		#la valeur d'envie_de_jouer est actualisée lors du tour de jeu:
+		#si l'utilisateur décide de fermer la fenetre, cette valeur devient False
+			#actualisation_affichage_plateau(plateau)
+		tour_de_jeu(plateau)
+		
 		pygame.display.update()
 		FPSCLOCK.tick()
 
-	#JEU TERMINE
-	podium = qui_a_gagne(plateau)
-	print('CLASSEMENT')
-	for rang in range(1,plateau.nb_joueurs+1):
-		print(str(rang)+'. ', podium[rang-1])
-	# afficher_fin_jeu()
+		#JEU TERMINE
+		if plateau.gagne:
+			podium = qui_a_gagne(plateau)
+			print('CLASSEMENT')
+			for rang in range(1,plateau.nb_joueurs+1):
+				print(str(rang)+'. ', podium[rang-1])
+			# afficher_fin_jeu()
+	pygame.quit()
+	sys.exit(0)
+	
 	
 def tour_de_jeu(plateau):
-	#AFFICHAGE DES INFORMARIONS DU JOUEUR
+	#AFFICHAGE DES INFORMATIONS DU JOUEUR
 	print('===========================================')
 	print('Au tour du joueur'+str(plateau.joueur_actif))
 	print('Mission: ', plateau.liste_joueurs[plateau.joueur_actif-1].mission)
 	print('Fantomes attrapés:', plateau.liste_joueurs[plateau.joueur_actif-1].fantomes)
 	print('Score actuel: ',plateau.liste_joueurs[plateau.joueur_actif-1].score)
-	#INITIALISATION DES TESTS
-	deplacement_fait = False
-	insertion_carte_faite = False
-	gagne = False
-	fantomes_attrapes=[]
+
+	#on initialise une variable indiquant que le joueur souhaite jouer -- cela permet d'arrêter les boucles proprement lorsque le joueur quitte le jeu
+	envie_de_jouer = True
+	#Variables servant à arrêter l'affichage des cartes lors de l'ouverture de l'interface de sauvegarde
+	affichage_sauvegarde = False
+	retour_au_jeu = False
+	#rectangle associé au bouton de sauvegarde:
+	bouton_sauvegarde = IMAGES_DICT['sauvegarder_plateau'].get_rect(topleft=(0,0))
+
 	#PREMIERE PARTIE DU TOUR : INSERTION DE LA CARTE (OBLIGATOIRE)
-	while not insertion_carte_faite:
+	while not plateau.insertion_carte_faite and envie_de_jouer and not affichage_sauvegarde:
+		#initialisation du plateau (fond sans les cartes)
+		init_affichage_plateau(plateau)
 		actualisation_affichage_plateau(plateau)
 		#Gestion du highlight des cartes cliquables sur le plateau
 		#Coordonnées de la souris
 		x_souris, y_souris = pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]
 		#Highlight sur les cartes en hover 
-		if not insertion_carte_faite:
+		if not plateau.insertion_carte_faite:
 			for index, surface_carte in np.ndenumerate(plateau.matrice_surfaces):
 				carte = plateau.matrice[index[0],index[1]]
 				if surface_carte.collidepoint(x_souris, y_souris) and carte.bougeable:
@@ -128,7 +136,7 @@ def tour_de_jeu(plateau):
 						if surface_carte.collidepoint(x_souris, y_souris):
 							if (carte.position[0] in [0,plateau.dimension-1] or carte.position[1] in [0,plateau.dimension-1]) and carte.bougeable:
 								plateau.inserer_carte(plateau.carte_jouable,carte.position)
-								insertion_carte_faite = True
+								plateau.insertion_carte_faite = True
 				#TOURNER CARTE JOUABLE
 				#création des Rect associées associées avec get_rect()
 				position_fleche1, position_fleche2 = IMAGES_DICT['fleche1'].get_rect().move((150,530)),IMAGES_DICT['fleche2'].get_rect().move((275,530))
@@ -138,6 +146,21 @@ def tour_de_jeu(plateau):
 				elif position_fleche2.collidepoint(x_souris, y_souris):
 					plateau.carte_jouable.tourner('droite')
 					plateau.carte_jouable.update_murs()
+				#SAUVEGARDE
+				if bouton_sauvegarde.collidepoint(x_souris,y_souris):
+					#la variable affichage sauvegarde permet d'arrêter l'affichage des cartes
+					affichage_sauvegarde = True
+			if event.type == pygame.QUIT:
+				envie_de_jouer = False	
+		#affichage de l'interface de sauvegarde si l'utilisateur en fait le choix
+		if affichage_sauvegarde:
+			retour_au_jeu = sauvegarde_pdt_partie(plateau)
+			affichage_sauvegarde = False
+		if retour_au_jeu:
+			init_affichage_plateau(plateau)
+			tour_de_jeu(plateau)
+			retour_au_jeu = False
+				
 		pygame.display.update()
 		FPSCLOCK.tick()
 	#=======================================	
@@ -150,9 +173,14 @@ def tour_de_jeu(plateau):
 	cartes_fantomes_pris = [] #liste contenant les cartes ou un fantome est capturé
 	carte_pepite_prises = [] #liste contenant les cartes ou une pépite est ramassée
 	derniere_direction = None #dernière direction (utile pour éviter les retours en arrière)
-	while not deplacement_fait:
+	
+	while not plateau.deplacement_fait and envie_de_jouer and not affichage_sauvegarde:
+		#initialisation du plateau (fond sans les cartes)
+		init_affichage_plateau(plateau)
 		actualisation_affichage_plateau(plateau)
 		carte_jouable_jouee(plateau) #affiche une croix sur la carte jouable pour montrer qu'elle a déjà été insérée
+		#Coordonnées de la souris
+		x_souris, y_souris = pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]
 		#affichage de la trace du déplacement du joueur 
 		if len(suivi_deplacement) != 1:
 			affichage_deplacement(suivi_deplacement[:-1],plateau)
@@ -167,6 +195,11 @@ def tour_de_jeu(plateau):
 						# print('cartes', carte1.position)
 						if surface_carte.collidepoint(x_souris, y_souris):
 							print('test4',carte1.__dict__)
+				#SAUVEGARDE
+				elif bouton_sauvegarde.collidepoint(x_souris,y_souris):
+					print('o')
+					#la variable affichage sauvegarde permet d'arrêter l'affichage des cartes
+					affichage_sauvegarde = True
 			if event.type == pygame.KEYDOWN:
 				#gestion du changement de perso (provisoire):
 				#JOUEUR ACTIF
@@ -174,69 +207,49 @@ def tour_de_jeu(plateau):
 				# 	plateau.changer_joueur()
 				# 	print('Le joueur actif est le',plateau.joueur_actif)
 
-				#Deplacement
-				#BAS
-				if event.key == pygame.K_UP and derniere_direction != 'bas':
-					carte_arrivee, pepite_attrapee = plateau.deplacer_joueur(plateau.joueur_actif,'haut')
-					suivi_deplacement += [carte_arrivee]
-					if pepite_attrapee:
-						carte_pepite_prises += [carte_arrivee]
-					#si le déplacement n'a pas été possible (mur) (la fonction déplacer_joueur renvoie alors None, qu'il faut supprimer de la liste suivi_deplacements)
-					if suivi_deplacement[-1] == None:
-						del suivi_deplacement[-1]
-					else:
-						derniere_direction = 'haut' #mise à jour de la dernière direction si le déplacement a eu lieu
-				#HAUT
-				elif event.key == pygame.K_DOWN and derniere_direction != 'haut':
-					carte_arrivee, pepite_attrapee = plateau.deplacer_joueur(plateau.joueur_actif,'bas')
-					suivi_deplacement += [carte_arrivee]
-					if pepite_attrapee:
-						carte_pepite_prises += [carte_arrivee]
-					if suivi_deplacement[-1] == None:
-						del suivi_deplacement[-1]
-					else:
-						derniere_direction = 'bas'
-				#GAUCHE
-				elif event.key == pygame.K_LEFT and derniere_direction != 'droite':
-					carte_arrivee, pepite_attrapee = plateau.deplacer_joueur(plateau.joueur_actif,'gauche')
-					suivi_deplacement += [carte_arrivee]
-					if pepite_attrapee:
-						carte_pepite_prises += [carte_arrivee]
-					if suivi_deplacement[-1] == None:
-						del suivi_deplacement[-1]
-					else:
-						derniere_direction = 'gauche'
-				#DROITE
-				elif event.key == pygame.K_RIGHT and derniere_direction != 'gauche':
-					carte_arrivee, pepite_attrapee = plateau.deplacer_joueur(plateau.joueur_actif,'droite')
-					suivi_deplacement += [carte_arrivee]
-					if pepite_attrapee:
-						carte_pepite_prises += [carte_arrivee]
-					if suivi_deplacement[-1] == None:
-						del suivi_deplacement[-1]
-					else:
-						derniere_direction = 'droite'
+				#Traduction de l'event (déplacement) en chaine de caractère
+				if event.key in [pygame.K_UP,pygame.K_DOWN,pygame.K_LEFT,pygame.K_RIGHT]:
+					if event.key == pygame.K_UP:
+						direction = 'haut'
+					elif event.key == pygame.K_DOWN:
+						direction = 'bas'
+					elif event.key == pygame.K_LEFT:
+						direction = 'gauche'
+					elif event.key == pygame.K_RIGHT:
+						direction = 'droite'
+				
+					#DEPLACEMENT
+					if deplacement_licite(plateau,plateau.joueur_actif,suivi_deplacement,direction,derniere_direction):
+						carte_arrivee, pepite_attrapee = plateau.deplacer_joueur(plateau.joueur_actif,direction)
+						suivi_deplacement += [carte_arrivee]
+						if pepite_attrapee:
+							carte_pepite_prises += [carte_arrivee]
+						#si le déplacement n'a pas été possible (mur) (la fonction déplacer_joueur renvoie alors None, qu'il faut supprimer de la liste suivi_deplacements)
+						if suivi_deplacement[-1] == None:
+							del suivi_deplacement[-1]
+						else:
+							derniere_direction = direction #mise à jour de la dernière direction si le déplacement a eu lieu
 				#PRISE FANTOME
-				elif event.key == pygame.K_f and plateau.matrice[chasseur.position[0],chasseur.position[1]].fantome != 0:
+				elif event.key == pygame.K_f and plateau.matrice[chasseur.position[0],chasseur.position[1]].fantome != 0  and len(cartes_fantomes_pris)==0:
 					chasseur = plateau.liste_joueurs[plateau.joueur_actif-1]
-					cartes_fantomes_pris += [chasseur.attraper_fantome(plateau)]
-					carte=plateau.matrice[chasseur.position[0],chasseur.position[1]]
-					if carte.fantome != 0:
-						num_fantome = fantome.numero
-						fantomes_attrapes.append(num_fantome)
+					fantome_pris = chasseur.attraper_fantome(plateau)
+					#Verification que le fantome soit effectivement attrapable
+					if fantome_pris != False:
+						cartes_fantomes_pris += [fantome_pris]
 					print('fantome attrapés du j'+str(plateau.joueur_actif),chasseur.fantomes)
+					print('cartes_fantomes_pris'+str(plateau.joueur_actif),cartes_fantomes_pris)
 				#VALIDATION
 				elif event.key == pygame.K_RETURN:
 					print('Deplacement terminé')
 					print('Score final du tour: ',plateau.liste_joueurs[plateau.joueur_actif-1].score)
-					deplacement_fait = True
+					plateau.deplacement_fait = True
 				#ANNULATION
 				elif event.key == pygame.K_ESCAPE: #annulation du déplacement
 					#remise des fantomes sur les cartes
 					while cartes_fantomes_pris != []:
 						# print(cartes_fantomes_pris)
 						num_fantome = chasseur.fantomes[-1]
-						cartes_fantomes_pris[-1].fantome = cl.Fantome(num_fantome) #recréarion des fantomes
+						cartes_fantomes_pris[-1].fantome = cl.Fantome(num_fantome) #recréation des fantomes
 						#remise à jour des fantomes restants
 						plateau.fantomes_restants +=1
 						#Remise à jour du score du joueur
@@ -264,15 +277,28 @@ def tour_de_jeu(plateau):
 					suivi_deplacement = [carte_initiale]
 					derniere_direction = None
 			if event.type == pygame.QUIT:
-				terminate()
+				envie_de_jouer = False
+		#affichage de l'interface de sauvegarde si l'utilisateur en fait le choix
+		if affichage_sauvegarde:
+			retour_au_jeu = sauvegarde_pdt_partie(plateau)
+			affichage_sauvegarde = False
+		if retour_au_jeu:
+			init_affichage_plateau(plateau)
+			tour_de_jeu(plateau)
+			retour_au_jeu = False
 		pygame.display.update()
 		FPSCLOCK.tick()
 	#TEST PARTIE GAGNE
 	if plateau.fantomes_restants == 0:
-		gagne = True
+		plateau.gagne = True
 	else:
-		gagne = False
-	return plateau, gagne
+		plateau.gagne = False
+	if not plateau.gagne and envie_de_jouer and plateau.insertion_carte_faite and plateau.deplacement_fait:
+		plateau.changer_joueur()
+		tour_de_jeu(plateau)
+	else:# a completer avec l'ecran de fin de jeu
+		pygame.quit()
+		sys.exit(0)
 
 def qui_a_gagne(plateau):
 	"""Definit qui a gagne.
@@ -291,6 +317,70 @@ def qui_a_gagne(plateau):
 	sorted(joueurs, key=lambda joueurs:joueurs.score)
 	# print([joueur.id for joueur in joueurs])
 	return [joueur.id for joueur in joueurs]
+
+def deplacement_licite(plateau,id_joueur,suivi_deplacement,direction,derniere_direction):
+	"""Fonction permettant de savoir si un déplacement est licite ou non (déplacement sur plusieurs cases ou non)
+	Arguments:
+		plateau: objet de type plateau
+		joueur: objet de type chasseur
+		suivi_deplacement: déplacement du joueur en cours
+		direction: direction vers laquelle veut se déplacer le joueur
+		event: evenement pygame (ici, uniquement pygame.K_up, etc = 4 directions de l'espace plan)
+		derniere_direction: derniere direction opérée par le joueur (= None ou une des 4 directions de l'espace plan)
+	---
+	return Booléen
+	"""
+	#Recuperation des évenements et traduction en chaine de caractère
+	direction_opposee = {'haut':'bas','bas':'haut','gauche':'droite','droite':'gauche'}
+	joueur = plateau.liste_joueurs[id_joueur-1]
+	#on verifie que l'utilisateur ne fait pas marche arrière
+	if derniere_direction != direction_opposee[direction]:
+		x_joueur, y_joueur = joueur.position
+		carte_visee = plateau.carte_a_cote(x_joueur,y_joueur,direction)
+		#si l'utilisateur ne fait pas marche arrière, on vérifie qu'il ne va pas sur une case où il est déjà passé dans le même tour
+		if carte_visee in suivi_deplacement:
+			licite = False
+		else:
+			licite = True
+	else:
+		licite = False
+	return licite
+
+def sauvegarde(plateau):
+	""" Fonction qui permet de sauvegarder un plateau dans un fichier à un instant t
+	Utilise le module shelf qui store des fichiers pythons dans une sorte de dictionnaire
+	---
+	plateau: objet de type plateau
+	sauvegarder: booléen indiquant si l'utilisateur veut sauvegarder ou non
+	"""
+	#recuperation de la date et de l'heure pour nommer le fichier
+	now = datetime.now()
+	nom_sauvegarde = now.strftime("%d-%m-%Y %Hh%Mm%Ss")
+	print(nom_sauvegarde)
+	print(type(nom_sauvegarde))
+	
+	#Ouverture du fichier de sauvegarde
+	save = sh.open(nom_sauvegarde)
+	
+	#On stocke les fichiers dans le "dictionnaire" qui sert de sauvegarde
+	save['plateau'] = plateau
+	save.close()
+	
+def charger_sauvegarde(nom_sauvegarde):
+	save = sh.open(nom_sauvegarde)
+	plateau=save['plateau']
+	save.close()
+	return plateau
+
+def delete_sauvegarde(nom_sauvegarde):
+	if nom_sauvegarde != None:
+		#Recuperation du chemin du fichier
+		dirname, filename = os.path.split(os.path.abspath(sys.argv[0]))
+		os.chdir(dirname)
+		
+		#délétion des fichiers avec le nom de sauvegarde
+		for file in glob.glob(nom_sauvegarde+'.*'):
+			os.remove(file)
 
 # def boucle_deplacement(plateau):
 # 	'''
