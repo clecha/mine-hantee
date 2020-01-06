@@ -47,6 +47,7 @@ def main():
 		envie_de_jouer = True
 		#création du plateau
 		plateau = cl.Plateau(parametres_jeu['dimension'],parametres_jeu['nb_joueurs'])
+		# affichage_fin_jeu(plateau)
 	elif choix_accueil == 'reprendre_jeu':
 		envie_de_jouer, plateau = interface_choix_sauvegarde()
 	elif choix_accueil == 'quitter':
@@ -276,7 +277,7 @@ def tour_de_jeu(plateau):
 			retour_au_jeu = False
 		pygame.display.update()
 		FPSCLOCK.tick()
-	#TEST PARTIE GAGNE
+	#TEST PARTIE GAGNE)
 	if plateau.fantomes_restants == 0:
 		plateau.gagne = True
 	else:
@@ -293,14 +294,6 @@ def qui_a_gagne(plateau):
 	Arguments:
 		plateau {Plateau()} -- plateau du jeu
 	"""
-	# scores_joueurs = []
-	# for joueur in plateau.liste_joueurs:
-	# 	scores_joueurs += [(joueur, joueur.score)]
-	# sorted(scores_joueurs, key=lambda scores_joueurs: scores_joueurs[1])
-	# print(scores_joueurs)
-	# dico = {}
-	# for rang in range(1,plateau.nb_joueurs+1):
-	# 	dico[rang] = scores_joueurs[rang-1][0]
 	joueurs = plateau.liste_joueurs
 	sorted(joueurs, key=lambda joueurs:joueurs.score)
 	# print([joueur.id for joueur in joueurs])
