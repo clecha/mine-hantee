@@ -707,17 +707,17 @@ def actualisation_affichage_plateau(plateau):
 	dessine_carte(plateau,carte_jouable)
 
 	#affichage des données spécifiques à chaque joueur
-	l=[(10,20),(255,20),(10,265),(255,265)] #liste des positions du texte
+		l=[(10,20),(255,20),(10,265),(255,265)] #liste des positions du texte
 	m=[(170,0),(425,0),(170,245),(425,245)]	
 	
 	nb_joueurs=plateau.nb_joueurs
 	for i in range (nb_joueurs):
 		gameDisplay.blit(IMAGES_DICT['chasseur'+str(plateau.liste_joueurs[i].id)],(m[i][0],m[i][1]))
-		fontObj = pygame.font.SysFont('arial',25)
+		fontObj = pygame.font.SysFont('arial',20)
 		
 		gameDisplayDeTexte = fontObj.render('Mission: '+str(plateau.liste_joueurs[i].mission),True,WHITE)
 		monRectangleDeTexte = gameDisplayDeTexte.get_rect()
-		monRectangleDeTexte.topleft = (l[i][0],l[i][1])
+		monRectangleDeTexte.topleft = (l[i][0],l[i][1]+10)
 		gameDisplay.blit(gameDisplayDeTexte,monRectangleDeTexte)
 		
 		
@@ -733,7 +733,12 @@ def actualisation_affichage_plateau(plateau):
 		
 		gameDisplayDeTexte = fontObj.render('Joker: ' +str(plateau.liste_joueurs[i].joker),True,WHITE)
 		monRectangleDeTexte = gameDisplayDeTexte.get_rect()
-		monRectangleDeTexte.topleft = (l[i][0],l[i][1]+185)
+		monRectangleDeTexte.topleft = (l[i][0],l[i][1]+155)
+		gameDisplay.blit(gameDisplayDeTexte,monRectangleDeTexte)
+		
+		gameDisplayDeTexte = fontObj.render('Score: ' +str(plateau.liste_joueurs[i].score),True,WHITE)
+		monRectangleDeTexte = gameDisplayDeTexte.get_rect()
+		monRectangleDeTexte.topleft = (l[i][0],l[i][1]+195)
 		gameDisplay.blit(gameDisplayDeTexte,monRectangleDeTexte)
 			
 		
