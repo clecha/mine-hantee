@@ -707,7 +707,7 @@ def actualisation_affichage_plateau(plateau):
 	dessine_carte(plateau,carte_jouable)
 
 	#affichage des données spécifiques à chaque joueur
-		l=[(10,20),(255,20),(10,265),(255,265)] #liste des positions du texte
+	l=[(10,20),(255,20),(10,265),(255,265)] #liste des positions du texte
 	m=[(170,0),(425,0),(170,245),(425,245)]	
 	
 	nb_joueurs=plateau.nb_joueurs
