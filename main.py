@@ -55,6 +55,7 @@ def main():
 	if envie_de_jouer:
 		#redimension des surfaces des images des cartes
 		redimension_images(plateau.dimension)
+		plateau.actualisation_matrice_surfaces()
 		#la partie continue de jouer tant que l'utilisateur n'a pas choisi d'arrêter de jouer ou que la partie n'est pas finie
 		#la valeur d'envie_de_jouer est actualisée lors du tour de jeu:
 		#si l'utilisateur décide de fermer la fenetre, cette valeur devient False
