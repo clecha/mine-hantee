@@ -33,7 +33,7 @@ def main():
 	
 	#FENETRE
 #	gameDisplay = pygame.display.set_mode((0, 0), pygame.FULLSCREEN, pygame.RESIZABLE)
-	gameDisplay = pygame.display.set_mode((WINWIDTH+15, WINHEIGHT+15),pygame.RESIZABLE) 
+	# gameDisplay = pygame.display.set_mode((WINWIDTH+15, WINHEIGHT+15),pygame.RESIZABLE) 
 	#titre de la fenetre
 	pygame.display.set_caption('La Mine Hantée')
 	

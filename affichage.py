@@ -21,12 +21,12 @@ import classes as cl
 
 
 def affiche_accueil():
-	# global gameDisplay
+	global gameDisplay, WINWIDTH, WINHEIGHT
 	'''Fonction permettant l'affichage de l'écran d'accueil du jeu, ou on peut faire les choix suivants : nouveau jeu, reprendre, quitter
 	-->: 'nouveau_jeu', 'reprendre_jeu' : c'est 2 valeurs sont utilisées dans main() pour appeler les fonctions adéquates
 	/!\ il faut encore écrire l'éveneement cliquer sur reprendre le jeu 
 	'''
-#	gameDisplay = pygame.display.set_mode((WINWIDTH, WINHEIGHT),pygame.RESIZABLE)
+	# gameDisplay = pygame.display.set_mode((WINWIDTH, WINHEIGHT),pygame.RESIZABLE)
 	gameDisplay.fill(BLACK)
 	
 	#affichage du titre
@@ -640,6 +640,7 @@ def dessine_carte(Plateau, Carte, position = None,hover=False):
 def init_affichage_plateau(plateau):
 	global espace, pixel_case, gameDisplay, WINWIDTH, WINHEIGHT, IMAGES_DICT
 	pixel_case=int(WINHEIGHT/plateau.dimension)
+	print(pixel_case)
 	
 	#change l'échelle des images
 	IMAGES_DICT['pepite'] = pygame.transform.scale(pygame.image.load('images/persos/pepite.png'),(int(pixel_case/6),int(pixel_case/6)))
@@ -664,6 +665,7 @@ def init_affichage_plateau(plateau):
 	IMAGES_DICT['fleche2'] = pygame.image.load('images/plateau/fleche2.png')
 	IMAGES_DICT['sauvegarder_plateau'] = pygame.image.load('images/plateau/sauvegarder_plateau.png')
 	
+	plateau.actualisation_matrice_surfaces()
 	#Affichage du plateau et de tous les éléments qui ne changent pas au cours de la partie
 	# 
 	# gameDisplay = pygame.display.set_mode((WINWIDTH,WINHEIGHT))
