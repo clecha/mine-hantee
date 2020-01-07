@@ -55,6 +55,8 @@ IMAGES_DICT = {'titre': pygame.image.load('images/ecran_titre/titre.png'),
 			   'choix_retirer_joueur_dis':pygame.image.load('images/init_jeu/bouton_retire_disabled.png'),
 			   'choix_valider':pygame.image.load('images/init_jeu/bouton_valider.png'),
 			   #########images plateau de jeu##########
+			 'wooden_sign':pygame.image.load('images/plateau/wooden_sign.png').convert_alpha(),
+			 'background_plateau':pygame.image.load('images/plateau/mine_hantee.jpg'),
 			 'pepite': pygame.image.load('images/persos/pepite.png'),
 			 'chasseur1': pygame.image.load('images/persos/chasseur1.png'),
 			 'chasseur2': pygame.image.load('images/persos/chasseur2.png'),
@@ -89,7 +91,7 @@ IMAGES_DICT = {'titre': pygame.image.load('images/ecran_titre/titre.png'),
 			 'sauvegarder':pygame.image.load('images/choix_sauvegarde/sauvegarder.png'),
 			 'sauvegarder_bright':pygame.image.load('images/choix_sauvegarde/sauvegarder_bright.png'),
 			 'bouton_retour':pygame.image.load('images/choix_sauvegarde/retour.png'),
-			 #########images interface classement##########
+	       			 #########images interface classement##########
 			 'titre_classement':pygame.image.load('images/classement/titre_classement.png'),
 			 'big_chasseur1': pygame.image.load('images/classement/chasseur1.png'),
 			 'big_chasseur2': pygame.image.load('images/classement/chasseur2.png'),
@@ -98,6 +100,5 @@ IMAGES_DICT = {'titre': pygame.image.load('images/ecran_titre/titre.png'),
 			 'titre_score': pygame.image.load('images/classement/titre_score.png'),
 			 'couronne': pygame.image.load('images/classement/couronne.png'),
 			 'bouton_retour_menu': pygame.image.load('images/classement/bouton_retour.png'),
-			 'bouton_retour_menu_hover': pygame.image.load('images/classement/bouton_retour_hover.png'),
+			 'bouton_retour_menu_hover': pygame.image.load('images/classement/bouton_retour_hover.png')
 			   }
-
