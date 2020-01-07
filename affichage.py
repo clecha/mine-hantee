@@ -71,8 +71,6 @@ def affiche_accueil():
 			elif clic[0] and bouton_quitterRect.collidepoint(mouse):
 				terminate()
 				return # user has pressed a key, so return.
-			
-		
 
 		# Display the gameDisplay contents to the actual screen.
 		pygame.display.update()

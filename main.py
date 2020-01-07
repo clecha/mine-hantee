@@ -29,11 +29,11 @@ def main():
 	global IMAGES_DICT, FPSCLOCK, gameDisplay
 	#INITIALISATION DE PYGAME
 	pygame.init()
-	FPSCLOCK = pygame.time.Clock()
+	# FPSCLOCK = pygame.time.Clock()
 	
 	#FENETRE
 #	gameDisplay = pygame.display.set_mode((0, 0), pygame.FULLSCREEN, pygame.RESIZABLE)
-	gameDisplay = pygame.display.set_mode((WINWIDTH, WINHEIGHT),pygame.RESIZABLE) 
+	# gameDisplay = pygame.display.set_mode((WINWIDTH, WINHEIGHT),pygame.RESIZABLE) 
 	#titre de la fenetre
 	pygame.display.set_caption('La Mine Hantée')
 	
