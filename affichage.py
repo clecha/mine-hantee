@@ -20,7 +20,7 @@ import classes as cl
 
 
 def affiche_accueil():
-	# global gameDisplay
+	global gameDisplay, WINWIDTH, WINHEIGHT
 	'''Fonction permettant l'affichage de l'écran d'accueil du jeu, ou on peut faire les choix suivants : nouveau jeu, reprendre, quitter
 	-->: 'nouveau_jeu', 'reprendre_jeu' : c'est 2 valeurs sont utilisées dans main() pour appeler les fonctions adéquates
 	/!\ il faut encore écrire l'éveneement cliquer sur reprendre le jeu 
