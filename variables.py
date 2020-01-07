@@ -21,7 +21,7 @@ GREY=(50,50,50)
 RED = (139,0,0)
 
 espace = 500
-# pixel_case=int(WINHEIGHT/7)
+pixel_case=int(WINHEIGHT/7)
 
 FPSCLOCK = pygame.time.Clock()
 gameDisplay = pygame.display.set_mode((WINWIDTH+15, WINHEIGHT+15),pygame.RESIZABLE)
