@@ -15,6 +15,7 @@ affichage_fin_jeu() - Affiche la fin de jeu (scores et classement)
 import pygame
 import os, sys, glob
 from variables import *
+from main import *#terminate, charger_sauvegarde, sauvegarde, delete_sauvegarde, tour_de_jeu
 from main import *
 import classes as cl
 
@@ -72,8 +73,6 @@ def affiche_accueil():
 			elif clic[0] and bouton_quitterRect.collidepoint(mouse):
 				terminate()
 				return # user has pressed a key, so return.
-			
-		
 
 		# Display the gameDisplay contents to the actual screen.
 		pygame.display.update()
@@ -670,7 +669,7 @@ def init_affichage_plateau(plateau):
 	# gameDisplay = pygame.display.set_mode((WINWIDTH,WINHEIGHT))
 	# pygame.display.set_caption('La mine hantée')
 	#remplissage du fond en gris
-	gameDisplay.fill(GREY)
+	gameDisplay.fill(BLACK)
 	#dessin du quadrillage en haut à gauche
 	pygame.draw.line(gameDisplay,WHITE,(10,240),(490,240),5)
 	pygame.draw.line(gameDisplay,WHITE,(240,10),(240,485),5)
@@ -773,17 +772,86 @@ def carte_jouable_jouee(plateau):
 	pygame.draw.line(gameDisplay,RED,topright,bottomleft,10)
 	return plateau
 
-def affichage_fin_jeu():
-	#écriture du titre au dessus de la carte jouable
-	fontObj = pygame.font.SysFont('arial',40)
-	gameDisplayDeTexte = fontObj.render("C'est gagné ! ",True,WHITE)
-	monRectangleDeTexte	 = gameDisplayDeTexte.get_rect()
-	monRectangleDeTexte .topleft = (WINWIDTH/2,WINHEIGHT/2)
-	gameDisplay.blit(gameDisplayDeTexte,monRectangleDeTexte)
-	for event in pygame.event.get():
-		if event.type == pygame.KEYDOWN:
-			terminate()
+def affichage_fin_jeu(plateau):
+	#CLASSEMENT
+	joueurs = plateau.liste_joueurs
+	sorted(joueurs, key=lambda joueurs:joueurs.score)
+	classement = [joueur.id for joueur in joueurs]
+
+	#initialisation des variables d'affichage
+	if len(joueurs) == 2:
+		x1 = WINWIDTH/8*3
+		x2 = WINWIDTH/8*5
+		X= [x1,x2]
+	elif len(joueurs) == 3:
+		x1 = WINWIDTH/8*2
+		x2 = WINWIDTH/8*4
+		x3 = WINWIDTH/8*6
+		X= [x1,x2,x3]
+	elif len(joueurs) == 4:
+		x1 = WINWIDTH/8*1
+		x2 = WINWIDTH/8*3
+		x3 = WINWIDTH/8*5
+		x4 = WINWIDTH/8*7
+		X = [x1,x2,x3,x4]
+
+	#AFFICHAGE
+	marge = int(WINWIDTH/10)
+	gameDisplay.fill(BLACK)
+	#affichage du titre
+	titreRect = IMAGES_DICT['titre_classement'].get_rect(center=(HALF_WINWIDTH, HALF_WINHEIGHT/5))
+	gameDisplay.blit(IMAGES_DICT['titre_classement'], titreRect)
+	
+	#initialisation des Rect et affichage des images des persos
+	c1Rect = IMAGES_DICT['big_chasseur1'].get_rect(center=(x1, WINHEIGHT/3))
+	c2Rect = IMAGES_DICT['big_chasseur2'].get_rect(center=(x2, WINHEIGHT/3))
+	gameDisplay.blit(IMAGES_DICT['big_chasseur1'],c1Rect)
+	gameDisplay.blit(IMAGES_DICT['big_chasseur2'],c2Rect)
+	if len(joueurs) > 2 :
+		c3Rect = IMAGES_DICT['big_chasseur3'].get_rect(center=(x3, WINHEIGHT/3))
+		gameDisplay.blit(IMAGES_DICT['big_chasseur3'],c3Rect)
+
+	if len(joueurs) > 3:
+		c4Rect = IMAGES_DICT['big_chasseur4'].get_rect(center=(x4, WINHEIGHT/3))
+		gameDisplay.blit(IMAGES_DICT['big_chasseur4'],c4Rect)
+	
+	#affichage de la couronne
+	couronneRect = IMAGES_DICT['couronne'].get_rect(midbottom=(X[classement[0]-1]-15, c1Rect.top+10))
+	gameDisplay.blit(IMAGES_DICT['couronne'],couronneRect)
+
+	#affichage des scores
+	fontObj = pygame.font.SysFont('arial',20,bold=True)
+	for joueur in range(len(joueurs)):
+		titreScoreRect = IMAGES_DICT['titre_score'].get_rect(center=(X[joueur-1], HALF_WINHEIGHT))
+		gameDisplay.blit(IMAGES_DICT['titre_score'], titreScoreRect)
+		gameDisplayDeTexte=fontObj.render(str(plateau.liste_joueurs[joueur-1].score),True,WHITE)
+		scoreRect =gameDisplayDeTexte.get_rect(topright=(X[joueur-1], HALF_WINHEIGHT+50))
+		gameDisplay.blit(gameDisplayDeTexte,scoreRect)
+
+	#affichage du bouton QUITTER
+	bouton_retourRect = IMAGES_DICT['bouton_retour_menu'].get_rect(center=(HALF_WINWIDTH, WINHEIGHT/4*3))
+	bouton_retour_hoverRect = IMAGES_DICT['bouton_retour_menu_hover'].get_rect(center=(HALF_WINWIDTH, WINHEIGHT/4*3))
+
+	while True:
+		mouse = pygame.mouse.get_pos() #recupere la position de la souris
+		clic = pygame.mouse.get_pressed() #recupere l'évenement clic de la souris (clic[0] = clic gauche, clic[1] = clic droit)
+
+ 		#mise en place de l'affichage et de la surbrillance des boutons
+		if bouton_retourRect.collidepoint(mouse):
+			gameDisplay.blit(IMAGES_DICT['bouton_retour_menu_hover'],bouton_retour_hoverRect)
+		else:
+			gameDisplay.blit(IMAGES_DICT['bouton_retour_menu'],bouton_retourRect)
 		
+		for event in pygame.event.get():
+			if clic[0] and bouton_retourRect.collidepoint(mouse):
+				terminate()
+			if event.type == pygame.QUIT:
+				terminate()
+				# Display the gameDisplay contents to the actual screen.
+		pygame.display.update()
+		FPSCLOCK.tick()
+
+    
 ## JOKER 
 def i_a(noeudDepart, noeudFinal,plateau):
 	"""Boucle while principale :
@@ -888,7 +956,6 @@ def Distance(noeud1,noeud2):
 	a =  noeud2.x_position - noeud1.x_position
 	b =  noeud2.y_position - noeud1.y_position
 	return ((a*a) + (b*b))
-
 
 
 def RemonterListe():
