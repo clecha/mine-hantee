@@ -29,11 +29,11 @@ def main():
 	global IMAGES_DICT, FPSCLOCK, gameDisplay
 	#INITIALISATION DE PYGAME
 	pygame.init()
-	FPSCLOCK = pygame.time.Clock()
+	# FPSCLOCK = pygame.time.Clock()
 	
 	#FENETRE
 #	gameDisplay = pygame.display.set_mode((0, 0), pygame.FULLSCREEN, pygame.RESIZABLE)
-	gameDisplay = pygame.display.set_mode((WINWIDTH, WINHEIGHT),pygame.RESIZABLE) 
+	gameDisplay = pygame.display.set_mode((WINWIDTH+15, WINHEIGHT+15),pygame.RESIZABLE) 
 	#titre de la fenetre
 	pygame.display.set_caption('La Mine Hantée')
 	
@@ -47,6 +47,7 @@ def main():
 		envie_de_jouer = True
 		#création du plateau
 		plateau = cl.Plateau(parametres_jeu['dimension'],parametres_jeu['nb_joueurs'])
+		# affichage_fin_jeu(plateau)
 	elif choix_accueil == 'reprendre_jeu':
 		envie_de_jouer, plateau = interface_choix_sauvegarde()
 	elif choix_accueil == 'quitter':
@@ -55,6 +56,7 @@ def main():
 	if envie_de_jouer:
 		#redimension des surfaces des images des cartes
 		redimension_images(plateau.dimension)
+		#actualisation de la matrice des surfaces
 		plateau.actualisation_matrice_surfaces()
 		#la partie continue de jouer tant que l'utilisateur n'a pas choisi d'arrêter de jouer ou que la partie n'est pas finie
 		#la valeur d'envie_de_jouer est actualisée lors du tour de jeu:
@@ -289,7 +291,7 @@ def tour_de_jeu(plateau):
 			retour_au_jeu = False
 		pygame.display.update()
 		FPSCLOCK.tick()
-	#TEST PARTIE GAGNE
+	#TEST PARTIE GAGNE)
 	if plateau.fantomes_restants == 0:
 		plateau.gagne = True
 	else:
@@ -306,14 +308,6 @@ def qui_a_gagne(plateau):
 	Arguments:
 		plateau {Plateau()} -- plateau du jeu
 	"""
-	# scores_joueurs = []
-	# for joueur in plateau.liste_joueurs:
-	# 	scores_joueurs += [(joueur, joueur.score)]
-	# sorted(scores_joueurs, key=lambda scores_joueurs: scores_joueurs[1])
-	# print(scores_joueurs)
-	# dico = {}
-	# for rang in range(1,plateau.nb_joueurs+1):
-	# 	dico[rang] = scores_joueurs[rang-1][0]
 	joueurs = plateau.liste_joueurs
 	sorted(joueurs, key=lambda joueurs:joueurs.score)
 	# print([joueur.id for joueur in joueurs])
