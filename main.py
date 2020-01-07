@@ -33,7 +33,7 @@ def main():
 	
 	#FENETRE
 #	gameDisplay = pygame.display.set_mode((0, 0), pygame.FULLSCREEN, pygame.RESIZABLE)
-	# gameDisplay = pygame.display.set_mode((WINWIDTH, WINHEIGHT),pygame.RESIZABLE) 
+	gameDisplay = pygame.display.set_mode((WINWIDTH+15, WINHEIGHT+15),pygame.RESIZABLE) 
 	#titre de la fenetre
 	pygame.display.set_caption('La Mine Hantée')
 	
@@ -56,6 +56,8 @@ def main():
 	if envie_de_jouer:
 		#redimension des surfaces des images des cartes
 		redimension_images(plateau.dimension)
+		#actualisation de la matrice des surfaces
+		plateau.actualisation_matrice_surfaces()
 		#la partie continue de jouer tant que l'utilisateur n'a pas choisi d'arrêter de jouer ou que la partie n'est pas finie
 		#la valeur d'envie_de_jouer est actualisée lors du tour de jeu:
 		#si l'utilisateur décide de fermer la fenetre, cette valeur devient False
@@ -83,7 +85,7 @@ def tour_de_jeu(plateau):
 	print('Mission: ', plateau.liste_joueurs[plateau.joueur_actif-1].mission)
 	print('Fantomes attrapés:', plateau.liste_joueurs[plateau.joueur_actif-1].fantomes)
 	print('Score actuel: ',plateau.liste_joueurs[plateau.joueur_actif-1].score)
-	
+
 	#on initialise une variable indiquant que le joueur souhaite jouer -- cela permet d'arrêter les boucles proprement lorsque le joueur quitte le jeu
 	envie_de_jouer = True
 	#Variables servant à arrêter l'affichage des cartes lors de l'ouverture de l'interface de sauvegarde
@@ -91,7 +93,7 @@ def tour_de_jeu(plateau):
 	retour_au_jeu = False
 	#rectangle associé au bouton de sauvegarde:
 	bouton_sauvegarde = IMAGES_DICT['sauvegarder_plateau'].get_rect(topleft=(0,0))
-	
+
 	#PREMIERE PARTIE DU TOUR : INSERTION DE LA CARTE (OBLIGATOIRE)
 	while not plateau.insertion_carte_faite and envie_de_jouer and not affichage_sauvegarde:
 		#initialisation du plateau (fond sans les cartes)
@@ -109,7 +111,18 @@ def tour_de_jeu(plateau):
 						dessine_carte(plateau,carte,carte.position,True) #True est le parametre qui permet le highlight
 		#Gestion des events
 		for event in pygame.event.get():
-			if event.type == pygame.MOUSEBUTTONUP:
+			if event.type == pygame.KEYDOWN: #JOKER
+				if event.key == pygame.K_j:
+					chasseur = plateau.liste_joueurs[plateau.joueur_actif-1] #chasseur actif
+					noeudDepart=cl.Noeud(chasseur.position)
+					if chasseur.mission != []:
+						id_fantome=chasseur.mission[0]
+					else:
+						id_fantome=int(fantomes_attrapes[-1]+1)
+					noeudFinal=cl.Noeud(position_fantome(plateau,id_fantome))
+					i_a(noeudDepart,noeudFinal,plateau)
+					chasseur.joker=False
+			elif event.type == pygame.MOUSEBUTTONUP:
 				if event.button == 3: #si clic droit
 					#Test (provisoire)
 					for index, surface_carte in np.ndenumerate(plateau.matrice_surfaces):
@@ -245,6 +258,7 @@ def tour_de_jeu(plateau):
 						#Remise à jour du score du joueur
 						if num_fantome in chasseur.mission:
 							chasseur.score-= 20
+							chasseur.mission.remove(num_fantome)
 							if chasseur.mission_complete():
 								chasseur.score -= 40
 						else:

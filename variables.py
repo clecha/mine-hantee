@@ -100,3 +100,4 @@ IMAGES_DICT = {'titre': pygame.image.load('images/ecran_titre/titre.png'),
 			 'bouton_retour_menu': pygame.image.load('images/classement/bouton_retour.png'),
 			 'bouton_retour_menu_hover': pygame.image.load('images/classement/bouton_retour_hover.png'),
 			   }
+
