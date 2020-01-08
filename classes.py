@@ -160,7 +160,7 @@ class Plateau(object):
 				###alternative
 				# self.matrice[ligne][col].chasseur = Chasseur(id_joueur,[ligne,col], liste_fantomes[0:3])
 				# self.liste_joueurs.append(self.matrice[ligne][col].chasseur)
-				print('liste joueurs',self.liste_joueurs)
+				
 				#On retire les fantomes déjà attribués
 				liste_fantomes.pop(0),liste_fantomes.pop(1),liste_fantomes.pop(2)
 				
@@ -199,37 +199,40 @@ class Plateau(object):
 		"""Fonction qui créée un affichage console du plateau en cours
 		--> Utilisée pour faire des verifications lors du code surtout // pas utile à proprement parlé
 		"""
-		try:
-			dimension = self.dimension
-			matrice_affichage_jouabilite = np.zeros((dimension,dimension), dtype=object)
-			matrice_affichage_type_carte = np.zeros((dimension,dimension))
-			matrice_affichage_orientation = np.zeros((dimension,dimension))
-			matrice_affichage_chasseurs = np.zeros((dimension,dimension))
-			matrice_affichage_fantomes = np.zeros((dimension,dimension))
-			for col in range(dimension):
-				for ligne in range(dimension):
-					carte = self.matrice[ligne][col]
-					id_joueur = carte.chasseur
-					matrice_affichage_jouabilite[ligne][col] = carte.jouable
-					matrice_affichage_type_carte[ligne][col] = carte.type_carte
-					matrice_affichage_orientation[ligne][col] = carte.orientation
-					matrice_affichage_chasseurs[ligne][col] = carte.chasseur
-					fantome = carte.fantome
-					if type(fantome) != int:
-						matrice_affichage_fantomes[ligne][col] = carte.fantome.numero
-					else:
-						matrice_affichage_fantomes[ligne][col] = carte.fantome
+#		try:
+		dimension = self.dimension
+		matrice_affichage_jouabilite = np.zeros((dimension,dimension), dtype=object)
+		matrice_affichage_type_carte = np.zeros((dimension,dimension))
+		matrice_affichage_orientation = np.zeros((dimension,dimension))
+		matrice_affichage_chasseurs = np.zeros((dimension,dimension))
+		matrice_affichage_fantomes = np.zeros((dimension,dimension))
+		for col in range(dimension):
+			for ligne in range(dimension):
+				carte = self.matrice[ligne][col]
+				id_joueur = carte.chasseur
+				matrice_affichage_jouabilite[ligne][col] = carte.jouable
+				matrice_affichage_type_carte[ligne][col] = carte.type_carte
+				matrice_affichage_orientation[ligne][col] = carte.orientation
+				if len(id_joueur)==0:
+					matrice_affichage_chasseurs[ligne][col] = 0
+				else:
+					matrice_affichage_chasseurs[ligne][col] = carte.chasseur[0]
+				fantome = carte.fantome
+				if type(fantome) != int:
+					matrice_affichage_fantomes[ligne][col] = carte.fantome.numero
+				else:
+					matrice_affichage_fantomes[ligne][col] = carte.fantome
 
-			print('matrice des jouabilites:\n', matrice_affichage_jouabilite)
-			print('matrice des types de carte:\n', matrice_affichage_type_carte)
-			print('matrice des orientations:\n', matrice_affichage_orientation)
-			print('matrice des chasseurs:\n', matrice_affichage_chasseurs)
-			print('matrice des fantomes:\n', matrice_affichage_fantomes)
-			print('matrice des surfaces\n', self.matrice_surfaces)
+		#print('matrice des jouabilites:\n', matrice_affichage_jouabilite)
+		#print('matrice des types de carte:\n', matrice_affichage_type_carte)
+		#print('matrice des orientations:\n', matrice_affichage_orientation)
+		print('matrice des chasseurs:\n', matrice_affichage_chasseurs)
+		#print('matrice des fantomes:\n', matrice_affichage_fantomes)
+		#print('matrice des surfaces\n', self.matrice_surfaces)
 
-		except:
-			print('Il n y a aucun jeu en cours.')
-		pass
+#		except:
+#			print('Il n y a aucun jeu en cours.')
+#		pass
 
 	def inserer_carte(self,carte_inseree,position):
 		"""Fonction placant la carte en argument a la position en argument
@@ -273,14 +276,6 @@ class Plateau(object):
 			#on retire l'élément qui a coulissé en dehors du plateau
 			nvelle_carte_jouable = liste_a_inserer[index_carte_a_pop]
 			liste_a_inserer = np.delete(liste_a_inserer, index_carte_a_pop)	
-			#du coup, si la carte à pop était en dernière position, la liste rétrécit 
-			#Si elle est en premier, ça décale tout ?		
-			# if insertion_colonne:
-			# 	for x in self.matrice[:,y_position]:
-			# 		# print('avant',x.position)
-			# else:
-			# 	for x in self.matrice[x_position,:]:
-			# 		# print('avant',x.position)
 			
 			#On vérifie la présence d'un fantome ou d'un joueur sur la carte qui a été sortie du tableau
 			#on initialise un booleen qui permettra d'actualiser ou non la position du chasseur
@@ -349,12 +344,22 @@ class Plateau(object):
 					x.position[0] = nouvel_index
 					# print('apres',x.position[0])
 					nouvel_index+=1
+					#actualisation de la position des chasseurs
+					if len(x.chasseur)>0:
+						for id_chasseur in x.chasseur:
+							chasseur = self.liste_joueurs[id_chasseur - 1]
+							chasseur.position = x.position
 			else:
 				for x in self.matrice[x_position,:]:
 					# print('apres',x.position[1])
 					x.position[1] = nouvel_index
 					# print('apres',x.position[1])
 					nouvel_index+=1
+					#actualisation de la position des chasseurs
+					if len(x.chasseur)>0:
+						for id_chasseur in x.chasseur:
+							chasseur = self.liste_joueurs[id_chasseur - 1]
+							chasseur.position = x.position
 			#Mise à jour de la position de la carte nouvellement jouable
 			self.carte_jouable.position = [None,None]
 			# print("test fin d'insertion",carte_inseree.position ,carte_inseree.chasseur)
@@ -528,6 +533,7 @@ class Fantome(object):
 class Chasseur(object):
 	"""Joueurs
 	---
+	identifiant: 
 	position: liste de coordonnees [x,y]
 	mission: liste d entiers correspondant aux numéros des fantomes à ingérer
 	pepite: entier -- nombre de pépites ramassées par le chasseur
@@ -580,7 +586,8 @@ class Chasseur(object):
 		#on recupere le fantome sur la case du plateau où est situé le chasseur
 		carte = Plateau.matrice[x_position,y_position]
 		fantome = carte.fantome
-		num_fantome = fantome.numero
+		if fantome !=0:
+			num_fantome = fantome.numero
 		fantome_attrapable = 22-Plateau.fantomes_restants
 		#on verifie qu'un fantome existe sur la case et qu'il correspond au fantome attrapable
 		if fantome != 0 and num_fantome == fantome_attrapable:
@@ -608,34 +615,6 @@ class Chasseur(object):
 				output = False
 		return output
 
-class Noeud():
-	"""Chaque case du jeu est représentée par un objet noeud qui contient :
-		- sa position dans la grille
-		- son cout G : distance entre elle et son ascendant + cout G de son
-		ascendant
-		- son cout H : distance entre elle et le noeud final
-		- son cout F : somme de G et H"""
-	def __init__(self,position):
-		self.x_position = int(position[0])
-		self.y_position = int(position[1])
-		self.coutF = 0
-		self.coutG = 0
-		self.coutH = 0
-		self.parent = self
-		
-	def AjouterListeFermee(self):
-		"""Ajoute un noeud à la liste fermée et le supprime de la liste ouverte"""
-		global listeOuverte,listeFermee
-		
-		listeFermee.append(self)
-		listeOuverte.remove(self)
-	
-	def DejaPresentDansListe(self,liste):
-		"""Fonction qui cherche si un noeud est deja présent dans un liste"""
-		for n in liste:
-			if n.x_position == self.x_position and n.y_position == self.y_position:
-				return n
-		return False
 		
 	##partie test
 		

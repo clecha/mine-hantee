@@ -93,6 +93,10 @@ def tour_de_jeu(plateau):
 	retour_au_jeu = False
 	#rectangle associé au bouton de sauvegarde:
 	bouton_sauvegarde = IMAGES_DICT['sauvegarder_plateau'].get_rect(topleft=(0,0))
+	
+	#reconnaissance du type de joueur:
+	id_joueur_actif = plateau.joueur_actif
+	joueur_actif = plateau.liste_joueurs[id_joueur_actif - 1]
 
 	#PREMIERE PARTIE DU TOUR : INSERTION DE LA CARTE (OBLIGATOIRE)
 	while not plateau.insertion_carte_faite and envie_de_jouer and not affichage_sauvegarde:
@@ -300,7 +304,8 @@ def tour_de_jeu(plateau):
 		plateau.changer_joueur()
 		tour_de_jeu(plateau)
 	else:# a completer avec l'ecran de fin de jeu
-		affichage_fin_jeu(plateau)
+		pygame.quit()
+		sys.exit(0)
 
 def qui_a_gagne(plateau):
 	"""Definit qui a gagne.
@@ -316,10 +321,9 @@ def deplacement_licite(plateau,id_joueur,suivi_deplacement,direction,derniere_di
 	"""Fonction permettant de savoir si un déplacement est licite ou non (déplacement sur plusieurs cases ou non)
 	Arguments:
 		plateau: objet de type plateau
-		joueur: objet de type chasseur
+		id_joueur: id du joueur
 		suivi_deplacement: déplacement du joueur en cours
 		direction: direction vers laquelle veut se déplacer le joueur
-		event: evenement pygame (ici, uniquement pygame.K_up, etc = 4 directions de l'espace plan)
 		derniere_direction: derniere direction opérée par le joueur (= None ou une des 4 directions de l'espace plan)
 	---
 	return Booléen
