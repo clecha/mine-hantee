@@ -20,7 +20,7 @@ import classes as cl
 
 
 def affiche_accueil():
-	global gameDisplay, WINWIDTH, WINHEIGHT
+	# global gameDisplay
 	'''Fonction permettant l'affichage de l'écran d'accueil du jeu, ou on peut faire les choix suivants : nouveau jeu, reprendre, quitter
 	-->: 'nouveau_jeu', 'reprendre_jeu' : c'est 2 valeurs sont utilisées dans main() pour appeler les fonctions adéquates
 	/!\ il faut encore écrire l'éveneement cliquer sur reprendre le jeu 
@@ -29,22 +29,17 @@ def affiche_accueil():
 	gameDisplay.fill(BLACK)
 	
 	#affichage du titre
-	titreRect = IMAGES_DICT['titre'].get_rect(center=(500+(700)/2, HALF_WINHEIGHT/4))
+	titreRect = IMAGES_DICT['titre'].get_rect(center=(HALF_WINWIDTH, HALF_WINHEIGHT/4))
 	gameDisplay.blit(IMAGES_DICT['titre'], titreRect)
 	
 	#initilisation des variables pour les boutons
-	bouton_nouveau_jeuRect = IMAGES_DICT['bouton_nouv_jeu'].get_rect(center=(500+(700)/2, HALF_WINHEIGHT/4+150))
-	bouton_nouveau_jeu_hoverRect = IMAGES_DICT['bouton_nouv_jeu_hover'].get_rect(center=(500+(700)/2, HALF_WINHEIGHT/4+150))
-	bouton_reprendreRect = IMAGES_DICT['bouton_reprendre'].get_rect(center=(500+(700)/2, HALF_WINHEIGHT/4+250))
-	bouton_reprendre_hoverRect = IMAGES_DICT['bouton_reprendre_hover'].get_rect(center=(500+(700)/2, HALF_WINHEIGHT/4+250))
-	bouton_quitterRect = IMAGES_DICT['bouton_quitter'].get_rect(center=(500+(700)/2, HALF_WINHEIGHT/4+350))
-	bouton_quitter_hoverRect = IMAGES_DICT['bouton_quitter_hover'].get_rect(center=(500+700/2, HALF_WINHEIGHT/4+350))
+	bouton_nouveau_jeuRect = IMAGES_DICT['bouton_nouv_jeu'].get_rect(center=(HALF_WINWIDTH, HALF_WINHEIGHT/4+150))
+	bouton_nouveau_jeu_hoverRect = IMAGES_DICT['bouton_nouv_jeu_hover'].get_rect(center=(HALF_WINWIDTH, HALF_WINHEIGHT/4+150))
+	bouton_reprendreRect = IMAGES_DICT['bouton_reprendre'].get_rect(center=(HALF_WINWIDTH, HALF_WINHEIGHT/4+250))
+	bouton_reprendre_hoverRect = IMAGES_DICT['bouton_reprendre_hover'].get_rect(center=(HALF_WINWIDTH, HALF_WINHEIGHT/4+250))
+	bouton_quitterRect = IMAGES_DICT['bouton_quitter'].get_rect(center=(HALF_WINWIDTH, HALF_WINHEIGHT/4+350))
+	bouton_quitter_hoverRect = IMAGES_DICT['bouton_quitter_hover'].get_rect(center=(HALF_WINWIDTH, HALF_WINHEIGHT/4+350))
 	
-	#affichage de l'image de fond
-	background_accueil = IMAGES_DICT['background_accueil']
-	background_accueilRect = background_accueil.get_rect(topleft=(0,0))
-	gameDisplay.blit(background_accueil,background_accueilRect) 
-
 	while True: # Main loop for the start screen.
 		
 		mouse = pygame.mouse.get_pos() #recupere la position de la souris
@@ -309,7 +304,7 @@ def interface_choix_sauvegarde():
 	os.chdir(dirname)
 	
 	#Recuperation des noms de fichiers pour l'affichage et création des boutons + rectangles associés + les boutons pour les hovers // pour les sauvegardes existantes
-	font = pygame.font.SysFont("Arial Rounded MT Bold", 24)
+	font = pygame.font.SysFont("comicsansms", 24)
 	liste_bouton = []
 	liste_bouton_hover = []
 	liste_rect=[]
@@ -444,7 +439,7 @@ def sauvegarde_pdt_partie(plateau):
 	os.chdir(dirname)
 	
 	#Recuperation des noms de fichiers pour l'affichage et création des boutons + rectangles associés + les boutons pour les hovers // pour les sauvegardes existantes
-	font = pygame.font.SysFont("Arial Rounded MT Bold", 24)
+	font = pygame.font.SysFont("comicsansms", 24)
 	liste_bouton = []
 	liste_bouton_hover = []
 	liste_rect=[]
@@ -552,8 +547,8 @@ def sauvegarde_pdt_partie(plateau):
 
 
 def position_pixel(Carte, position=None):
-	global espace
-	marge = 5
+	global espace, marge
+	
 	# On vérifie que la carte est bien présente sur le plateau, i.e. que ce n'est pas la carte jouable
 	if Carte.jouable == False and position != None:
 		x_carte = position[0]
@@ -635,7 +630,7 @@ def dessine_carte(Plateau, Carte, position = None,hover=False):
 	if fantome != 0 :
 		id_fantome = fantome.numero
 		gameDisplay.blit(IMAGES_DICT['fantome'],(x_pixel+2,y_pixel+2))
-		fontObj = pygame.font.SysFont('Arial Rounded MT Bold',20,bold=False)
+		fontObj = pygame.font.SysFont('arial',20,bold=True)
 		gameDisplayDeTexte=fontObj.render(str(id_fantome),True,BLACK)
 		monRectangleDeTexte=gameDisplayDeTexte.get_rect()
 		monRectangleDeTexte.topleft = (x_pixel+3*pixel_case/10,y_pixel+5)
@@ -669,31 +664,19 @@ def init_affichage_plateau(plateau):
 	IMAGES_DICT['fleche1'] = pygame.image.load('images/plateau/fleche1.png')
 	IMAGES_DICT['fleche2'] = pygame.image.load('images/plateau/fleche2.png')
 	IMAGES_DICT['sauvegarder_plateau'] = pygame.image.load('images/plateau/sauvegarder_plateau.png')
-	IMAGES_DICT['background_plateau'] = pygame.transform.scale(IMAGES_DICT['background_plateau'],(espace,WINHEIGHT+15))
-	IMAGES_DICT['wooden_sign'] = pygame.transform.scale(IMAGES_DICT['wooden_sign'],(int(2.5*pixel_case),int(pixel_case)))
-
-	plateau.actualisation_matrice_surfaces()
 	
 	#Affichage du plateau et de tous les éléments qui ne changent pas au cours de la partie
 	# 
 	# gameDisplay = pygame.display.set_mode((WINWIDTH,WINHEIGHT))
 	# pygame.display.set_caption('La mine hantée')
 	#remplissage du fond en gris
-	gameDisplay.fill(BROWN)
-	#affichage du background
-	background_plateau = IMAGES_DICT['background_plateau']
-	background_plateauRect = background_plateau.get_rect(bottomleft=(0,WINHEIGHT+15))
-	gameDisplay.blit(background_plateau,background_plateauRect)
-	#affichage du panneau
-	wooden_sign = IMAGES_DICT['wooden_sign']
-	wooden_signRect = background_plateau.get_rect(topleft=(120,40))
-	gameDisplay.blit(wooden_sign,wooden_signRect)
+	gameDisplay.fill(GREY)
 	#dessin du quadrillage en haut à gauche
-	pygame.draw.line(gameDisplay,WHITE,(10,360),(490,360),1)
-	pygame.draw.line(gameDisplay,WHITE,(240,250),(240,470),1)
+	pygame.draw.line(gameDisplay,WHITE,(10,240),(490,240),5)
+	pygame.draw.line(gameDisplay,WHITE,(240,10),(240,485),5)
 	#écriture du titre au dessus de la carte jouable
-	fontObj = pygame.font.SysFont('Arial Rounded MT Bold',40)
-	gameDisplayDeTexte = fontObj.render('Carte',True,WHITE)
+	fontObj = pygame.font.SysFont('arial',40)
+	gameDisplayDeTexte = fontObj.render('Carte: ',True,WHITE)
 	monRectangleDeTexte	 = gameDisplayDeTexte.get_rect()
 	monRectangleDeTexte .topleft = (10,550)
 	gameDisplay.blit(gameDisplayDeTexte,monRectangleDeTexte)
@@ -702,8 +685,8 @@ def init_affichage_plateau(plateau):
 	gameDisplay.blit(IMAGES_DICT['fleche2'],(275,530))
 	#affichage du bouton sauvegarder // creation du rectangle
 	sauvegarder_plateau = IMAGES_DICT['sauvegarder_plateau']
-	rect_sauvegarder = sauvegarder_plateau.get_rect(topleft=(5,5))
-	gameDisplay.blit(sauvegarder_plateau, rect_sauvegarder)
+	rect_sauvegarder = sauvegarder_plateau.get_rect(topleft=(0,0))
+	gameDisplay.blit(sauvegarder_plateau, rect_sauvegarder)	
 
 
 	
@@ -711,11 +694,6 @@ def actualisation_affichage_plateau(plateau):
 	global espace, pixel_case, gameDisplay, WINWIDTH, WINHEIGHT, dico_joueurs
 	dimension = plateau.dimension
 	matrice = plateau.matrice
-
-	#ajouté pour le bug d'affichage sur mon ordi (clem)
-	WINWIDTH = 1200 # width of the program's window, in pixels
-	WINHEIGHT = 700 # height in pixels
-
 
 	#Parcours du plateau pour afficher toutes les cases
 	for ligne in range(dimension):
@@ -727,61 +705,48 @@ def actualisation_affichage_plateau(plateau):
 	#affichage de la carte jouable
 	carte_jouable = plateau.carte_jouable
 	dessine_carte(plateau,carte_jouable)
-	
-	#affichage du joueur actif
-	centre = (250,170)
-	fontObj_joueur_actif = pygame.font.SysFont('Arial Rounded MT Bold',20, bold = False)
-	gameDisplayDeTexte = fontObj_joueur_actif.render('Tour de jeu: ',True,WHITE)
-	monRectangleDeTexte = gameDisplayDeTexte.get_rect()
-	monRectangleDeTexte.center = centre
-	gameDisplay.blit(gameDisplayDeTexte,monRectangleDeTexte)
-	gameDisplayDeTexte = fontObj_joueur_actif.render('Joueur '+str(plateau.joueur_actif),True,WHITE)
-	monRectangleDeTexte = gameDisplayDeTexte.get_rect()
-	monRectangleDeTexte.center = (centre[0],centre[1]+18)
-	gameDisplay.blit(gameDisplayDeTexte,monRectangleDeTexte)
 
 	#affichage des données spécifiques à chaque joueur
-#	l=[(10,50),(255,50),(10,160),(255,160)] #liste des positions du texte
-#	m=[(170,30),(425,30),(170,140),(425,140)]
-	l=[(10,250),(255,250),(10,360),(255,360)] #liste des positions du texte
-	m=[(170,250),(425,250),(170,360),(425,360)]#liste des positions des images de joueur
-	fontObj = pygame.font.SysFont('Arial Rounded MT Bold',14, bold = True)
+	l=[(10,20),(255,20),(10,265),(255,265)] #liste des positions du texte
+	m=[(170,0),(425,0),(170,245),(425,245)]	
 	
 	nb_joueurs=plateau.nb_joueurs
 	for i in range (nb_joueurs):
-
-		id_joueur=plateau.liste_joueurs[i].id
-		gameDisplay.blit(IMAGES_DICT['chasseur'+str(id_joueur)],(m[i][0],m[i][1]))
-
-		gameDisplayDeTexte = fontObj.render('Joueur : '+str(id_joueur),True,WHITE)
+		gameDisplay.blit(IMAGES_DICT['chasseur'+str(plateau.liste_joueurs[i].id)],(m[i][0],m[i][1]))
+		fontObj = pygame.font.SysFont('arial',20)
+		
+		list=plateau.liste_joueurs[i].mission
+		mission = ', '.join(str(elem) for elem in list)
+		gameDisplayDeTexte = fontObj.render('Mission: '+str(mission),True,WHITE)
 		monRectangleDeTexte = gameDisplayDeTexte.get_rect()
 		monRectangleDeTexte.topleft = (l[i][0],l[i][1]+10)
-		gameDisplay.blit(gameDisplayDeTexte,monRectangleDeTexte)
-		
-		gameDisplayDeTexte = fontObj.render('Mission: '+str(plateau.liste_joueurs[i].mission),True,WHITE)
-		monRectangleDeTexte = gameDisplayDeTexte.get_rect()
-		monRectangleDeTexte.topleft = (l[i][0],l[i][1]+26)
 		gameDisplay.blit(gameDisplayDeTexte,monRectangleDeTexte)
 		
 		
 		gameDisplayDeTexte = fontObj.render('Nombre de pépites: '+str(plateau.liste_joueurs[i].pepite),True,WHITE)
 		monRectangleDeTexte = gameDisplayDeTexte.get_rect()
-		monRectangleDeTexte.topleft = (l[i][0],l[i][1]+42)
+		monRectangleDeTexte.topleft = (l[i][0],l[i][1]+55)
 		gameDisplay.blit(gameDisplayDeTexte,monRectangleDeTexte)
 		
-		gameDisplayDeTexte = fontObj.render('Fantômes attrapés: '+str(plateau.liste_joueurs[i].fantomes),True,WHITE)
+		list=plateau.liste_joueurs[i].fantomes
+		fantomes = ', '.join(str(elem) for elem in list)
+		gameDisplayDeTexte = fontObj.render('Fantômes attrapés: '+str(fantomes),True,WHITE)
 		monRectangleDeTexte = gameDisplayDeTexte.get_rect()
-		monRectangleDeTexte.topleft = (l[i][0],l[i][1]+58)
+		monRectangleDeTexte.topleft = (l[i][0],l[i][1]+110)
 		gameDisplay.blit(gameDisplayDeTexte,monRectangleDeTexte)
-		
-		gameDisplayDeTexte = fontObj.render('Joker: ' +str(plateau.liste_joueurs[i].joker),True,WHITE)
+			
+		if plateau.liste_joueurs[i].joker: 
+			joker=str('Disponible')
+		else :
+			joker=str('Indisponible')
+		gameDisplayDeTexte = fontObj.render('Joker: '+str(joker),True,WHITE)
 		monRectangleDeTexte = gameDisplayDeTexte.get_rect()
-		monRectangleDeTexte.topleft = (l[i][0],l[i][1]+74)
+		monRectangleDeTexte.topleft = (l[i][0],l[i][1]+155)
 		gameDisplay.blit(gameDisplayDeTexte,monRectangleDeTexte)
 		
 		gameDisplayDeTexte = fontObj.render('Score: ' +str(plateau.liste_joueurs[i].score),True,WHITE)
 		monRectangleDeTexte = gameDisplayDeTexte.get_rect()
-		monRectangleDeTexte.topleft = (l[i][0],l[i][1]+90)
+		monRectangleDeTexte.topleft = (l[i][0],l[i][1]+195)
 		gameDisplay.blit(gameDisplayDeTexte,monRectangleDeTexte)
 			
 		
@@ -816,81 +781,181 @@ def carte_jouable_jouee(plateau):
 	pygame.draw.line(gameDisplay,RED,topright,bottomleft,10)
 	return plateau
 
-def affichage_fin_jeu(plateau):
-	#CLASSEMENT
-	joueurs = plateau.liste_joueurs
-	sorted(joueurs, key=lambda joueurs:joueurs.score)
-	classement = [joueur.id for joueur in joueurs]
+def affichage_fin_jeu():
+	#écriture du titre au dessus de la carte jouable
+	fontObj = pygame.font.SysFont('arial',40)
+	gameDisplayDeTexte = fontObj.render("C'est gagné ! ",True,WHITE)
+	monRectangleDeTexte	 = gameDisplayDeTexte.get_rect()
+	monRectangleDeTexte .topleft = (WINWIDTH/2,WINHEIGHT/2)
+	gameDisplay.blit(gameDisplayDeTexte,monRectangleDeTexte)
+	for event in pygame.event.get():
+		if event.type == pygame.KEYDOWN:
+			terminate()
+		
+## JOKER 
+def i_a(noeudDepart, noeudFinal,plateau):
+	"""Boucle while principale :
+		- on met le meilleur noeud de la liste ouverte dans la liste fermée
+		et on appelle la fonction qui va chercher ses voisins
+		- lorsque le meilleur noeud correspond au noeud final on sort de la
+		boucle pour afficher le chemin
+		- si le noeud final n'est pas atteint et si la liste des noeud à
+		explorer est vide : il n'y a pas de solution"""
+	global listeOuverte,listeFermee,noeudCourant
+	
+	listeOuverte = []
+	listeFermee = []
+	
+	#Initialistion du noeudCourant avec le noeud de départ
+	noeudCourant = noeudDepart
+	noeudCourant.coutH = Distance(noeudCourant,noeudFinal,plateau)
+	noeudCourant.coutF = noeudCourant.coutH
+	#On le met dans la liste ouverte
+	listeOuverte.append(noeudCourant)
+	
+	while (not(noeudCourant.x_position == noeudFinal.x_position and noeudCourant.y_position == noeudFinal.y_position)
+		and listeOuverte != []):
+		# On choisi le meilleur noeud ce sera le noeud courant
+		noeudCourant = MeilleurNoeud()
+		listeFermee.append(noeudCourant)
+		listeOuverte.remove(noeudCourant)
+		
+		# On va chercher les voisins du noeud courant
+		AjouterCasesAdjacentes(noeudCourant,noeudFinal,plateau)
+	RemonterListe()
+	return(listeFermee)
+	
+		
+	# # on a atteint le noeud final
+	# if noeudCourant.x_position == noeudFinal.x_position and noeudCourant.y_position == noeudFinal.y_position :
+	# 	RemonterListe()
+	# # On a pas atteint le noeud final et il n'y a plus de noeud à explorer
+	# elif listeOuverte == []:
+	# 	print('===========================================')
+	# 	print('PAS DE SOLUTION')
 
-	#initialisation des variables d'affichage
-	if len(joueurs) == 2:
-		x1 = WINWIDTH/8*3
-		x2 = WINWIDTH/8*5
-		X= [x1,x2]
-	elif len(joueurs) == 3:
-		x1 = WINWIDTH/8*2
-		x2 = WINWIDTH/8*4
-		x3 = WINWIDTH/8*6
-		X= [x1,x2,x3]
-	elif len(joueurs) == 4:
-		x1 = WINWIDTH/8*1
-		x2 = WINWIDTH/8*3
-		x3 = WINWIDTH/8*5
-		x4 = WINWIDTH/8*7
-		X = [x1,x2,x3,x4]
+def MeilleurNoeud():
+	"""Fonction qui renvoie le meilleur noeud de la liste ouverte en fonction
+	de son cout en F (plus long chemin)"""
+	cout = 5000000
+	noeud = None
+	for n in listeOuverte:
+		if n.coutF < cout:
+			cout = n.coutF
+			noeud = n
+	#print(noeud.x_position)
+	return noeud
+	
+def AjouterCasesAdjacentes(noeudCourant,noeudFinal,plateau):
+	"""Fonction qui cherche tous les voisins possibles au noeud courant passé
+	en parametre."""
+	global listeOuverte,listeFermee
+	dimension = plateau.dimension
+	deplacements=['haut','bas','gauche','droite']
+	#L=[]
+	for direction in deplacements:
+		if direction=='haut':
+			dir=(0,-1)
+		elif direction=='bas':
+			dir=(0,1)
+		elif direction=='gauche':
+			dir=(-1,0)
+		else: 
+			dir=(1,0)
+		coordSuivante=(noeudCourant.x_position+dir[0],noeudCourant.y_position+dir[1])
+		#On vérifie qu'on sort pas de la matrice
+		if coordSuivante[0] >= 0 and coordSuivante[0] <= dimension-1 and coordSuivante[1] >= 0 and coordSuivante[1] <= dimension-1:
+			#On vérifie que le voisin n'est pas un obstacle
+			if plateau.deplacement_possible(noeudCourant.x_position,noeudCourant.y_position, direction):
+				#On crée un objet noeud au coordonnée du voisin
+				noeudTemp = cl.Noeud(coordSuivante)
+				#print('noeudTemppos')
+				#print(noeudTemp.x_position)
+				#Le noeud courant sera son parent
+				noeudTemp.parent = noeudCourant
+				#L.append(noeudTemp)
+				#print('L')
+				#print(L)
+				#On s'assure que ce voisin ne fait pas deja parti de la liste fermée
+				if noeudTemp.DejaPresentDansListe(listeFermee)==False:
+					#On calcule ses couts
+					noeudTemp.coutG = noeudTemp.parent.coutG + Distance(noeudTemp,noeudTemp.parent,plateau)
+					# print('coutG')
+					# print(noeudTemp.coutG)
+					noeudTemp.coutH = Distance(noeudTemp,noeudFinal,plateau)
+					# print('coutH')
+					# print(noeudTemp.coutH)
+					noeudTemp.coutF = noeudTemp.coutG + noeudTemp.coutH
+					# print('coutF')
+					# print(noeudTemp.coutF)
+					#On regarde si ce voisin est déjà présent dans la liste ouverte
+					n = noeudTemp.DejaPresentDansListe(listeOuverte)
+					if n != False:
+						#On compare son cout G avec celui de la liste ouverte(n)
+						if noeudTemp.coutG < n.coutG:
+							#Si il est inférieur on remplace les couts et le parent de n par ceux du voisin récemment trouvé
+							n.parent = noeudCourant
+							n.coutG = noeudTemp.coutG
+							n.coutH = noeudTemp.coutH
+							n.coutF = noeudTemp.coutF
+							#Dans le cas contraire on ne change rien...
+	
+					#Ce voisin n'est pas déja présent dans le liste ouverte et donc on l'y ajoute
+					else:
+						listeOuverte.append(noeudTemp)
+						# print('listeouverte')
+						# print(listeOuverte[0].x_position)
+						# print(listeOuverte[-1].x_position)
+						# print('fin')
 
-	#AFFICHAGE
-	marge = int(WINWIDTH/10)
-	gameDisplay.fill(BLACK)
-	#affichage du titre
-	titreRect = IMAGES_DICT['titre_classement'].get_rect(center=(HALF_WINWIDTH, HALF_WINHEIGHT/5))
-	gameDisplay.blit(IMAGES_DICT['titre_classement'], titreRect)
 
-	#initialisation des Rect et affichage des images des persos
-	c1Rect = IMAGES_DICT['big_chasseur1'].get_rect(center=(x1, WINHEIGHT/3))
-	c2Rect = IMAGES_DICT['big_chasseur2'].get_rect(center=(x2, WINHEIGHT/3))
-	gameDisplay.blit(IMAGES_DICT['big_chasseur1'],c1Rect)
-	gameDisplay.blit(IMAGES_DICT['big_chasseur2'],c2Rect)
-	if len(joueurs) > 2 :
-		c3Rect = IMAGES_DICT['big_chasseur3'].get_rect(center=(x3, WINHEIGHT/3))
-		gameDisplay.blit(IMAGES_DICT['big_chasseur3'],c3Rect)
+def Distance(noeud1,noeud2,plateau):
+	"""Calcule des distances entre 2 noeuds suivant l'heuristique choisie"""
+	a =  noeud2.x_position - noeud1.x_position
+	b =  noeud2.y_position - noeud1.y_position
+	#print('Distance')
+	#print((a*a) + (b*b))
+	#return ((a*a) + (b*b))
+	carte = plateau.matrice[noeud2.x_position,noeud2.y_position]
+	pepite= carte.pepite
+	if pepite: 
+		return ((a*a) + (b*b))
+	else: 
+		return ((a*a) + (b*b)+2)
 
-	if len(joueurs) > 3:
-		c4Rect = IMAGES_DICT['big_chasseur4'].get_rect(center=(x4, WINHEIGHT/3))
-		gameDisplay.blit(IMAGES_DICT['big_chasseur4'],c4Rect)
 
-	#affichage de la couronne
-	couronneRect = IMAGES_DICT['couronne'].get_rect(midbottom=(X[classement[0]-1]-15, c1Rect.top+10))
-	gameDisplay.blit(IMAGES_DICT['couronne'],couronneRect)
-
-	#affichage des scores
-	fontObj = pygame.font.SysFont('Arial Rounded MT Bold',20,bold=True)
-	for joueur in range(len(joueurs)):
-		titreScoreRect = IMAGES_DICT['titre_score'].get_rect(center=(X[joueur-1], HALF_WINHEIGHT))
-		gameDisplay.blit(IMAGES_DICT['titre_score'], titreScoreRect)
-		gameDisplayDeTexte=fontObj.render(str(plateau.liste_joueurs[joueur-1].score),True,WHITE)
-		scoreRect =gameDisplayDeTexte.get_rect(topright=(X[joueur-1], HALF_WINHEIGHT+50))
-		gameDisplay.blit(gameDisplayDeTexte,scoreRect)
-
-	#affichage du bouton QUITTER
-	bouton_retourRect = IMAGES_DICT['bouton_retour_menu'].get_rect(center=(HALF_WINWIDTH, WINHEIGHT/4*3))
-	bouton_retour_hoverRect = IMAGES_DICT['bouton_retour_menu_hover'].get_rect(center=(HALF_WINWIDTH, WINHEIGHT/4*3))
-
-	while True:
-		mouse = pygame.mouse.get_pos() #recupere la position de la souris
-		clic = pygame.mouse.get_pressed() #recupere l'évenement clic de la souris (clic[0] = clic gauche, clic[1] = clic droit)
-
- 		#mise en place de l'affichage et de la surbrillance des boutons
-		if bouton_retourRect.collidepoint(mouse):
-			gameDisplay.blit(IMAGES_DICT['bouton_retour_menu_hover'],bouton_retour_hoverRect)
-		else:
-			gameDisplay.blit(IMAGES_DICT['bouton_retour_menu'],bouton_retourRect)
-
-		for event in pygame.event.get():
-			if clic[0] and bouton_retourRect.collidepoint(mouse):
-				terminate()
-			if event.type == pygame.QUIT:
-				terminate()
-				# Display the gameDisplay contents to the actual screen.
-		pygame.display.update()
-		FPSCLOCK.tick()
+def RemonterListe():
+	"""Le but est atteint, cette fonction remonte le chemin d'ascendant en
+	ascendant en partant du dernier noeud courant choisi"""
+	size = 20
+	chemin = []
+	n = listeFermee[-1]
+	chemin.append(n)
+	n = n.parent
+		### on crée des ronds pour chaque noeud appartenant au chemin gagnant
+	while n.parent != n:
+		chemin.append(n)
+		x_pixel = espace + n.x_position * pixel_case + n.x_position*marge/2
+		x=int(x_pixel+pixel_case/2)
+		y_pixel = n.y_position * pixel_case + n.y_position*marge/2
+		y=int(y_pixel+pixel_case/2)
+		pygame.draw.circle(gameDisplay, (70,225,70,100), (x,y),int(size), 8)
+	n = n.parent
+	chemin.append(n)
+	x_pixel = espace + n.x_position * pixel_case + n.x_position*marge/2
+	x=int(x_pixel+pixel_case/2)
+	y_pixel = n.y_position * pixel_case + n.y_position*marge/2
+	y=int(y_pixel+pixel_case/2)
+	pygame.draw.circle(gameDisplay, (70,225,70,100), (x,y),int(size), 8)
+	
+def position_fantome(plateau, id_fantome):
+	dimension=plateau .dimension 
+	for x in range (dimension):
+		for y in range (dimension):
+			carte = plateau.matrice[x,y]
+			fantome = carte.fantome
+			if carte.fantome != 0:
+				num_fantome = fantome.numero
+				if num_fantome == id_fantome:
+					return carte.position
+					
