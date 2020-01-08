@@ -19,12 +19,13 @@ WHITE = (255, 255, 255)
 BLACK = (0,0,0)
 GREY=(50,50,50)
 RED = (139,0,0)
+BROWN = (46,23,0)
 
 espace = 500
 pixel_case=int(WINHEIGHT/7)
 
 FPSCLOCK = pygame.time.Clock()
-gameDisplay = pygame.display.set_mode((WINWIDTH+15, WINHEIGHT+15),pygame.RESIZABLE)
+gameDisplay = pygame.display.set_mode((WINWIDTH+15, WINHEIGHT+15),pygame.RESIZABLE,32)
 
 #dictionnaire contenant l'ensemble des images du jeu
 IMAGES_DICT = {'titre': pygame.image.load('images/ecran_titre/titre.png'),
@@ -34,6 +35,7 @@ IMAGES_DICT = {'titre': pygame.image.load('images/ecran_titre/titre.png'),
 			   'bouton_reprendre_hover':pygame.image.load('images/ecran_titre/bouton_reprendre_bright.png'),
 			   'bouton_quitter':pygame.image.load('images/ecran_titre/bouton_quitter.png'),
 			   'bouton_quitter_hover':pygame.image.load('images/ecran_titre/bouton_quitter_bright.png'),
+			   'background_accueil':pygame.image.load('images/ecran_titre/background.png'),
 			   #########images de l'écran du choix des paramètres du nouveau jeu#############
 			   'choix_nouv_jeu':pygame.image.load('images/init_jeu/Nouveau jeu.png'),
 			   'choix_dimensions':pygame.image.load('images/init_jeu/Dimensions du plateau.png'),
@@ -56,7 +58,7 @@ IMAGES_DICT = {'titre': pygame.image.load('images/ecran_titre/titre.png'),
 			   'choix_valider':pygame.image.load('images/init_jeu/bouton_valider.png'),
 			   #########images plateau de jeu##########
 			 'wooden_sign':pygame.image.load('images/plateau/wooden_sign.png').convert_alpha(),
-			 'background_plateau':pygame.image.load('images/plateau/mine_hantee.jpg'),
+			 'background_plateau':pygame.image.load('images/plateau/mine_hantee.png'),
 			 'pepite': pygame.image.load('images/persos/pepite.png'),
 			 'chasseur1': pygame.image.load('images/persos/chasseur1.png'),
 			 'chasseur2': pygame.image.load('images/persos/chasseur2.png'),
