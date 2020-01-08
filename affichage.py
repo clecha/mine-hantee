@@ -707,6 +707,11 @@ def actualisation_affichage_plateau(plateau):
 	dimension = plateau.dimension
 	matrice = plateau.matrice
 
+	#ajouté pour le bug d'affichage sur mon ordi (clem)
+	WINWIDTH = 1200 # width of the program's window, in pixels
+	WINHEIGHT = 700 # height in pixels
+
+
 	#Parcours du plateau pour afficher toutes les cases
 	for ligne in range(dimension):
 		for col in range(dimension):

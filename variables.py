@@ -22,10 +22,12 @@ RED = (139,0,0)
 
 espace = 500
 pixel_case=int(WINHEIGHT/7)
+print("1",HALF_WINWIDTH, HALF_WINHEIGHT)
+# screen_info = pygame.display.Info()
 
 FPSCLOCK = pygame.time.Clock()
-gameDisplay = pygame.display.set_mode((WINWIDTH+15, WINHEIGHT+15),pygame.RESIZABLE)
-
+gameDisplay = pygame.display.set_mode((WINWIDTH+15, WINHEIGHT+15),pygame.RESIZABLE,32)
+print('2',WINWIDTH, WINHEIGHT)
 #dictionnaire contenant l'ensemble des images du jeu
 IMAGES_DICT = {'titre': pygame.image.load('images/ecran_titre/titre.png'),
 			   'bouton_nouv_jeu':pygame.image.load('images/ecran_titre/bouton_nouv_jeu.png'),
