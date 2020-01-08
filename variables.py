@@ -35,6 +35,7 @@ IMAGES_DICT = {'titre': pygame.image.load('images/ecran_titre/titre.png'),
 			   'bouton_reprendre_hover':pygame.image.load('images/ecran_titre/bouton_reprendre_bright.png'),
 			   'bouton_quitter':pygame.image.load('images/ecran_titre/bouton_quitter.png'),
 			   'bouton_quitter_hover':pygame.image.load('images/ecran_titre/bouton_quitter_bright.png'),
+			   'background_accueil':pygame.image.load('images/ecran_titre/background.png'),
 			   #########images de l'écran du choix des paramètres du nouveau jeu#############
 			   'choix_nouv_jeu':pygame.image.load('images/init_jeu/Nouveau jeu.png'),
 			   'choix_dimensions':pygame.image.load('images/init_jeu/Dimensions du plateau.png'),

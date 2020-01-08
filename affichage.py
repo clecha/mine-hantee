@@ -29,17 +29,22 @@ def affiche_accueil():
 	gameDisplay.fill(BLACK)
 	
 	#affichage du titre
-	titreRect = IMAGES_DICT['titre'].get_rect(center=(HALF_WINWIDTH, HALF_WINHEIGHT/4))
+	titreRect = IMAGES_DICT['titre'].get_rect(center=(500+(700)/2, HALF_WINHEIGHT/4))
 	gameDisplay.blit(IMAGES_DICT['titre'], titreRect)
 	
 	#initilisation des variables pour les boutons
-	bouton_nouveau_jeuRect = IMAGES_DICT['bouton_nouv_jeu'].get_rect(center=(HALF_WINWIDTH, HALF_WINHEIGHT/4+150))
-	bouton_nouveau_jeu_hoverRect = IMAGES_DICT['bouton_nouv_jeu_hover'].get_rect(center=(HALF_WINWIDTH, HALF_WINHEIGHT/4+150))
-	bouton_reprendreRect = IMAGES_DICT['bouton_reprendre'].get_rect(center=(HALF_WINWIDTH, HALF_WINHEIGHT/4+250))
-	bouton_reprendre_hoverRect = IMAGES_DICT['bouton_reprendre_hover'].get_rect(center=(HALF_WINWIDTH, HALF_WINHEIGHT/4+250))
-	bouton_quitterRect = IMAGES_DICT['bouton_quitter'].get_rect(center=(HALF_WINWIDTH, HALF_WINHEIGHT/4+350))
-	bouton_quitter_hoverRect = IMAGES_DICT['bouton_quitter_hover'].get_rect(center=(HALF_WINWIDTH, HALF_WINHEIGHT/4+350))
+	bouton_nouveau_jeuRect = IMAGES_DICT['bouton_nouv_jeu'].get_rect(center=(500+(700)/2, HALF_WINHEIGHT/4+150))
+	bouton_nouveau_jeu_hoverRect = IMAGES_DICT['bouton_nouv_jeu_hover'].get_rect(center=(500+(700)/2, HALF_WINHEIGHT/4+150))
+	bouton_reprendreRect = IMAGES_DICT['bouton_reprendre'].get_rect(center=(500+(700)/2, HALF_WINHEIGHT/4+250))
+	bouton_reprendre_hoverRect = IMAGES_DICT['bouton_reprendre_hover'].get_rect(center=(500+(700)/2, HALF_WINHEIGHT/4+250))
+	bouton_quitterRect = IMAGES_DICT['bouton_quitter'].get_rect(center=(500+(700)/2, HALF_WINHEIGHT/4+350))
+	bouton_quitter_hoverRect = IMAGES_DICT['bouton_quitter_hover'].get_rect(center=(500+700/2, HALF_WINHEIGHT/4+350))
 	
+	#affichage de l'image de fond
+	background_accueil = IMAGES_DICT['background_accueil']
+	background_accueilRect = background_accueil.get_rect(topleft=(0,0))
+	gameDisplay.blit(background_accueil,background_accueilRect) 
+
 	while True: # Main loop for the start screen.
 		
 		mouse = pygame.mouse.get_pos() #recupere la position de la souris
@@ -630,7 +635,7 @@ def dessine_carte(Plateau, Carte, position = None,hover=False):
 	if fantome != 0 :
 		id_fantome = fantome.numero
 		gameDisplay.blit(IMAGES_DICT['fantome'],(x_pixel+2,y_pixel+2))
-		fontObj = pygame.font.SysFont('Arial Rounded MT Bold',20,bold=True)
+		fontObj = pygame.font.SysFont('Arial Rounded MT Bold',20,bold=False)
 		gameDisplayDeTexte=fontObj.render(str(id_fantome),True,BLACK)
 		monRectangleDeTexte=gameDisplayDeTexte.get_rect()
 		monRectangleDeTexte.topleft = (x_pixel+3*pixel_case/10,y_pixel+5)
@@ -684,8 +689,8 @@ def init_affichage_plateau(plateau):
 	wooden_signRect = background_plateau.get_rect(topleft=(120,40))
 	gameDisplay.blit(wooden_sign,wooden_signRect)
 	#dessin du quadrillage en haut à gauche
-	pygame.draw.line(gameDisplay,WHITE,(10,360),(490,360),5)
-	pygame.draw.line(gameDisplay,WHITE,(240,250),(240,470),5)
+	pygame.draw.line(gameDisplay,WHITE,(10,360),(490,360),1)
+	pygame.draw.line(gameDisplay,WHITE,(240,250),(240,470),1)
 	#écriture du titre au dessus de la carte jouable
 	fontObj = pygame.font.SysFont('Arial Rounded MT Bold',40)
 	gameDisplayDeTexte = fontObj.render('Carte',True,WHITE)
@@ -697,7 +702,7 @@ def init_affichage_plateau(plateau):
 	gameDisplay.blit(IMAGES_DICT['fleche2'],(275,530))
 	#affichage du bouton sauvegarder // creation du rectangle
 	sauvegarder_plateau = IMAGES_DICT['sauvegarder_plateau']
-	rect_sauvegarder = sauvegarder_plateau.get_rect(topleft=(0,0))
+	rect_sauvegarder = sauvegarder_plateau.get_rect(topleft=(5,5))
 	gameDisplay.blit(sauvegarder_plateau, rect_sauvegarder)
 
 

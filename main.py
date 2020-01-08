@@ -29,12 +29,8 @@ def main():
 	global IMAGES_DICT, FPSCLOCK, gameDisplay
 	#INITIALISATION DE PYGAME
 	pygame.init()
-	WINWIDTH = 1200 # width of the program's window, in pixels
-	WINHEIGHT = 700 # height in pixels
-	HALF_WINWIDTH = int(WINWIDTH / 2)
-	HALF_WINHEIGHT = int(WINHEIGHT / 2)
 	# FPSCLOCK = pygame.time.Clock()
-	print('4',WINWIDTH, WINHEIGHT)
+	
 	#FENETRE
 #	gameDisplay = pygame.display.set_mode((0, 0), pygame.FULLSCREEN, pygame.RESIZABLE)
 	# gameDisplay = pygame.display.set_mode((WINWIDTH+15, WINHEIGHT+15),pygame.RESIZABLE) 
