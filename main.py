@@ -300,8 +300,7 @@ def tour_de_jeu(plateau):
 		plateau.changer_joueur()
 		tour_de_jeu(plateau)
 	else:# a completer avec l'ecran de fin de jeu
-		pygame.quit()
-		sys.exit(0)
+		affichage_fin_jeu(plateau)
 
 def qui_a_gagne(plateau):
 	"""Definit qui a gagne.
