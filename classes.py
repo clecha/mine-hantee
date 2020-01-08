@@ -623,13 +623,7 @@ class Noeud():
 		self.coutH = 0
 		self.parent = self
 		
-	def AjouterListeFermee(self):
-		"""Ajoute un noeud à la liste fermée et le supprime de la liste ouverte"""
-		global listeOuverte,listeFermee
-		
-		listeFermee.append(self)
-		listeOuverte.remove(self)
-	
+
 	def DejaPresentDansListe(self,liste):
 		"""Fonction qui cherche si un noeud est deja présent dans un liste"""
 		for n in liste:
