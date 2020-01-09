@@ -22,6 +22,8 @@ from variables import *
 from affichage import *
 import shelve as sh
 from datetime import datetime
+from IA import *
+import copy
 
 def main():
 	'''Fonction principale du jeu
@@ -29,11 +31,11 @@ def main():
 	global IMAGES_DICT, FPSCLOCK, gameDisplay
 	#INITIALISATION DE PYGAME
 	pygame.init()
-	# FPSCLOCK = pygame.time.Clock()
+	FPSCLOCK = pygame.time.Clock()
 	
 	#FENETRE
 #	gameDisplay = pygame.display.set_mode((0, 0), pygame.FULLSCREEN, pygame.RESIZABLE)
-	# gameDisplay = pygame.display.set_mode((WINWIDTH+15, WINHEIGHT+15),pygame.RESIZABLE) 
+	gameDisplay = pygame.display.set_mode((WINWIDTH, WINHEIGHT),pygame.RESIZABLE) 
 	#titre de la fenetre
 	pygame.display.set_caption('La Mine Hantée')
 	
@@ -47,7 +49,6 @@ def main():
 		envie_de_jouer = True
 		#création du plateau
 		plateau = cl.Plateau(parametres_jeu['dimension'],parametres_jeu['nb_joueurs'])
-		# affichage_fin_jeu(plateau)
 	elif choix_accueil == 'reprendre_jeu':
 		envie_de_jouer, plateau = interface_choix_sauvegarde()
 	elif choix_accueil == 'quitter':
@@ -56,8 +57,6 @@ def main():
 	if envie_de_jouer:
 		#redimension des surfaces des images des cartes
 		redimension_images(plateau.dimension)
-		#actualisation de la matrice des surfaces
-		plateau.actualisation_matrice_surfaces()
 		#la partie continue de jouer tant que l'utilisateur n'a pas choisi d'arrêter de jouer ou que la partie n'est pas finie
 		#la valeur d'envie_de_jouer est actualisée lors du tour de jeu:
 		#si l'utilisateur décide de fermer la fenetre, cette valeur devient False
@@ -93,7 +92,7 @@ def tour_de_jeu(plateau):
 	retour_au_jeu = False
 	#rectangle associé au bouton de sauvegarde:
 	bouton_sauvegarde = IMAGES_DICT['sauvegarder_plateau'].get_rect(topleft=(0,0))
-
+	
 	#PREMIERE PARTIE DU TOUR : INSERTION DE LA CARTE (OBLIGATOIRE)
 	while not plateau.insertion_carte_faite and envie_de_jouer and not affichage_sauvegarde:
 		#initialisation du plateau (fond sans les cartes)
@@ -113,15 +112,27 @@ def tour_de_jeu(plateau):
 		for event in pygame.event.get():
 			if event.type == pygame.KEYDOWN: #JOKER
 				if event.key == pygame.K_j:
-					chasseur = plateau.liste_joueurs[plateau.joueur_actif-1] #chasseur actif
-					noeudDepart=cl.Noeud(chasseur.position)
-					if chasseur.mission != []:
-						id_fantome=chasseur.mission[0]
-					else:
-						id_fantome=int(fantomes_attrapes[-1]+1)
-					noeudFinal=cl.Noeud(position_fantome(plateau,id_fantome))
-					i_a(noeudDepart,noeudFinal,plateau)
+					print(a_star_insertion(plateau)[0])
+					carte_a_inserer=plateau.carte_jouable
+					carte_a_inserer.orientation=a_star_insertion(plateau)[1]
+				# 	carte_a_inserer_position=a_star_insertion[0]
+				# 	plateau.inserer_carte(carte_a_inserer,carte_a_inserer_position)
+				# 	deplacement_optimal=a_star_insertion[2]
+				# 	dessine_chemin(deplacement_optimal)
+				# 	nouvelle_position_x=deplacement_optimal[-1].x_position
+				# 	nouvelle_position_y=deplacement_optimal[-1].y_position
+				# 	print('nouvelle position')
+				# 	print(nouvelle_position_x)
+				# 	print(nouvelle_position_y)
+				elif event.key == pygame.K_RETURN:
 					chasseur.joker=False
+					x,y = chasseur.position[0],chasseur.position[1]
+					carte_depart = plateau.matrice[x,y]
+					carte_depart.chasseur.remove(chasseur.id)
+				# 	carte_visee=plateau.matrice[nouvelle_position_x,nouvelle_position_y]
+				# 	carte_visee.chasseur += [chasseur.id]
+				# 	chasseur.position = nouvelle_position_x,nouvelle_position_y
+				# 	plateau.changer_joueur()
 			elif event.type == pygame.MOUSEBUTTONUP:
 				if event.button == 3: #si clic droit
 					#Test (provisoire)
@@ -291,7 +302,7 @@ def tour_de_jeu(plateau):
 			retour_au_jeu = False
 		pygame.display.update()
 		FPSCLOCK.tick()
-	#TEST PARTIE GAGNE)
+	#TEST PARTIE GAGNE
 	if plateau.fantomes_restants == 0:
 		plateau.gagne = True
 	else:
@@ -300,13 +311,22 @@ def tour_de_jeu(plateau):
 		plateau.changer_joueur()
 		tour_de_jeu(plateau)
 	else:# a completer avec l'ecran de fin de jeu
-		affichage_fin_jeu(plateau)
+		pygame.quit()
+		sys.exit(0)
 
 def qui_a_gagne(plateau):
 	"""Definit qui a gagne.
 	Arguments:
 		plateau {Plateau()} -- plateau du jeu
 	"""
+	# scores_joueurs = []
+	# for joueur in plateau.liste_joueurs:
+	# 	scores_joueurs += [(joueur, joueur.score)]
+	# sorted(scores_joueurs, key=lambda scores_joueurs: scores_joueurs[1])
+	# print(scores_joueurs)
+	# dico = {}
+	# for rang in range(1,plateau.nb_joueurs+1):
+	# 	dico[rang] = scores_joueurs[rang-1][0]
 	joueurs = plateau.liste_joueurs
 	sorted(joueurs, key=lambda joueurs:joueurs.score)
 	# print([joueur.id for joueur in joueurs])
