@@ -102,7 +102,7 @@ def tour_de_jeu(plateau):
 	
 	# si le joueur est une IA
 	if joueur_actif.IA:
-		print('yo')
+		print('CPU playing')
 		position_insertion_optimale, orientation_optimale, deplacement_optimal = IA_MCTS(plateau)
 		
 		### GESTION DE L'INSERTION DE LA CARTE
