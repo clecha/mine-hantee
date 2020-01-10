@@ -65,9 +65,6 @@ def main():
 		#si l'utilisateur décide de fermer la fenetre, cette valeur devient False
 			#actualisation_affichage_plateau(plateau)
 		tour_de_jeu(plateau)
-		
-		pygame.display.update()
-		FPSCLOCK.tick()
 
 		#JEU TERMINE
 		if plateau.gagne:
@@ -75,6 +72,7 @@ def main():
 			print('CLASSEMENT')
 			for rang in range(1,plateau.nb_joueurs+1):
 				print(str(rang)+'. ', podium[rang-1])
+			affichage_fin_jeu(plateau)
 			# afficher_fin_jeu()
 	pygame.quit()
 	sys.exit(0)
@@ -330,7 +328,7 @@ def tour_de_jeu(plateau):
 			plateau.changer_joueur()
 			tour_de_jeu(plateau)
 		else:# a completer avec l'ecran de fin de jeu
-			print('yop')
+			affichage_fin_jeu(plateau)
 			pygame.quit()
 			sys.exit(0)
 

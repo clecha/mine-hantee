@@ -861,7 +861,7 @@ def affichage_fin_jeu(plateau):
 
 	#affichage de la couronne
 	couronneRect = IMAGES_DICT['couronne'].get_rect(midbottom=(X[classement[0]-1]-15, c1Rect.top+10))
-	gameDisplay.blit(IMAGES_DICT['couronne'],couronneRect)
+	# gameDisplay.blit(IMAGES_DICT['couronne'],couronneRect)
 
 	#affichage des scores
 	fontObj = pygame.font.SysFont('Arial Rounded MT Bold',20,bold=True)
