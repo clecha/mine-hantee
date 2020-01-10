@@ -48,8 +48,9 @@ def main():
 		envie_de_jouer = True
 		#liste indiquant si les joueurs sont un ordinateur ou non
 		liste_joueur_IA = [parametres_jeu['joueur1'],parametres_jeu['joueur2'],parametres_jeu['joueur3'],parametres_jeu['joueur4']]
+		niveauIA = parametres_jeu['niveauIA']
 		#création du plateau
-		plateau = cl.Plateau(parametres_jeu['dimension'],parametres_jeu['nb_joueurs'],liste_joueur_IA)
+		plateau = cl.Plateau(parametres_jeu['dimension'],parametres_jeu['nb_joueurs'],liste_joueur_IA,niveauIA)
 	elif choix_accueil == 'reprendre_jeu':
 		envie_de_jouer, plateau = interface_choix_sauvegarde()
 	elif choix_accueil == 'quitter':
@@ -100,10 +101,28 @@ def tour_de_jeu(plateau):
 	id_joueur_actif = plateau.joueur_actif
 	joueur_actif = plateau.liste_joueurs[id_joueur_actif-1]
 	
+	afficher_joker = False
+	
 	# si le joueur est une IA
 	if joueur_actif.IA:
+		if plateau.niveauIA == 1:
+			profondeur_insertion = 1
+			nb_simulations_insertion = 30
+			profondeur_chemin = 2
+			nb_simulations_chemins = 30
+		elif plateau.niveau_IA == 2:
+			profondeur_insertion = 2
+			nb_simulations_insertion = 40
+			profondeur_chemin = 3
+			nb_simulations_chemins = 40
+		elif plateau.niveauIA == 3:
+			profondeur_insertion = 3
+			nb_simulations_insertion = 50
+			profondeur_chemin = 5
+			nb_simulations_chemins = 50
+		
 		print('CPU playing')
-		position_insertion_optimale, orientation_optimale, deplacement_optimal = IA_MCTS(plateau)
+		position_insertion_optimale, orientation_optimale, deplacement_optimal = IA_MCTS(plateau, profondeur_insertion, nb_simulations_insertion, profondeur_chemin, nb_simulations_chemins)
 		
 		### GESTION DE L'INSERTION DE LA CARTE
 		#modification de l'orientation de la carte
@@ -129,6 +148,9 @@ def tour_de_jeu(plateau):
 			#initialisation du plateau (fond sans les cartes)
 			init_affichage_plateau(plateau)
 			actualisation_affichage_plateau(plateau)
+			#affichage du joker si utilisé:
+			if afficher_joker:
+				affichage_deplacement([position_insertion_optimale], plateau, (200,50,50, 100), afficher_joker)
 			#Gestion du highlight des cartes cliquables sur le plateau
 			#Coordonnées de la souris
 			x_souris, y_souris = pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]
@@ -142,16 +164,28 @@ def tour_de_jeu(plateau):
 			#Gestion des events
 			for event in pygame.event.get():
 				if event.type == pygame.KEYDOWN: #JOKER
-					if event.key == pygame.K_j:
-						chasseur = plateau.liste_joueurs[plateau.joueur_actif-1] #chasseur actif
-						noeudDepart=cl.Noeud(chasseur.position)
-						if chasseur.mission != []:
-							id_fantome=chasseur.mission[0]
-						else:
-							id_fantome=int(fantomes_attrapes[-1]+1)
-						noeudFinal=cl.Noeud(position_fantome(plateau,id_fantome))
-						i_a(noeudDepart,noeudFinal,plateau)
-						chasseur.joker=False
+					if event.key == pygame.K_j and joueur_actif.joker:
+						#déploiement du joker
+						position_insertion_optimale, orientation_optimale, deplacement_optimal = IA_MCTS(plateau)
+						print('Position insertion optimale: ['+ str(int(position_insertion_optimale[0]+1))+','+str(int(position_insertion_optimale[1]+1))+']')
+		
+						### GESTION DE L'INSERTION DE LA CARTE
+						#modification de l'orientation de la carte
+						carte_jouable = plateau.carte_jouable
+						carte_jouable.orientation = orientation_optimale
+#						#insertion de la carte
+#						plateau.inserer_carte(carte_jouable, position_insertion_optimale)
+#						
+#						#GESTION DU DEPLACEMENT
+#						if len(deplacement_optimal)>0:
+#							validation_deplacement(plateau,deplacement_optimal)
+#							
+#						plateau.insertion_carte_faite = True
+#						plateau.deplacement_fait = True
+#						plateau.changer_joueur()
+#						tour_de_jeu(plateau)
+						afficher_joker = True
+						joueur_actif.joker=False
 				elif event.type == pygame.MOUSEBUTTONUP:
 					if event.button == 3: #si clic droit
 						#Test (provisoire)
@@ -166,10 +200,16 @@ def tour_de_jeu(plateau):
 					if event.button ==1:
 						for index, surface_carte in np.ndenumerate(plateau.matrice_surfaces):
 							carte = plateau.matrice[index[0],index[1]]
-							if surface_carte.collidepoint(x_souris, y_souris):
+							if surface_carte.collidepoint(x_souris, y_souris):					
 								if (carte.position[0] in [0,plateau.dimension-1] or carte.position[1] in [0,plateau.dimension-1]) and carte.bougeable:
 									plateau.inserer_carte(plateau.carte_jouable,carte.position)
 									plateau.insertion_carte_faite = True
+									#dans le cas où le joker a été activé
+									if afficher_joker:
+										#si l'insertion n'est pas faite dans l'endroit optimal, on n'affiche pas le déplacement optimal
+										if [index[0],index[1]] != [position_insertion_optimale[0],position_insertion_optimale[1]]:
+											afficher_joker = False
+
 					#TOURNER CARTE JOUABLE
 					#création des Rect associées associées avec get_rect()
 					position_fleche1, position_fleche2 = IMAGES_DICT['fleche1'].get_rect().move((150,530)),IMAGES_DICT['fleche2'].get_rect().move((275,530))
@@ -212,6 +252,9 @@ def tour_de_jeu(plateau):
 			init_affichage_plateau(plateau)
 			actualisation_affichage_plateau(plateau)
 			carte_jouable_jouee(plateau) #affiche une croix sur la carte jouable pour montrer qu'elle a déjà été insérée
+			#affichage du joker si utilisé:
+			if afficher_joker:
+				affichage_deplacement(deplacement_optimal, plateau, (50,50,50, 100), afficher_joker)
 			#Coordonnées de la souris
 			x_souris, y_souris = pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]
 			#affichage de la trace du déplacement du joueur 
@@ -330,7 +373,7 @@ def tour_de_jeu(plateau):
 			plateau.changer_joueur()
 			tour_de_jeu(plateau)
 		else:# a completer avec l'ecran de fin de jeu
-			print('yop')
+			affichage_fin_jeu()
 			pygame.quit()
 			sys.exit(0)
 
