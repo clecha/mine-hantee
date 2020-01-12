@@ -47,7 +47,7 @@ class Plateau(object):
 	deplacer_joueur
 
 	"""
-	def __init__(self, dimension = 7, nb_joueurs = 4, liste_joueur_IA=[1,1,0,0]):
+	def __init__(self, dimension = 7, nb_joueurs = 4, liste_joueur_IA=[1,1,0,0],niveauIA=3):
 		#liste joueur IA = 0 si le joueur n'existe pas, 1 si c'est un joueur, 2 si c'est un ordi
 		self.fantomes_restants = 21
 		self.dimension = dimension #dimension du plateau
@@ -57,6 +57,7 @@ class Plateau(object):
 		self.deplacement_fait = False
 		self.insertion_carte_faite = False
 		self.gagne = False
+		self.niveauIA = niveauIA
 		if dimension % 2 == 1 and dimension >= 7:
 		#création de la matrice contenant les objets cartes
 			self.matrice = np.zeros((dimension,dimension), dtype= object)

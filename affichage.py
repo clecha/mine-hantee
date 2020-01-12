@@ -94,10 +94,8 @@ def init_jeu():
 	
 	dimension = 7
 	nb_joueurs = 2
-	joueur1 = 1
-	joueur2 = 1
-	joueur3 = 0
-	joueur4 = 0
+	liste_joueurs=[1,1,0,0]
+	choixniveauIA = 1
 	
 	#Initalisation des variables images pour les boutons
 	bouton_dim7 = IMAGES_DICT['choix_dim7']
@@ -110,6 +108,10 @@ def init_jeu():
 	bouton_j3_ordi = IMAGES_DICT['choix_ordi_grey']
 	bouton_j4_hum = IMAGES_DICT['choix_hum'] 
 	bouton_j4_ordi = IMAGES_DICT['choix_ordi_grey']
+	niveau_IA = IMAGES_DICT['niveau_IA']
+	niveau1 = IMAGES_DICT['niveau1hover']
+	niveau2 = IMAGES_DICT['niveau2']
+	niveau3 = IMAGES_DICT['niveau3']
 	
 	bouton_ajoute_joueur = IMAGES_DICT['choix_ajouter_joueur']
 	bouton_retire_joueur = IMAGES_DICT['choix_retirer_joueur_dis'] 
@@ -141,6 +143,20 @@ def init_jeu():
 			bouton_ajoute_joueur = IMAGES_DICT['choix_ajouter_joueur_dis']
 		else:
 			 bouton_ajoute_joueur = IMAGES_DICT['choix_ajouter_joueur']
+			 
+		 #changement des images des boutons IA
+		if choixniveauIA == 1:
+			niveau1 = IMAGES_DICT['niveau1hover']
+		else:
+			niveau1 = IMAGES_DICT['niveau1']
+		if choixniveauIA == 2:
+			niveau2 = IMAGES_DICT['niveau2hover']
+		else:
+			niveau2 = IMAGES_DICT['niveau2']
+		if choixniveauIA == 3:
+			niveau3 = IMAGES_DICT['niveau3hover']
+		else:
+			niveau3 = IMAGES_DICT['niveau3']
 		
 
 		#Initilisation des surfaces boutons humain/ordi
@@ -152,6 +168,11 @@ def init_jeu():
 		boutonj3ordiRect = bouton_j3_ordi.get_rect(topright=(HALF_WINWIDTH+dimRect.width+boutonj3humRect.width+10, HALF_WINHEIGHT/2+75*3))	
 		boutonj4humRect = bouton_j4_hum.get_rect(topright=(HALF_WINWIDTH+dimRect.width, HALF_WINHEIGHT/2+75*4))
 		boutonj4ordiRect = bouton_j4_ordi.get_rect(topright=(HALF_WINWIDTH+dimRect.width+boutonj4humRect.width+10, HALF_WINHEIGHT/2+75*4))
+		niveau_IARect = niveau_IA.get_rect(topright=(HALF_WINWIDTH+dimRect.width-25, WINHEIGHT-100))
+		niveau1Rect = niveau1.get_rect(topright=(HALF_WINWIDTH+dimRect.width+30, WINHEIGHT-100))
+		niveau2Rect = niveau2.get_rect(topright=(HALF_WINWIDTH+dimRect.width+30+niveau1Rect.width+3, WINHEIGHT-100))
+		niveau3Rect= niveau3.get_rect(topright=(HALF_WINWIDTH+dimRect.width+30+2*niveau1Rect.width+6, WINHEIGHT-100))
+		
 		#Initialisatioon de la surface boutons dimension
 		dim7Rect = bouton_dim7.get_rect(topright=(HALF_WINWIDTH+dimRect.width, HALF_WINHEIGHT/2))
 		dim9Rect = bouton_dim9.get_rect(topright=(HALF_WINWIDTH+dim7Rect.width+dimRect.width+10, HALF_WINHEIGHT/2))						   
@@ -181,6 +202,12 @@ def init_jeu():
 		#Affichage du bouton valider
 		gameDisplay.blit(bouton_valider,validerRect)
 
+		#affichage du choix de l'IA:
+		if 2 in liste_joueurs:
+			gameDisplay.blit(niveau_IA,niveau_IARect)
+			gameDisplay.blit(niveau1,niveau1Rect)
+			gameDisplay.blit(niveau2,niveau2Rect)
+			gameDisplay.blit(niveau3,niveau3Rect)
 
 		#Affichage conditionnel des joueurs 3 et4 
 		if nb_joueurs >= 3:
@@ -215,61 +242,71 @@ def init_jeu():
 					if bouton_j1_hum ==	 IMAGES_DICT['choix_hum_grey']:
 						bouton_j1_hum = IMAGES_DICT['choix_hum']
 						bouton_j1_ordi = IMAGES_DICT['choix_ordi_grey']
-						joueur1 = 1
+						liste_joueurs[0] = 1
 				if boutonj1ordiRect.collidepoint(mouse):
 					if bouton_j1_ordi ==  IMAGES_DICT['choix_ordi_grey']:
 						bouton_j1_ordi = IMAGES_DICT['choix_ordi']
 						bouton_j1_hum =	 IMAGES_DICT['choix_hum_grey']
-						joueur1 = 2
+						liste_joueurs[0] = 2
 			   
 				#clicabilité joueur 2
 				if boutonj2humRect.collidepoint(mouse):
 					if bouton_j2_hum ==	 IMAGES_DICT['choix_hum_grey']:
 						bouton_j2_hum = IMAGES_DICT['choix_hum']
 						bouton_j2_ordi = IMAGES_DICT['choix_ordi_grey']
-						joueur2 = 1
+						liste_joueurs[1] = 1
 				if boutonj2ordiRect.collidepoint(mouse):
 					if bouton_j2_ordi ==  IMAGES_DICT['choix_ordi_grey']:
 						bouton_j2_ordi = IMAGES_DICT['choix_ordi']
 						bouton_j2_hum =	 IMAGES_DICT['choix_hum_grey']
-						joueur2 = 2
+						liste_joueurs[1] = 2
 
 				#Event joueur 3
 				if boutonj3humRect.collidepoint(mouse):
 					if bouton_j3_hum ==	 IMAGES_DICT['choix_hum_grey']:
 						bouton_j3_hum = IMAGES_DICT['choix_hum']
 						bouton_j3_ordi = IMAGES_DICT['choix_ordi_grey']
-						joueur3 = 1
+						liste_joueurs[2] = 1
 				if boutonj3ordiRect.collidepoint(mouse):
 					if bouton_j3_ordi ==  IMAGES_DICT['choix_ordi_grey']:
 						bouton_j3_ordi = IMAGES_DICT['choix_ordi']
 						bouton_j3_hum =	 IMAGES_DICT['choix_hum_grey']
-						joueur3 = 2
+						liste_joueurs[2] = 2
 				
 				#Events joueur 4
 				if boutonj4humRect.collidepoint(mouse):
 					if bouton_j4_hum ==	 IMAGES_DICT['choix_hum_grey']:
 						bouton_j4_hum = IMAGES_DICT['choix_hum']
 						bouton_j4_ordi = IMAGES_DICT['choix_ordi_grey']
-						joueur4 = 1
+						liste_joueurs[3] = 1
 				if boutonj4ordiRect.collidepoint(mouse):
 					if bouton_j4_ordi ==  IMAGES_DICT['choix_ordi_grey']:
 						bouton_j4_ordi = IMAGES_DICT['choix_ordi']
 						bouton_j4_hum =	 IMAGES_DICT['choix_hum_grey']
-						joueur4 = 2
+						liste_joueurs[3] = 2
 				
 				#Gestion du nombre de joueurs
 				if ajoutJoueurRect.collidepoint(mouse) and nb_joueurs != 4:
 					nb_joueurs += 1
+					liste_joueurs[nb_joueurs-1]=1
 					print('nb',nb_joueurs)
 				if retireJoueurRect.collidepoint(mouse) and nb_joueurs != 2:
 					nb_joueurs -= 1
+					liste_joueurs[nb_joueurs]=0
 					print('nbm',nb_joueurs)
+				
+				#gestion du choix de l'IA:
+				if niveau1Rect.collidepoint(mouse):
+					choixniveauIA = 1
+				if niveau2Rect.collidepoint(mouse):
+					choixniveauIA = 2
+				if niveau3Rect.collidepoint(mouse):
+					choixniveauIA = 3
 				
 				#Gestion du bouton valider // Renvoie True si le joueur accepte un nouveau jeu
 				if validerRect.collidepoint(mouse):
-					print('dim,j1,j2,j3,j4:',dimension, joueur1, joueur2, joueur3, joueur4)
-					return {'dimension':dimension, 'nb_joueurs':nb_joueurs,'joueur1': joueur1, 'joueur2':joueur2, 'joueur3':joueur3, 'joueur4':joueur4}
+					print('dim,j1,j2,j3,j4:',dimension, liste_joueurs)
+					return {'dimension':dimension, 'nb_joueurs':nb_joueurs,'joueur1': liste_joueurs[0], 'joueur2':liste_joueurs[1], 'joueur3':liste_joueurs[2], 'joueur4':liste_joueurs[3], 'niveauIA':choixniveauIA}
 			if event.type == pygame.QUIT:
 				terminate()
 			elif event.type == pygame.KEYDOWN:
@@ -749,11 +786,15 @@ def actualisation_affichage_plateau(plateau):
 	
 	nb_joueurs=plateau.nb_joueurs
 	for i in range (nb_joueurs):
-
-		id_joueur=plateau.liste_joueurs[i].id
+		
+		joueur=plateau.liste_joueurs[i]
+		id_joueur = joueur.id
 		gameDisplay.blit(IMAGES_DICT['chasseur'+str(id_joueur)],(m[i][0],m[i][1]))
-
-		gameDisplayDeTexte = fontObj.render('Joueur : '+str(id_joueur),True,WHITE)
+		
+		if joueur.IA:
+			gameDisplayDeTexte = fontObj.render('Joueur '+str(id_joueur)+' (CPU)',True,WHITE)
+		else:
+			gameDisplayDeTexte = fontObj.render('Joueur '+str(id_joueur),True,WHITE)
 		monRectangleDeTexte = gameDisplayDeTexte.get_rect()
 		monRectangleDeTexte.topleft = (l[i][0],l[i][1]+10)
 		gameDisplay.blit(gameDisplayDeTexte,monRectangleDeTexte)
@@ -785,19 +826,31 @@ def actualisation_affichage_plateau(plateau):
 		gameDisplay.blit(gameDisplayDeTexte,monRectangleDeTexte)
 			
 		
-def affichage_deplacement(liste_cartes, plateau):
+def affichage_deplacement(liste_cartes, plateau, color =(50,205,50, 100), afficher_joker = False):
 	global gameDisplay, pixel_case
 	#VERIFICATION DE LA VALIDITE DU DEPLACEMENT
 	size = 20
-	for carte in liste_cartes:
-		# position_carte = carte.position
-		x_position, y_position = position_pixel(carte,carte.position)
-		# print('aa',x_position, y_position)
-		position_cercle = (int(x_position+pixel_case/2),int(y_position+pixel_case/2))
-		# print('bb',int(x_position-pixel_case/2),int(y_position-pixel_case/2))
-		# surface = plateau.matrice_surfaces[carte.position[0],carte.position[1]]
-		# print('s',surface.top, surface.left)
-		pygame.draw.circle(gameDisplay, (50,205,50, 100), position_cercle,int(size), 8)
+	if afficher_joker:
+		marge = 5
+		for carte in liste_cartes:
+			x_position = espace + carte[0] * pixel_case + carte[0]*marge/2
+			y_position = carte[1] * pixel_case + carte[1]*marge/2
+			# print('aa',x_position, y_position)
+			position_cercle = (int(x_position+pixel_case/2),int(y_position+pixel_case/2))
+			# print('bb',int(x_position-pixel_case/2),int(y_position-pixel_case/2))
+			# surface = plateau.matrice_surfaces[carte.position[0],carte.position[1]]
+			# print('s',surface.top, surface.left)
+			pygame.draw.circle(gameDisplay, color, position_cercle,int(size), 8)
+	else:
+		for carte in liste_cartes:
+			# position_carte = carte.position
+			x_position, y_position = position_pixel(carte,carte.position)
+			# print('aa',x_position, y_position)
+			position_cercle = (int(x_position+pixel_case/2),int(y_position+pixel_case/2))
+			# print('bb',int(x_position-pixel_case/2),int(y_position-pixel_case/2))
+			# surface = plateau.matrice_surfaces[carte.position[0],carte.position[1]]
+			# print('s',surface.top, surface.left)
+			pygame.draw.circle(gameDisplay, color, position_cercle,int(size), 8)
 	return plateau
 
 def carte_jouable_jouee(plateau):
