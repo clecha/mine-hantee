@@ -289,11 +289,9 @@ def init_jeu():
 				if ajoutJoueurRect.collidepoint(mouse) and nb_joueurs != 4:
 					nb_joueurs += 1
 					liste_joueurs[nb_joueurs-1]=1
-					print('nb',nb_joueurs)
 				if retireJoueurRect.collidepoint(mouse) and nb_joueurs != 2:
 					nb_joueurs -= 1
 					liste_joueurs[nb_joueurs]=0
-					print('nbm',nb_joueurs)
 				
 				#gestion du choix de l'IA:
 				if niveau1Rect.collidepoint(mouse):
@@ -305,7 +303,6 @@ def init_jeu():
 				
 				#Gestion du bouton valider // Renvoie True si le joueur accepte un nouveau jeu
 				if validerRect.collidepoint(mouse):
-					print('dim,j1,j2,j3,j4:',dimension, liste_joueurs)
 					return {'dimension':dimension, 'nb_joueurs':nb_joueurs,'joueur1': liste_joueurs[0], 'joueur2':liste_joueurs[1], 'joueur3':liste_joueurs[2], 'joueur4':liste_joueurs[3], 'niveauIA':choixniveauIA}
 			if event.type == pygame.QUIT:
 				terminate()
@@ -612,7 +609,6 @@ def dessine_carte(Plateau, Carte, position = None,hover=False):
 
 	#obtention des coordonnées en pixels de la carte
 	x_pixel, y_pixel = position_pixel(Carte, position)
-#	print(x_pixel, y_pixel)
 	if Carte.bougeable == False:
 		couleur = '_dark'
 	elif Carte.position[0] in [0,Plateau.dimension-1] or Carte.position[1] in [0,Plateau.dimension-1] :
@@ -712,9 +708,6 @@ def init_affichage_plateau(plateau):
 	plateau.actualisation_matrice_surfaces()
 	
 	#Affichage du plateau et de tous les éléments qui ne changent pas au cours de la partie
-	# 
-	# gameDisplay = pygame.display.set_mode((WINWIDTH,WINHEIGHT))
-	# pygame.display.set_caption('La mine hantée')
 	#remplissage du fond en gris
 	gameDisplay.fill(BROWN)
 	#affichage du background
@@ -778,8 +771,6 @@ def actualisation_affichage_plateau(plateau):
 	gameDisplay.blit(gameDisplayDeTexte,monRectangleDeTexte)
 
 	#affichage des données spécifiques à chaque joueur
-#	l=[(10,50),(255,50),(10,160),(255,160)] #liste des positions du texte
-#	m=[(170,30),(425,30),(170,140),(425,140)]
 	l=[(10,250),(255,250),(10,360),(255,360)] #liste des positions du texte
 	m=[(170,250),(425,250),(170,360),(425,360)]#liste des positions des images de joueur
 	fontObj = pygame.font.SysFont('Arial Rounded MT Bold',14, bold = True)
@@ -835,21 +826,12 @@ def affichage_deplacement(liste_cartes, plateau, color =(50,205,50, 100), affich
 		for carte in liste_cartes:
 			x_position = espace + carte[0] * pixel_case + carte[0]*marge/2
 			y_position = carte[1] * pixel_case + carte[1]*marge/2
-			# print('aa',x_position, y_position)
 			position_cercle = (int(x_position+pixel_case/2),int(y_position+pixel_case/2))
-			# print('bb',int(x_position-pixel_case/2),int(y_position-pixel_case/2))
-			# surface = plateau.matrice_surfaces[carte.position[0],carte.position[1]]
-			# print('s',surface.top, surface.left)
 			pygame.draw.circle(gameDisplay, color, position_cercle,int(size), 8)
 	else:
 		for carte in liste_cartes:
-			# position_carte = carte.position
 			x_position, y_position = position_pixel(carte,carte.position)
-			# print('aa',x_position, y_position)
 			position_cercle = (int(x_position+pixel_case/2),int(y_position+pixel_case/2))
-			# print('bb',int(x_position-pixel_case/2),int(y_position-pixel_case/2))
-			# surface = plateau.matrice_surfaces[carte.position[0],carte.position[1]]
-			# print('s',surface.top, surface.left)
 			pygame.draw.circle(gameDisplay, color, position_cercle,int(size), 8)
 	return plateau
 
@@ -857,10 +839,6 @@ def carte_jouable_jouee(plateau):
 	global gameDisplay, pixel_case
 	carte = plateau.carte_jouable
 	marge = 5
-	# x_topleft, y_topleft = position_pixel(carte)
-	# x_topright, y_topright = x_topleft+pixel_case, y_topleft
-	# x_bottomleft, y_bottomleft = x_topleft, y_topleft+pixel_case
-	# x-bottomright, y_bottomright = x_topleft+pixel_case, y_topleft+pixel_case
 	topleft = position_pixel(carte)
 	topright = (topleft[0]+pixel_case-marge, topleft[1]+marge)
 	bottomright = (topright[0]-marge,topright[1]+pixel_case-marge)
@@ -914,7 +892,6 @@ def affichage_fin_jeu(plateau):
 
 	#affichage de la couronne
 	couronneRect = IMAGES_DICT['couronne'].get_rect(midbottom=(X[classement[0]-1]-15, c1Rect.top+10))
-	# gameDisplay.blit(IMAGES_DICT['couronne'],couronneRect)
 
 	#affichage des scores
 	fontObj = pygame.font.SysFont('Arial Rounded MT Bold',20,bold=True)

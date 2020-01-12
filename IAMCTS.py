@@ -197,10 +197,6 @@ def IA_MCTS(plateau, profondeur_insertion = 2, nb_simulations_insertion = 50, pr
 	orientation_optimale = clef_dico_suggeree[2]
 	evaluation_insertion =  dico_insertions[clef_dico_suggeree]
 	
-#	print('position_insertion_optimale: ', position_insertion_optimale)
-#	print('orientation_optimale',orientation_optimale)
-#	print('evaluation_insertion',evaluation_insertion)
-	
 	### PARTIE 2: RECHERCHE DU CHEMIN OPTIMAL A PARTIR DU POINT D'INSERTION OPTIMAL
 	nb_tours_joueur = plateau.nb_joueurs*profondeur_chemin
 	plateau_rch_chemin = copy.deepcopy(plateau)
@@ -238,10 +234,4 @@ def IA_MCTS(plateau, profondeur_insertion = 2, nb_simulations_insertion = 50, pr
 	clef_dico_chemin_suggere = max(dico_score_chemin, key = dico_score_chemin.get)
 	deplacement_optimal = liste_chemins[clef_dico_chemin_suggere]
 	evaluation_chemin =  dico_score_chemin[clef_dico_chemin_suggere]
-#	print('deplacement_optimal: ', deplacement_optimal)
-#	print('evaluation_chemin: ', evaluation_chemin)
 	return position_insertion_optimale, orientation_optimale, deplacement_optimal
-
-### TEST
-#plateau = Plateau(dimension = 7, nb_joueurs = 4)
-#IA_MCTS(plateau, profondeur_insertion = 3, nb_simulations_insertion = 50, profondeur_chemin = 5, nb_simulations_chemins = 50)

@@ -30,11 +30,8 @@ def main():
 	global IMAGES_DICT, FPSCLOCK, gameDisplay
 	#INITIALISATION DE PYGAME
 	pygame.init()
-	# FPSCLOCK = pygame.time.Clock()
 	
 	#FENETRE
-#	gameDisplay = pygame.display.set_mode((0, 0), pygame.FULLSCREEN, pygame.RESIZABLE)
-	# gameDisplay = pygame.display.set_mode((WINWIDTH+15, WINHEIGHT+15),pygame.RESIZABLE) 
 	#titre de la fenetre
 	pygame.display.set_caption('La Mine Hantée')
 	
@@ -70,11 +67,7 @@ def main():
 		#JEU TERMINE
 		if plateau.gagne:
 			podium = qui_a_gagne(plateau)
-			print('CLASSEMENT')
-			for rang in range(1,plateau.nb_joueurs+1):
-				print(str(rang)+'. ', podium[rang-1])
 			affichage_fin_jeu(plateau)
-			# afficher_fin_jeu()
 	pygame.quit()
 	sys.exit(0)
 	
@@ -108,7 +101,7 @@ def tour_de_jeu(plateau):
 			nb_simulations_insertion = 30
 			profondeur_chemin = 2
 			nb_simulations_chemins = 30
-		elif plateau.niveau_IA == 2:
+		elif plateau.niveauIA == 2:
 			profondeur_insertion = 2
 			nb_simulations_insertion = 40
 			profondeur_chemin = 3
@@ -165,23 +158,11 @@ def tour_de_jeu(plateau):
 					if event.key == pygame.K_j and joueur_actif.joker:
 						#déploiement du joker
 						position_insertion_optimale, orientation_optimale, deplacement_optimal = IA_MCTS(plateau)
-						print('Position insertion optimale: ['+ str(int(position_insertion_optimale[0]+1))+','+str(int(position_insertion_optimale[1]+1))+']')
 		
 						### GESTION DE L'INSERTION DE LA CARTE
 						#modification de l'orientation de la carte
 						carte_jouable = plateau.carte_jouable
 						carte_jouable.orientation = orientation_optimale
-#						#insertion de la carte
-#						plateau.inserer_carte(carte_jouable, position_insertion_optimale)
-#						
-#						#GESTION DU DEPLACEMENT
-#						if len(deplacement_optimal)>0:
-#							validation_deplacement(plateau,deplacement_optimal)
-#							
-#						plateau.insertion_carte_faite = True
-#						plateau.deplacement_fait = True
-#						plateau.changer_joueur()
-#						tour_de_jeu(plateau)
 						afficher_joker = True
 						joueur_actif.joker=False
 				elif event.type == pygame.MOUSEBUTTONUP:
@@ -266,20 +247,15 @@ def tour_de_jeu(plateau):
 						#TEST
 						for index, surface_carte in np.ndenumerate(plateau.matrice_surfaces):
 							carte1 = plateau.matrice[index[0],index[1]]
-							# print('cartes', carte1.position)
 							if surface_carte.collidepoint(x_souris, y_souris):
 								print('test4',carte1.__dict__)
 					#SAUVEGARDE
 					elif bouton_sauvegarde.collidepoint(x_souris,y_souris):
-						print('o')
 						#la variable affichage sauvegarde permet d'arrêter l'affichage des cartes
 						affichage_sauvegarde = True
 				if event.type == pygame.KEYDOWN:
-					#gestion du changement de perso (provisoire):
+					#gestion du changement de pers:
 					#JOUEUR ACTIF
-					# if event.key == pygame.K_p:
-					# 	plateau.changer_joueur()
-					# 	print('Le joueur actif est le',plateau.joueur_actif)
 	
 					#Traduction de l'event (déplacement) en chaine de caractère
 					if event.key in [pygame.K_UP,pygame.K_DOWN,pygame.K_LEFT,pygame.K_RIGHT]:
@@ -321,7 +297,6 @@ def tour_de_jeu(plateau):
 					elif event.key == pygame.K_ESCAPE: #annulation du déplacement
 						#remise des fantomes sur les cartes
 						while cartes_fantomes_pris != []:
-							# print(cartes_fantomes_pris)
 							num_fantome = chasseur.fantomes[-1]
 							cartes_fantomes_pris[-1].fantome = cl.Fantome(num_fantome) #recréation des fantomes
 							#remise à jour des fantomes restants
@@ -382,7 +357,6 @@ def qui_a_gagne(plateau):
 	"""
 	joueurs = plateau.liste_joueurs
 	sorted(joueurs, key=lambda joueurs:joueurs.score)
-	# print([joueur.id for joueur in joueurs])
 	return [joueur.id for joueur in joueurs]
 
 def deplacement_licite(plateau,id_joueur,suivi_deplacement,direction,derniere_direction):
@@ -422,8 +396,6 @@ def sauvegarde(plateau):
 	#recuperation de la date et de l'heure pour nommer le fichier
 	now = datetime.now()
 	nom_sauvegarde = now.strftime("%d-%m-%Y %Hh%Mm%Ss")
-	print(nom_sauvegarde)
-	print(type(nom_sauvegarde))
 	
 	#Ouverture du fichier de sauvegarde
 	save = sh.open(nom_sauvegarde)
@@ -444,7 +416,7 @@ def delete_sauvegarde(nom_sauvegarde):
 		dirname, filename = os.path.split(os.path.abspath(sys.argv[0]))
 		os.chdir(dirname)
 		
-		#délétion des fichiers avec le nom de sauvegarde
+		#delétion des fichiers avec le nom de sauvegarde
 		for file in glob.glob(nom_sauvegarde+'.*'):
 			os.remove(file)
 
@@ -487,9 +459,3 @@ def terminate():
 	
 if __name__ == '__main__':
 	main()
-	
-
-#test
-# plateau = cl.Plateau(11,3)
-# init_affichage_plateau()
-# actualisation_affichage_plateau()
